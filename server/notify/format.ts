@@ -39,7 +39,7 @@ export interface DigestOptions {
 }
 
 export function formatPropertyLine(p: PropertyRow, opts: Pick<DigestOptions, "appBaseUrl" | "center">): string {
-  const icon = p.kind === "plot" ? "🟩" : "🏠";
+  const icon = p.kind === "plot" ? "🟦" : "🏠";
   const kindLabel = p.kind === "plot" ? "Działka" : "Dom";
   const head = [kindLabel, p.areaM2 !== null ? formatArea(p.areaM2, p.kind) : null].filter(Boolean).join(" · ");
   const extras: string[] = [];

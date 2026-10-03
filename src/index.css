@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  --color-plot: #059669;
-  --color-plot-soft: #d1fae5;
+  --color-plot: #0284c7;
+  --color-plot-soft: #e0f2fe;
   --color-house: #d97706;
   --color-house-soft: #fef3c7;
 }

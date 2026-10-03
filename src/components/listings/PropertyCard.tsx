@@ -71,7 +71,7 @@ export const PropertyCard = memo(function PropertyCard({ item, isNew, distanceKm
       <div className="mb-1 flex flex-wrap items-center gap-1.5">
         <KindBadge kind={item.kind} />
         {item.favorite && <Badge className="bg-amber-100 text-amber-700">★ ulubione</Badge>}
-        {isNew && <Badge className="bg-sky-100 text-sky-700">nowe</Badge>}
+        {isNew && <Badge className="bg-violet-100 text-violet-700">nowe</Badge>}
         {item.hidden && <Badge className="bg-slate-200 text-slate-600">ukryte</Badge>}
         {item.ignored && <Badge className="bg-slate-200 text-slate-600" title="Wszystkie ogłoszenia tej nieruchomości są ignorowane">ignorowane</Badge>}
         {!item.isActive && <Badge className="bg-rose-100 text-rose-700">wygasłe</Badge>}

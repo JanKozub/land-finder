@@ -22,7 +22,7 @@ export interface MapViewProps {
   onToggleIgnored: (item: PropertyDto) => void;
 }
 
-const COLORS = { plot: "#059669", house: "#d97706", hidden: "#94a3b8", inactive: "#e11d48", favorite: "#ca8a04", focus: "#0f172a" } as const;
+const COLORS = { plot: "#38bdf8", house: "#d97706", hidden: "#94a3b8", inactive: "#e11d48", favorite: "#ca8a04", focus: "#0f172a" } as const;
 
 function toBounds(b: LatLngBounds): Bounds {
   return { south: b.getSouth(), west: b.getWest(), north: b.getNorth(), east: b.getEast() };

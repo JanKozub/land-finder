@@ -72,7 +72,7 @@ export function MapPage() {
         <div className="flex items-center gap-2 border-b border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">
           <span className="font-semibold text-plot">{counts.plots} działek</span>
           <span className="font-semibold text-house">{counts.houses} domów</span>
-          {counts.fresh > 0 && <span className="font-semibold text-sky-700">{counts.fresh} nowych</span>}
+          {counts.fresh > 0 && <span className="font-semibold text-violet-700">{counts.fresh} nowych</span>}
           {counts.unlocated > 0 && <span title="Oferty bez współrzędnych nie są widoczne na mapie">{counts.unlocated} bez mapy</span>}
           {query.isFetching && <span className="ml-auto animate-pulse">odświeżanie…</span>}
         </div>
