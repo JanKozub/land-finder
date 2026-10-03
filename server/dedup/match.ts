@@ -1,0 +1,135 @@
+import { and, between, eq, gt, isNotNull, isNull, ne, or, sql } from "drizzle-orm";
+import { bboxAround } from "../../shared/geo";
+import type { Db } from "../db/client";
+import { listings, properties, type ListingRow } from "../db/schema";
+import { decide, type DedupCandidate } from "./decide";
+import { normalizeAdvertiser } from "./normalize";
+import { aggregateListings, recomputeProperty } from "./recompute";
+
+const CANDIDATE_BBOX_KM = 10;
+const INACTIVE_GRACE_DAYS = 180;
+const CANDIDATE_LIMIT = 300;
+
+export function toCandidate(row: ListingRow): DedupCandidate {
+  return {
+    kind: row.kind,
+    lat: row.lat,
+    lon: row.lon,
+    locationPrecision: row.locationPrecision,
+    locationRadiusKm: row.locationRadiusKm,
+    areaM2: row.areaM2,
+    plotAreaM2: row.plotAreaM2,
+    price: row.price,
+    titleNorm: row.titleNorm,
+    advertiserKey: normalizeAdvertiser(row.advertiserName, row.advertiserId),
+    city: row.city,
+  };
+}
+
+export interface AssignOptions {
+  suppressNotifications?: boolean;
+  now?: Date;
+}
+
+export interface AssignResult {
+  propertyId: number | null;
+  created: boolean;
+  matchedListingId: number | null;
+  reason: string;
+}
+
+export async function createPropertyFromListing(db: Db, row: ListingRow, opts: AssignOptions = {}): Promise<number> {
+  const now = opts.now ?? new Date();
+  const agg = aggregateListings([row]);
+  const [created] = await db
+    .insert(properties)
+    .values({ ...agg, notifiedAt: opts.suppressNotifications ? now : null, createdAt: now, updatedAt: now })
+    .returning({ id: properties.id });
+  await db.update(listings).set({ propertyId: created!.id, updatedAt: now }).where(eq(listings.id, row.id));
+  return created!.id;
+}
+
+async function findCandidates(db: Db, L: ListingRow, now: Date): Promise<ListingRow[]> {
+  const conds = [
+    ne(listings.id, L.id),
+    eq(listings.kind, L.kind),
+    isNotNull(listings.propertyId),
+    or(eq(listings.isActive, true), gt(listings.deactivatedAt, new Date(now.getTime() - INACTIVE_GRACE_DAYS * 86_400_000)))!,
+    sql`NOT EXISTS (SELECT 1 FROM dedup_exclusions e WHERE e.listing_id_a = LEAST(${L.id}::bigint, ${listings.id}) AND e.listing_id_b = GREATEST(${L.id}::bigint, ${listings.id}))`,
+  ];
+  if (L.lat !== null && L.lon !== null) {
+    const box = bboxAround(L.lat, L.lon, CANDIDATE_BBOX_KM);
+    const sameCity = L.city ? sql`lower(${listings.city}) = lower(${L.city})` : sql`false`;
+    conds.push(
+      or(
+        and(isNull(listings.lat), sameCity),
+        and(between(listings.lat, box.minLat, box.maxLat), between(listings.lon, box.minLon, box.maxLon)),
+      )!,
+    );
+  } else if (L.city) {
+    conds.push(sql`lower(${listings.city}) = lower(${L.city})`);
+  } else {
+    return [];
+  }
+  if (L.areaM2 !== null) {
+    conds.push(or(isNull(listings.areaM2), between(listings.areaM2, L.areaM2 * 0.94, L.areaM2 * 1.06))!);
+  }
+  return db.select().from(listings).where(and(...conds)).limit(CANDIDATE_LIMIT);
+}
+
+/**
+ * Attaches the listing to an existing property when the dedup rules say it is the same offer,
+ * otherwise creates a new property. Pinned listings keep their assignment.
+ */
+export async function assignProperty(db: Db, listingId: number, opts: AssignOptions = {}): Promise<AssignResult> {
+  const now = opts.now ?? new Date();
+  const [L] = await db.select().from(listings).where(eq(listings.id, listingId)).limit(1);
+  if (!L) return { propertyId: null, created: false, matchedListingId: null, reason: "missing" };
+  if (L.pinned && L.propertyId !== null) {
+    await recomputeProperty(db, L.propertyId, now);
+    return { propertyId: L.propertyId, created: false, matchedListingId: null, reason: "pinned" };
+  }
+
+  const me = toCandidate(L);
+  const candidates = await findCandidates(db, L, now);
+  const perProperty = new Map<number, { count: number; score: number; listingId: number; reason: string }>();
+  for (const c of candidates) {
+    const d = decide(me, toCandidate(c));
+    if (!d.match || c.propertyId === null) continue;
+    const cur = perProperty.get(c.propertyId);
+    if (!cur) perProperty.set(c.propertyId, { count: 1, score: d.score, listingId: c.id, reason: d.reason });
+    else {
+      cur.count += 1;
+      if (d.score > cur.score) {
+        cur.score = d.score;
+        cur.listingId = c.id;
+        cur.reason = d.reason;
+      }
+    }
+  }
+  const ranked = [...perProperty.entries()].sort((a, b) => b[1].count - a[1].count || b[1].score - a[1].score);
+  const previous = L.propertyId;
+  const winner = ranked[0];
+
+  if (!winner) {
+    if (previous !== null) {
+      const others = await db.select({ id: listings.id }).from(listings).where(and(eq(listings.propertyId, previous), ne(listings.id, L.id))).limit(1);
+      if (others.length === 0) {
+        // Still the only listing of its property: just refresh the aggregate.
+        await recomputeProperty(db, previous, now);
+        return { propertyId: previous, created: false, matchedListingId: null, reason: "solo" };
+      }
+    }
+    const id = await createPropertyFromListing(db, L, { ...opts, now });
+    if (previous !== null) await recomputeProperty(db, previous, now);
+    return { propertyId: id, created: true, matchedListingId: null, reason: "new" };
+  }
+
+  const [targetId, info] = winner;
+  if (previous !== targetId) {
+    await db.update(listings).set({ propertyId: targetId, updatedAt: now }).where(eq(listings.id, L.id));
+    if (previous !== null) await recomputeProperty(db, previous, now);
+  }
+  await recomputeProperty(db, targetId, now);
+  return { propertyId: targetId, created: false, matchedListingId: info.listingId, reason: info.reason };
+}

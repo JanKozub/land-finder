@@ -1,0 +1,207 @@
+{
+ "pageProps": {
+  "ad": {
+   "id": 68488446,
+   "slug": "panoramiczny-widok-dom-wolnostojacy-czernichow-8-pokoi-garaz-10ar-ID4DmYm",
+   "title": "Panoramiczny widok dom wolnostojący/ Czernichów/ 8 pokoi/ garaż/ 10Ar",
+   "status": "active",
+   "createdAt": "2026-10-03T16:47:45Z",
+   "modifiedAt": "2026-10-03T16:47:53Z",
+   "pushedUpAt": null,
+   "externalId": "",
+   "advertiserType": "business",
+   "advertType": "AGENCY",
+   "market": "SECONDARY",
+   "source": "urn:site:local",
+   "url": "https://www.otodom.pl/pl/oferta/panoramiczny-widok-dom-wolnostojacy-czernichow-8-pokoi-garaz-10ar-ID4DmYm",
+   "location": {
+    "id": "orn:otodompl:location:malopolskie/krakowski/czernichow/czernichow",
+    "coordinates": {
+     "latitude": 49.98777,
+     "longitude": 19.67953,
+     "__typename": "Coordinates"
+    },
+    "mapDetails": {
+     "radius": 0,
+     "zoom": 14,
+     "__typename": "MapDetails"
+    },
+    "reverseGeocoding": {
+     "locations": [
+      {
+       "id": "malopolskie",
+       "locationLevel": "voivodeship",
+       "name": "małopolskie",
+       "fullName": "małopolskie",
+       "fullNameItems": [
+        "małopolskie"
+       ],
+       "parentIds": [],
+       "__typename": "BasicLocationObject"
+      },
+      {
+       "id": "malopolskie/krakowski",
+       "locationLevel": "county",
+       "name": "krakowski",
+       "fullName": "krakowski, małopolskie",
+       "fullNameItems": [
+        "krakowski",
+        "małopolskie"
+       ],
+       "parentIds": [
+        "malopolskie"
+       ],
+       "__typename": "BasicLocationObject"
+      },
+      {
+       "id": "malopolskie/krakowski/czernichow",
+       "locationLevel": "commune",
+       "name": "Czernichów",
+       "fullName": "Czernichów, krakowski, małopolskie",
+       "fullNameItems": [
+        "Czernichów",
+        "krakowski",
+        "małopolskie"
+       ],
+       "parentIds": [
+        "malopolskie",
+        "malopolskie/krakowski"
+       ],
+       "__typename": "BasicLocationObject"
+      },
+      {
+       "id": "malopolskie/krakowski/czernichow/czernichow",
+       "locationLevel": "city_or_village",
+       "name": "Czernichów",
+       "fullName": "Czernichów, Czernichów, krakowski, małopolskie",
+       "fullNameItems": [
+        "Czernichów",
+        "Czernichów",
+        "krakowski",
+        "małopolskie"
+       ],
+       "parentIds": [
+        "malopolskie",
+        "malopolskie/krakowski",
+        "malopolskie/krakowski/czernichow"
+       ],
+       "__typename": "BasicLocationObject"
+      }
+     ]
+    },
+    "address": {
+     "street": null,
+     "subdistrict": null,
+     "district": null,
+     "city": null,
+     "county": null,
+     "municipality": null,
+     "province": null,
+     "postalCode": null
+    }
+   },
+   "target": {
+    "Access_types": [
+     "asphalt"
+    ],
+    "Area": "330",
+    "AreaRange": [],
+    "Build_year": "1980",
+    "Building_material": [
+     "breezeblock"
+    ],
+    "Building_type": [
+     "detached"
+    ],
+    "City": "czernichow",
+    "City_id": "92",
+    "Construction_status": [
+     "to_renovation"
+    ],
+    "Country": "Polska",
+    "Extras_types": [
+     "basement",
+     "attic",
+     "garage"
+    ],
+    "Fence_types": [
+     "brick",
+     "wire",
+     "metal",
+     "hedge"
+    ],
+    "Floors_num": [
+     "two_floors"
+    ],
+    "Garret_type": [
+     "usable"
+    ],
+    "Heating_types": [
+     "coal",
+     "oil"
+    ],
+    "Id": "68488446",
+    "Location": [
+     "country"
+    ],
+    "MarketType": "secondary",
+    "Media_types": [
+     "water",
+     "electricity",
+     "sewage",
+     "phone",
+     "internet",
+     "cable_television"
+    ],
+    "ObidoAdvert": "n",
+    "OfferType": "sprzedaz",
+    "Photo": "aHR0cHM6Ly9pcmVsYW5kLmFwb2xsby5vbHhjZG4uY29tL3YxL2ZpbGVzL2V5Sm1iaUk2SW5Sd2VXVXhPR2RpTW1Wd2RqTXRRVkJNSWl3aWR5STZXM3NpWm00aU9pSmxiblptY1hGbE1XRjVOR3N4TFVGUVRDSXNJbk1pT2lJeE5DSXNJbkFpT2lJeE1Dd3RNVEFpTENKaElqb2lNQ0o5WFgwLnlQWUJvLWVxMkQ0TUNMOG1QdF9pLV8tcFRsM1RsVjFpaWMwUFc5VW9OZk0vaW1hZ2U7cz02NTV4NDkxO3E9ODA=",
+    "Price": 1149000,
+    "PriceRange": [
+     "1000001-3000000"
+    ],
+    "Price_per_m": 3481,
+    "ProperType": "dom",
+    "Province": "malopolskie",
+    "RegularUser": "n",
+    "Roof_type": [
+     "diagonal"
+    ],
+    "Roofing": [
+     "tile"
+    ],
+    "Rooms_num": [
+     "8"
+    ],
+    "Security_types": [
+     "roller_shutters",
+     "alarm",
+     "closed_area"
+    ],
+    "Subregion": "powiat-krakowski",
+    "Terrain_area": "1000",
+    "Title": "UGFub3JhbWljem55IHdpZG9rIGRvbSB3b2xub3N0b2rEhWN5LyBDemVybmljaMOzdy8gOCBwb2tvaS8gZ2FyYcW8LyAxMEFy",
+    "Vicinity_types": [
+     "forest",
+     "lake",
+     "mountains"
+    ],
+    "Windows_type": [
+     "plastic"
+    ],
+    "categoryId": "201",
+    "env": "production",
+    "hidePrice": "0",
+    "seller_id": "9124066",
+    "user_type": "agency"
+   },
+   "adCategory": {
+    "id": 201,
+    "name": "HOUSE",
+    "type": "SELL"
+   },
+   "exclusiveOffer": false
+  }
+ },
+ "__N_SSP": true
+}

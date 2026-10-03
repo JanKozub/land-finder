@@ -1,0 +1,560 @@
+{
+ "props": {
+  "pageProps": {
+   "data": {
+    "searchAds": {
+     "items": [
+      {
+       "id": 68488446,
+       "title": "Panoramiczny widok dom wolnostojący/ Czernichów/ 8 pokoi/ garaż/ 10Ar",
+       "slug": "panoramiczny-widok-dom-wolnostojacy-czernichow-8-pokoi-garaz-10ar-ID4DmYm",
+       "estate": "HOUSE",
+       "developmentId": 0,
+       "developmentTitle": "",
+       "developmentUrl": "",
+       "transaction": "SELL",
+       "location": {
+        "mapDetails": {
+         "radius": 0,
+         "__typename": "MapDetails"
+        },
+        "address": {
+         "street": null,
+         "city": {
+          "name": "Czernichów",
+          "__typename": "City"
+         },
+         "province": {
+          "name": "małopolskie",
+          "__typename": "Province"
+         },
+         "__typename": "Address"
+        },
+        "reverseGeocoding": {
+         "locations": [
+          {
+           "id": "malopolskie",
+           "name": "małopolskie",
+           "locationLevel": "voivodeship",
+           "fullName": "małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/krakowski",
+           "name": "krakowski",
+           "locationLevel": "county",
+           "fullName": "krakowski, małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/krakowski/czernichow",
+           "name": "Czernichów",
+           "locationLevel": "commune",
+           "fullName": "Czernichów, krakowski, małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/krakowski/czernichow/czernichow",
+           "name": "Czernichów",
+           "locationLevel": "city_or_village",
+           "fullName": "Czernichów, Czernichów, krakowski, małopolskie",
+           "__typename": "BasicLocationObject"
+          }
+         ],
+         "__typename": "ReverseGeocoding"
+        },
+        "__typename": "LocationDetails"
+       },
+       "totalPossibleImages": 18,
+       "isExclusiveOffer": false,
+       "isPrivateOwner": false,
+       "isPromoted": false,
+       "extendedAdvertiserType": null,
+       "source": "urn:site:local",
+       "agency": {
+        "id": 9124066,
+        "name": "Ewelina Dumała Smart Estate",
+        "slug": "ewelina-dumala-smart-estate-ID9124066",
+        "imageUrl": "https://ireland.apollo.olxcdn.com/v1/files/eyJmbiI6Imx1eGRmY3ByNXJ1ZzEtQVBMIn0.Q60Vs17OyuDjFRcdRQicS5sJ8wxfUPSmmVtG0u0kqRo/image;s=800x600;q=90",
+        "type": "AGENCY",
+        "brandingVisible": true,
+        "highlightedAds": false,
+        "enhancedBrandingFeatures": [
+         "ENHANCED_BRANDING_SELLER_TYPE",
+         "ENHANCED_BRANDING_LOGO_DISPLAY",
+         "ENHANCED_BRANDING_COMPANY_NAME"
+        ],
+        "__typename": "AgencyListingDetails"
+       },
+       "openDays": "",
+       "totalPrice": {
+        "value": 1149000,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "rentPrice": null,
+       "priceFromPerSquareMeter": null,
+       "pricePerSquareMeter": {
+        "value": 3481.82,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "areaInSquareMeters": 330,
+       "terrainAreaInSquareMeters": 1000,
+       "roomsNumber": "EIGHT",
+       "hidePrice": false,
+       "floorNumber": null,
+       "investmentState": null,
+       "investmentUnitsAreaInSquareMeters": null,
+       "peoplePerRoom": null,
+       "dateCreated": "2026-10-03 18:47:53",
+       "createdAtFirst": "2026-10-03T18:47:45Z",
+       "investmentUnitsNumber": null,
+       "investmentUnitsRoomsNumber": null,
+       "investmentUnitsFloorsRange": null,
+       "investmentEstimatedDelivery": null,
+       "pushedUpAt": null,
+       "specialOffer": null,
+       "shortDescription": "Biuro Nieruchomości Smart Estate ma przyjemność zaprezentować wyjątkowy murowany dom wolnostojący o powierzchni całkowitej 330m2 użytkowej 236m2m2. Nieruchomość mieści się w pięknej zielonej okolicy w",
+       "organisationAssignedMember": null,
+       "advertOwner": {
+        "name": "Ewelina Dumała",
+        "imageUrl": "",
+        "contacts": [],
+        "__typename": "LegacyAdvertOwner"
+       },
+       "tags": [
+        {
+         "value": "BASEMENT",
+         "weight": 25,
+         "__typename": "AdvertListItemTag"
+        },
+        {
+         "value": "PARKING_SPOT",
+         "weight": 15,
+         "__typename": "AdvertListItemTag"
+        },
+        {
+         "value": "SECURE_BUILDING",
+         "weight": 10,
+         "__typename": "AdvertListItemTag"
+        }
+       ],
+       "__typename": "AdvertListItem",
+       "showPremiumTile": false,
+       "development": null,
+       "href": "[lang]/ad/panoramiczny-widok-dom-wolnostojacy-czernichow-8-pokoi-garaz-10ar-ID4DmYm"
+      },
+      {
+       "id": 68488421,
+       "title": "Wieliczka ulica Reformacka. Nowy DOM w zabudowie bliźniaczej.",
+       "slug": "wieliczka-ulica-reformacka-nowy-dom-w-zabudowie-blizniaczej-ID4DmXX",
+       "estate": "HOUSE",
+       "developmentId": 0,
+       "developmentTitle": "",
+       "developmentUrl": "",
+       "transaction": "SELL",
+       "location": {
+        "mapDetails": {
+         "radius": 0,
+         "__typename": "MapDetails"
+        },
+        "address": {
+         "street": {
+          "name": "ul. Reformacka",
+          "number": "",
+          "__typename": "Street"
+         },
+         "city": {
+          "name": "Wieliczka",
+          "__typename": "City"
+         },
+         "province": {
+          "name": "małopolskie",
+          "__typename": "Province"
+         },
+         "__typename": "Address"
+        },
+        "reverseGeocoding": {
+         "locations": [
+          {
+           "id": "malopolskie",
+           "name": "małopolskie",
+           "locationLevel": "voivodeship",
+           "fullName": "małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/wielicki",
+           "name": "wielicki",
+           "locationLevel": "county",
+           "fullName": "wielicki, małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/wielicki/wieliczka",
+           "name": "Wieliczka",
+           "locationLevel": "commune",
+           "fullName": "Wieliczka, wielicki, małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/wielicki/wieliczka/wieliczka",
+           "name": "Wieliczka",
+           "locationLevel": "city_or_village",
+           "fullName": "Wieliczka, Wieliczka, wielicki, małopolskie",
+           "__typename": "BasicLocationObject"
+          }
+         ],
+         "__typename": "ReverseGeocoding"
+        },
+        "__typename": "LocationDetails"
+       },
+       "totalPossibleImages": 20,
+       "isExclusiveOffer": false,
+       "isPrivateOwner": false,
+       "isPromoted": true,
+       "extendedAdvertiserType": "developer",
+       "source": "urn:site:local",
+       "agency": null,
+       "openDays": "",
+       "totalPrice": {
+        "value": 1375000,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "rentPrice": null,
+       "priceFromPerSquareMeter": null,
+       "pricePerSquareMeter": {
+        "value": 10185.19,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "areaInSquareMeters": 135,
+       "terrainAreaInSquareMeters": 409,
+       "roomsNumber": "FIVE",
+       "hidePrice": false,
+       "floorNumber": null,
+       "investmentState": null,
+       "investmentUnitsAreaInSquareMeters": null,
+       "peoplePerRoom": null,
+       "dateCreated": "2026-10-03 18:29:01",
+       "createdAtFirst": "2026-10-03T18:27:07Z",
+       "investmentUnitsNumber": null,
+       "investmentUnitsRoomsNumber": null,
+       "investmentUnitsFloorsRange": null,
+       "investmentEstimatedDelivery": null,
+       "pushedUpAt": null,
+       "specialOffer": null,
+       "shortDescription": "Dom B1 – Wieliczka ulica Reformacka 33aPowierzchnia użytkowa: 134,76m2Powierzchnia działki 4,09 arCena 10.185,00zł za m2 --&gt; 1.375.000,00 złTermin zakończenia budowy: Czerwiec 2026Termin oddania bu",
+       "organisationAssignedMember": null,
+       "advertOwner": {
+        "name": "Sprzedający 1",
+        "imageUrl": "",
+        "contacts": [],
+        "__typename": "LegacyAdvertOwner"
+       },
+       "tags": [
+        {
+         "value": "PARKING_SPOT",
+         "weight": 15,
+         "__typename": "AdvertListItemTag"
+        },
+        {
+         "value": "SECURE_BUILDING",
+         "weight": 10,
+         "__typename": "AdvertListItemTag"
+        }
+       ],
+       "__typename": "AdvertListItem",
+       "showPremiumTile": false,
+       "development": null,
+       "href": "[lang]/ad/wieliczka-ulica-reformacka-nowy-dom-w-zabudowie-blizniaczej-ID4DmXX"
+      },
+      {
+       "id": 68487216,
+       "title": "Zadbany domek z klimatem w Wiśniowej",
+       "slug": "zadbany-domek-z-klimatem-w-wisniowej-ID4DmEv",
+       "estate": "HOUSE",
+       "developmentId": 0,
+       "developmentTitle": "",
+       "developmentUrl": "",
+       "transaction": "SELL",
+       "location": {
+        "mapDetails": {
+         "radius": 0,
+         "__typename": "MapDetails"
+        },
+        "address": {
+         "street": null,
+         "city": {
+          "name": "Wiśniowa",
+          "__typename": "City"
+         },
+         "province": {
+          "name": "małopolskie",
+          "__typename": "Province"
+         },
+         "__typename": "Address"
+        },
+        "reverseGeocoding": {
+         "locations": [
+          {
+           "id": "malopolskie",
+           "name": "małopolskie",
+           "locationLevel": "voivodeship",
+           "fullName": "małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/myslenicki",
+           "name": "myślenicki",
+           "locationLevel": "county",
+           "fullName": "myślenicki, małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/myslenicki/wisniowa",
+           "name": "Wiśniowa",
+           "locationLevel": "commune",
+           "fullName": "Wiśniowa, myślenicki, małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/myslenicki/wisniowa/wisniowa",
+           "name": "Wiśniowa",
+           "locationLevel": "city_or_village",
+           "fullName": "Wiśniowa, Wiśniowa, myślenicki, małopolskie",
+           "__typename": "BasicLocationObject"
+          }
+         ],
+         "__typename": "ReverseGeocoding"
+        },
+        "__typename": "LocationDetails"
+       },
+       "totalPossibleImages": 10,
+       "isExclusiveOffer": false,
+       "isPrivateOwner": false,
+       "isPromoted": false,
+       "extendedAdvertiserType": null,
+       "source": "urn:site:local",
+       "agency": {
+        "id": 8115175,
+        "name": "Justyna Rakoczy",
+        "slug": "justyna-rakoczy-ID8115175",
+        "imageUrl": "https://ireland.apollo.olxcdn.com/v1/files/eyJmbiI6Ink4OHExcHZ3dDI4NTEtQVBMIn0.1wwzVIbCmtXYiGu_YaWmNKenEtxCr71iVT8UT-Ig55c/image;s=800x600;q=90",
+        "type": "AGENCY",
+        "brandingVisible": true,
+        "highlightedAds": false,
+        "enhancedBrandingFeatures": [
+         "ENHANCED_BRANDING_SELLER_TYPE",
+         "ENHANCED_BRANDING_LOGO_DISPLAY",
+         "ENHANCED_BRANDING_COMPANY_NAME"
+        ],
+        "__typename": "AgencyListingDetails"
+       },
+       "openDays": "",
+       "totalPrice": {
+        "value": 339000,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "rentPrice": {
+        "value": 0,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "priceFromPerSquareMeter": null,
+       "pricePerSquareMeter": {
+        "value": 5650,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "areaInSquareMeters": 60,
+       "terrainAreaInSquareMeters": 1600,
+       "roomsNumber": "TWO",
+       "hidePrice": false,
+       "floorNumber": null,
+       "investmentState": null,
+       "investmentUnitsAreaInSquareMeters": null,
+       "peoplePerRoom": null,
+       "dateCreated": "2026-10-02 23:50:44",
+       "createdAtFirst": "2026-10-02T23:50:31Z",
+       "investmentUnitsNumber": null,
+       "investmentUnitsRoomsNumber": null,
+       "investmentUnitsFloorsRange": null,
+       "investmentEstimatedDelivery": null,
+       "pushedUpAt": null,
+       "specialOffer": null,
+       "shortDescription": "Na sprzedaż połowa domu z lat 70., położona w Wiśniowej, w województwie małopolskim. Nieruchomość o powierzchni około 60 m², usytuowana na działce o powierzchni około 16 arów, to propozycja dla osób s",
+       "organisationAssignedMember": {
+        "profileID": "5405",
+        "userID": "11731081",
+        "firstName": "Karolina",
+        "lastName": "Jasek",
+        "photoURL": "https://ireland.apollo.olxcdn.com/v1/files/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmbiI6IjVocGQwcTU3cDNlczItQVBMIn0.E_Z9iE6kXjimUqlSmiw7yUrLStMQTmTCWavFIDa6BAU/image",
+        "mobile": "+48696367777",
+        "__typename": "OrganisationAssignedMemberResponse"
+       },
+       "advertOwner": {
+        "name": "Justyna Rakoczy",
+        "imageUrl": "",
+        "contacts": [],
+        "__typename": "LegacyAdvertOwner"
+       },
+       "tags": [],
+       "__typename": "AdvertListItem",
+       "showPremiumTile": false,
+       "development": null,
+       "href": "[lang]/ad/zadbany-domek-z-klimatem-w-wisniowej-ID4DmEv"
+      },
+      {
+       "id": 68487176,
+       "title": "Dom Wykończony 85 m2 ,Klimatyzacja,3MiejscaParkingowe,Strych,Piwniczka",
+       "slug": "dom-wykonczony-85-m2-klimatyzacja-3miejscaparkingowe-strych-piwniczka-ID4DmDS",
+       "estate": "HOUSE",
+       "developmentId": 0,
+       "developmentTitle": "",
+       "developmentUrl": "",
+       "transaction": "SELL",
+       "location": {
+        "mapDetails": {
+         "radius": 0,
+         "__typename": "MapDetails"
+        },
+        "address": {
+         "street": {
+          "name": "ul. Jana Pawła II",
+          "number": "",
+          "__typename": "Street"
+         },
+         "city": {
+          "name": "Kobylany",
+          "__typename": "City"
+         },
+         "province": {
+          "name": "małopolskie",
+          "__typename": "Province"
+         },
+         "__typename": "Address"
+        },
+        "reverseGeocoding": {
+         "locations": [
+          {
+           "id": "malopolskie",
+           "name": "małopolskie",
+           "locationLevel": "voivodeship",
+           "fullName": "małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/krakowski",
+           "name": "krakowski",
+           "locationLevel": "county",
+           "fullName": "krakowski, małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/krakowski/zabierzow",
+           "name": "Zabierzów",
+           "locationLevel": "commune",
+           "fullName": "Zabierzów, krakowski, małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/krakowski/zabierzow/kobylany",
+           "name": "Kobylany",
+           "locationLevel": "city_or_village",
+           "fullName": "Kobylany, Zabierzów, krakowski, małopolskie",
+           "__typename": "BasicLocationObject"
+          }
+         ],
+         "__typename": "ReverseGeocoding"
+        },
+        "__typename": "LocationDetails"
+       },
+       "totalPossibleImages": 20,
+       "isExclusiveOffer": false,
+       "isPrivateOwner": false,
+       "isPromoted": true,
+       "extendedAdvertiserType": "developer",
+       "source": "urn:site:local",
+       "agency": null,
+       "openDays": "",
+       "totalPrice": {
+        "value": 1150000,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "rentPrice": null,
+       "priceFromPerSquareMeter": null,
+       "pricePerSquareMeter": {
+        "value": 13529.41,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "areaInSquareMeters": 85,
+       "terrainAreaInSquareMeters": 308,
+       "roomsNumber": "FIVE",
+       "hidePrice": false,
+       "floorNumber": null,
+       "investmentState": null,
+       "investmentUnitsAreaInSquareMeters": null,
+       "peoplePerRoom": null,
+       "dateCreated": "2026-10-02 23:19:27",
+       "createdAtFirst": "2026-10-02T23:12:38Z",
+       "investmentUnitsNumber": null,
+       "investmentUnitsRoomsNumber": null,
+       "investmentUnitsFloorsRange": null,
+       "investmentEstimatedDelivery": null,
+       "pushedUpAt": null,
+       "specialOffer": null,
+       "shortDescription": "Na sprzedaż Połowa bliźniaka segment wewnętrzny w miejscowości Kobylany ul. Jana Pawła II gmina ZabierzówDom wykończony pod klucz za kwotę 1150000 złTermin wykończenia pod klucz 31.12.2026 r.CENA 1150",
+       "organisationAssignedMember": null,
+       "advertOwner": {
+        "name": "Sprzedający 2",
+        "imageUrl": "",
+        "contacts": [],
+        "__typename": "LegacyAdvertOwner"
+       },
+       "tags": [
+        {
+         "value": "AIR_CONDITIONING",
+         "weight": 55,
+         "__typename": "AdvertListItemTag"
+        },
+        {
+         "value": "BASEMENT",
+         "weight": 25,
+         "__typename": "AdvertListItemTag"
+        },
+        {
+         "value": "PARKING_SPOT",
+         "weight": 15,
+         "__typename": "AdvertListItemTag"
+        },
+        {
+         "value": "SECURE_BUILDING",
+         "weight": 10,
+         "__typename": "AdvertListItemTag"
+        }
+       ],
+       "__typename": "AdvertListItem",
+       "showPremiumTile": false,
+       "development": null,
+       "href": "[lang]/ad/dom-wykonczony-85-m2-klimatyzacja-3miejscaparkingowe-strych-piwniczka-ID4DmDS"
+      }
+     ],
+     "pagination": {
+      "totalItems": 2307,
+      "totalPages": 65,
+      "currentPage": 1,
+      "itemsPerPage": 36,
+      "__typename": "SearchPagination"
+     }
+    }
+   }
+  }
+ },
+ "buildId": "mGqk5wgHgzkZ129f54Sjh"
+}

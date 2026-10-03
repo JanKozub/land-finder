@@ -1,0 +1,780 @@
+{
+ "props": {
+  "pageProps": {
+   "data": {
+    "searchAds": {
+     "__typename": "FoundAds",
+     "items": [
+      {
+       "id": 68488582,
+       "title": "Działka budowlana 20,71 a - Jankówka, gm. Wieliczka",
+       "slug": "dzialka-budowlana-20-71-a-jankowka-gm-wieliczka-ID4Dn0y",
+       "estate": "TERRAIN",
+       "developmentId": 0,
+       "developmentTitle": "",
+       "developmentUrl": "",
+       "transaction": "SELL",
+       "location": {
+        "mapDetails": {
+         "radius": 500,
+         "__typename": "MapDetails"
+        },
+        "address": {
+         "street": null,
+         "city": {
+          "name": "Jankówka",
+          "__typename": "City"
+         },
+         "province": {
+          "name": "małopolskie",
+          "__typename": "Province"
+         },
+         "__typename": "Address"
+        },
+        "reverseGeocoding": {
+         "locations": [
+          {
+           "id": "malopolskie",
+           "name": "małopolskie",
+           "locationLevel": "voivodeship",
+           "fullName": "małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/wielicki",
+           "name": "wielicki",
+           "locationLevel": "county",
+           "fullName": "wielicki, małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/wielicki/wieliczka",
+           "name": "Wieliczka",
+           "locationLevel": "commune",
+           "fullName": "Wieliczka, wielicki, małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/wielicki/wieliczka/jankowka",
+           "name": "Jankówka",
+           "locationLevel": "city_or_village",
+           "fullName": "Jankówka, Wieliczka, wielicki, małopolskie",
+           "__typename": "BasicLocationObject"
+          }
+         ],
+         "__typename": "ReverseGeocoding"
+        },
+        "__typename": "LocationDetails"
+       },
+       "totalPossibleImages": 12,
+       "isExclusiveOffer": false,
+       "isPrivateOwner": false,
+       "isPromoted": false,
+       "extendedAdvertiserType": null,
+       "source": "urn:site:local",
+       "agency": {
+        "id": 9369682,
+        "name": "Agentka Z Sąsiedztwa",
+        "slug": "agentka-z-sasiedztwa-ID9369682",
+        "imageUrl": "https://ireland.apollo.olxcdn.com/v1/files/eyJmbiI6Im9obzVraHU0bXViZDMtQVBMIn0.j4uqXgAGjk8TtOjtyvUp9BZBdxhRQHGCqGdF5dQUADE/image;s=800x600;q=90",
+        "type": "AGENCY",
+        "brandingVisible": true,
+        "highlightedAds": false,
+        "enhancedBrandingFeatures": [
+         "ENHANCED_BRANDING_SELLER_TYPE",
+         "ENHANCED_BRANDING_LOGO_DISPLAY",
+         "ENHANCED_BRANDING_COMPANY_NAME"
+        ],
+        "__typename": "AgencyListingDetails"
+       },
+       "openDays": "",
+       "totalPrice": {
+        "value": 329000,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "rentPrice": null,
+       "priceFromPerSquareMeter": null,
+       "pricePerSquareMeter": {
+        "value": 158.86,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "areaInSquareMeters": 2071,
+       "terrainAreaInSquareMeters": null,
+       "roomsNumber": null,
+       "hidePrice": false,
+       "floorNumber": null,
+       "investmentState": null,
+       "investmentUnitsAreaInSquareMeters": null,
+       "peoplePerRoom": null,
+       "dateCreated": "2026-10-03 20:48:10",
+       "createdAtFirst": "2026-10-03T20:47:49Z",
+       "investmentUnitsNumber": null,
+       "investmentUnitsRoomsNumber": null,
+       "investmentUnitsFloorsRange": null,
+       "investmentEstimatedDelivery": null,
+       "pushedUpAt": null,
+       "specialOffer": null,
+       "shortDescription": "Na sprzedaż działka budowlana o powierzchni 20,71a, położona w miejscowości Jankówka tuż przy granicy z Raciborskiem, w gminie Wieliczka.Wymiary: 38x52mTo doskonały wybór dla osób, które marzą o własn",
+       "organisationAssignedMember": null,
+       "advertOwner": {
+        "name": "Agentka Z Sąsiedztwa",
+        "imageUrl": "",
+        "contacts": [],
+        "__typename": "LegacyAdvertOwner"
+       },
+       "tags": [],
+       "__typename": "AdvertListItem",
+       "showPremiumTile": false,
+       "development": null,
+       "href": "[lang]/ad/dzialka-budowlana-20-71-a-jankowka-gm-wieliczka-ID4Dn0y"
+      },
+      {
+       "id": 68488576,
+       "title": "Działka inwestycyjna 41,41a - Jankówka, gm. Wieliczka",
+       "slug": "dzialka-inwestycyjna-41-41a-jankowka-gm-wieliczka-ID4Dn0s",
+       "estate": "TERRAIN",
+       "developmentId": 0,
+       "developmentTitle": "",
+       "developmentUrl": "",
+       "transaction": "SELL",
+       "location": {
+        "mapDetails": {
+         "radius": 500,
+         "__typename": "MapDetails"
+        },
+        "address": {
+         "street": null,
+         "city": {
+          "name": "Jankówka",
+          "__typename": "City"
+         },
+         "province": {
+          "name": "małopolskie",
+          "__typename": "Province"
+         },
+         "__typename": "Address"
+        },
+        "reverseGeocoding": {
+         "locations": [
+          {
+           "id": "malopolskie",
+           "name": "małopolskie",
+           "locationLevel": "voivodeship",
+           "fullName": "małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/wielicki",
+           "name": "wielicki",
+           "locationLevel": "county",
+           "fullName": "wielicki, małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/wielicki/wieliczka",
+           "name": "Wieliczka",
+           "locationLevel": "commune",
+           "fullName": "Wieliczka, wielicki, małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/wielicki/wieliczka/jankowka",
+           "name": "Jankówka",
+           "locationLevel": "city_or_village",
+           "fullName": "Jankówka, Wieliczka, wielicki, małopolskie",
+           "__typename": "BasicLocationObject"
+          }
+         ],
+         "__typename": "ReverseGeocoding"
+        },
+        "__typename": "LocationDetails"
+       },
+       "totalPossibleImages": 12,
+       "isExclusiveOffer": false,
+       "isPrivateOwner": false,
+       "isPromoted": false,
+       "extendedAdvertiserType": null,
+       "source": "urn:site:local",
+       "agency": {
+        "id": 9369682,
+        "name": "Agentka Z Sąsiedztwa",
+        "slug": "agentka-z-sasiedztwa-ID9369682",
+        "imageUrl": "https://ireland.apollo.olxcdn.com/v1/files/eyJmbiI6Im9obzVraHU0bXViZDMtQVBMIn0.j4uqXgAGjk8TtOjtyvUp9BZBdxhRQHGCqGdF5dQUADE/image;s=800x600;q=90",
+        "type": "AGENCY",
+        "brandingVisible": true,
+        "highlightedAds": false,
+        "enhancedBrandingFeatures": [
+         "ENHANCED_BRANDING_SELLER_TYPE",
+         "ENHANCED_BRANDING_LOGO_DISPLAY",
+         "ENHANCED_BRANDING_COMPANY_NAME"
+        ],
+        "__typename": "AgencyListingDetails"
+       },
+       "openDays": "",
+       "totalPrice": {
+        "value": 621000,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "rentPrice": null,
+       "priceFromPerSquareMeter": null,
+       "pricePerSquareMeter": {
+        "value": 149.96,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "areaInSquareMeters": 4141,
+       "terrainAreaInSquareMeters": null,
+       "roomsNumber": null,
+       "hidePrice": false,
+       "floorNumber": null,
+       "investmentState": null,
+       "investmentUnitsAreaInSquareMeters": null,
+       "peoplePerRoom": null,
+       "dateCreated": "2026-10-03 20:42:26",
+       "createdAtFirst": "2026-10-03T20:42:14Z",
+       "investmentUnitsNumber": null,
+       "investmentUnitsRoomsNumber": null,
+       "investmentUnitsFloorsRange": null,
+       "investmentEstimatedDelivery": null,
+       "pushedUpAt": null,
+       "specialOffer": null,
+       "shortDescription": "Działka inwestycyjna 41,41a - Jankówka, gm. WieliczkaNa sprzedaż działka budowlana o powierzchni 41,41a, położona w miejscowości Jankówka tuż przy granicy z Raciborskiem, w gminie Wieliczka.Wymiary dz",
+       "organisationAssignedMember": null,
+       "advertOwner": {
+        "name": "Agentka Z Sąsiedztwa",
+        "imageUrl": "",
+        "contacts": [],
+        "__typename": "LegacyAdvertOwner"
+       },
+       "tags": [],
+       "__typename": "AdvertListItem",
+       "showPremiumTile": false,
+       "development": null,
+       "href": "[lang]/ad/dzialka-inwestycyjna-41-41a-jankowka-gm-wieliczka-ID4Dn0s"
+      },
+      {
+       "id": 68488563,
+       "title": "Działka budowlana 44 a /Raciborsko/Wieliczka/idealna pod inwestycję",
+       "slug": "dzialka-budowlana-44-a-raciborsko-wieliczka-idealna-pod-inwestycje-ID4Dn0f",
+       "estate": "TERRAIN",
+       "developmentId": 0,
+       "developmentTitle": "",
+       "developmentUrl": "",
+       "transaction": "SELL",
+       "location": {
+        "mapDetails": {
+         "radius": 500,
+         "__typename": "MapDetails"
+        },
+        "address": {
+         "street": null,
+         "city": {
+          "name": "Raciborsko",
+          "__typename": "City"
+         },
+         "province": {
+          "name": "małopolskie",
+          "__typename": "Province"
+         },
+         "__typename": "Address"
+        },
+        "reverseGeocoding": {
+         "locations": [
+          {
+           "id": "malopolskie",
+           "name": "małopolskie",
+           "locationLevel": "voivodeship",
+           "fullName": "małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/wielicki",
+           "name": "wielicki",
+           "locationLevel": "county",
+           "fullName": "wielicki, małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/wielicki/wieliczka",
+           "name": "Wieliczka",
+           "locationLevel": "commune",
+           "fullName": "Wieliczka, wielicki, małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/wielicki/wieliczka/raciborsko",
+           "name": "Raciborsko",
+           "locationLevel": "city_or_village",
+           "fullName": "Raciborsko, Wieliczka, wielicki, małopolskie",
+           "__typename": "BasicLocationObject"
+          }
+         ],
+         "__typename": "ReverseGeocoding"
+        },
+        "__typename": "LocationDetails"
+       },
+       "totalPossibleImages": 16,
+       "isExclusiveOffer": false,
+       "isPrivateOwner": false,
+       "isPromoted": false,
+       "extendedAdvertiserType": null,
+       "source": "urn:site:local",
+       "agency": {
+        "id": 9369682,
+        "name": "Agentka Z Sąsiedztwa",
+        "slug": "agentka-z-sasiedztwa-ID9369682",
+        "imageUrl": "https://ireland.apollo.olxcdn.com/v1/files/eyJmbiI6Im9obzVraHU0bXViZDMtQVBMIn0.j4uqXgAGjk8TtOjtyvUp9BZBdxhRQHGCqGdF5dQUADE/image;s=800x600;q=90",
+        "type": "AGENCY",
+        "brandingVisible": true,
+        "highlightedAds": false,
+        "enhancedBrandingFeatures": [
+         "ENHANCED_BRANDING_SELLER_TYPE",
+         "ENHANCED_BRANDING_LOGO_DISPLAY",
+         "ENHANCED_BRANDING_COMPANY_NAME"
+        ],
+        "__typename": "AgencyListingDetails"
+       },
+       "openDays": "",
+       "totalPrice": {
+        "value": 650000,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "rentPrice": null,
+       "priceFromPerSquareMeter": null,
+       "pricePerSquareMeter": {
+        "value": 147.73,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "areaInSquareMeters": 4400,
+       "terrainAreaInSquareMeters": null,
+       "roomsNumber": null,
+       "hidePrice": false,
+       "floorNumber": null,
+       "investmentState": null,
+       "investmentUnitsAreaInSquareMeters": null,
+       "peoplePerRoom": null,
+       "dateCreated": "2026-10-03 20:26:35",
+       "createdAtFirst": "2026-10-03T20:26:30Z",
+       "investmentUnitsNumber": null,
+       "investmentUnitsRoomsNumber": null,
+       "investmentUnitsFloorsRange": null,
+       "investmentEstimatedDelivery": null,
+       "pushedUpAt": null,
+       "specialOffer": null,
+       "shortDescription": "Działka budowlana 44 a – Raciborsko, gm. Wieliczka (idealna pod inwestycję)Na sprzedaż wyjątkowo przestronna działka budowlana o powierzchni 44a (4400), położona w urokliwej miejscowości Raciborsko w ",
+       "organisationAssignedMember": null,
+       "advertOwner": {
+        "name": "Agentka Z Sąsiedztwa",
+        "imageUrl": "",
+        "contacts": [],
+        "__typename": "LegacyAdvertOwner"
+       },
+       "tags": [],
+       "__typename": "AdvertListItem",
+       "showPremiumTile": false,
+       "development": null,
+       "href": "[lang]/ad/dzialka-budowlana-44-a-raciborsko-wieliczka-idealna-pod-inwestycje-ID4Dn0f"
+      },
+      {
+       "id": 68487988,
+       "title": "Działka budowlana blisko Krakowa",
+       "slug": "dzialka-budowlana-blisko-krakowa-ID4DmQY",
+       "estate": "TERRAIN",
+       "developmentId": 0,
+       "developmentTitle": "",
+       "developmentUrl": "",
+       "transaction": "SELL",
+       "location": {
+        "mapDetails": {
+         "radius": 100,
+         "__typename": "MapDetails"
+        },
+        "address": {
+         "street": null,
+         "city": {
+          "name": "Rzeszotary",
+          "__typename": "City"
+         },
+         "province": {
+          "name": "małopolskie",
+          "__typename": "Province"
+         },
+         "__typename": "Address"
+        },
+        "reverseGeocoding": {
+         "locations": [
+          {
+           "id": "malopolskie",
+           "name": "małopolskie",
+           "locationLevel": "voivodeship",
+           "fullName": "małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/krakowski",
+           "name": "krakowski",
+           "locationLevel": "county",
+           "fullName": "krakowski, małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/krakowski/swiatniki-gorne",
+           "name": "Świątniki Górne",
+           "locationLevel": "commune",
+           "fullName": "Świątniki Górne, krakowski, małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/krakowski/swiatniki-gorne/rzeszotary",
+           "name": "Rzeszotary",
+           "locationLevel": "city_or_village",
+           "fullName": "Rzeszotary, Świątniki Górne, krakowski, małopolskie",
+           "__typename": "BasicLocationObject"
+          }
+         ],
+         "__typename": "ReverseGeocoding"
+        },
+        "__typename": "LocationDetails"
+       },
+       "totalPossibleImages": 13,
+       "isExclusiveOffer": false,
+       "isPrivateOwner": false,
+       "isPromoted": false,
+       "extendedAdvertiserType": null,
+       "source": "urn:partner:imo-qa",
+       "agency": {
+        "id": 576715,
+        "name": "Nieruchomości A-Z",
+        "slug": "nieruchomosci-a-z-ID576715",
+        "imageUrl": "https://ireland.apollo.olxcdn.com/v1/files/eyJmbiI6InE2Z2tsMnJvcXhrNDMtQVBMIn0.4mVWcZaOLvVIXaq3fRJoLGjPDE0YNr9bgsglLMEJVLw/image;s=800x600;q=90",
+        "type": "AGENCY",
+        "brandingVisible": false,
+        "highlightedAds": false,
+        "enhancedBrandingFeatures": [
+         "ENHANCED_BRANDING_SELLER_TYPE"
+        ],
+        "__typename": "AgencyListingDetails"
+       },
+       "openDays": "",
+       "totalPrice": {
+        "value": 380000,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "rentPrice": null,
+       "priceFromPerSquareMeter": null,
+       "pricePerSquareMeter": {
+        "value": 122.58,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "areaInSquareMeters": 3100,
+       "terrainAreaInSquareMeters": null,
+       "roomsNumber": null,
+       "hidePrice": false,
+       "floorNumber": null,
+       "investmentState": null,
+       "investmentUnitsAreaInSquareMeters": null,
+       "peoplePerRoom": null,
+       "dateCreated": "2026-10-03 13:22:21",
+       "createdAtFirst": "2026-10-03T13:22:11Z",
+       "investmentUnitsNumber": null,
+       "investmentUnitsRoomsNumber": null,
+       "investmentUnitsFloorsRange": null,
+       "investmentEstimatedDelivery": null,
+       "pushedUpAt": null,
+       "specialOffer": null,
+       "shortDescription": "Na sprzedaż działka o powierzchni ok. 31 arów, w całości budowlana, położona w atrakcyjnej  spokojnej lokalizacji. W miejscowym planie zagospodarowania przestrzennego oznaczona jako MN – tereny zabudo",
+       "organisationAssignedMember": null,
+       "advertOwner": {
+        "name": "Ryszard Bojczuk",
+        "imageUrl": "https://statics.otodom.pl/static/otodompl/naspersclassifieds-regional/verticalsre-atlas-web-otodompl/static/img/user_placeholder.png",
+        "contacts": [],
+        "__typename": "LegacyAdvertOwner"
+       },
+       "tags": [],
+       "__typename": "AdvertListItem",
+       "showPremiumTile": false,
+       "development": null,
+       "href": "[lang]/ad/dzialka-budowlana-blisko-krakowa-ID4DmQY"
+      },
+      {
+       "id": 68487740,
+       "title": "Działka z widokiem na Tatry",
+       "slug": "dzialka-z-widokiem-na-tatry-ID4DmMY",
+       "estate": "TERRAIN",
+       "developmentId": 0,
+       "developmentTitle": "",
+       "developmentUrl": "",
+       "transaction": "SELL",
+       "location": {
+        "mapDetails": {
+         "radius": 0,
+         "__typename": "MapDetails"
+        },
+        "address": {
+         "street": {
+          "name": "ul. Mogilańska",
+          "number": "",
+          "__typename": "Street"
+         },
+         "city": {
+          "name": "Mogilany",
+          "__typename": "City"
+         },
+         "province": {
+          "name": "małopolskie",
+          "__typename": "Province"
+         },
+         "__typename": "Address"
+        },
+        "reverseGeocoding": {
+         "locations": [
+          {
+           "id": "malopolskie",
+           "name": "małopolskie",
+           "locationLevel": "voivodeship",
+           "fullName": "małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/krakowski",
+           "name": "krakowski",
+           "locationLevel": "county",
+           "fullName": "krakowski, małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/krakowski/mogilany",
+           "name": "Mogilany",
+           "locationLevel": "commune",
+           "fullName": "Mogilany, krakowski, małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/krakowski/mogilany/mogilany",
+           "name": "Mogilany",
+           "locationLevel": "city_or_village",
+           "fullName": "Mogilany, Mogilany, krakowski, małopolskie",
+           "__typename": "BasicLocationObject"
+          }
+         ],
+         "__typename": "ReverseGeocoding"
+        },
+        "__typename": "LocationDetails"
+       },
+       "totalPossibleImages": 8,
+       "isExclusiveOffer": false,
+       "isPrivateOwner": false,
+       "isPromoted": false,
+       "extendedAdvertiserType": null,
+       "source": "urn:site:local",
+       "agency": {
+        "id": 9676520,
+        "name": "Geo-Dom Nieruchomości Krzysztof Kumala",
+        "slug": "geo-dom-nieruchomosci-krzysztof-kumala-ID9676520",
+        "imageUrl": "https://ireland.apollo.olxcdn.com/v1/files/eyJmbiI6ImVhODV1aXlqMXB6dS1BUEwifQ.QF2ddGvTZn8AIbEIcvINccOH5KrxDG7wGbXxZW9cQEI/image;s=800x600;q=90",
+        "type": "AGENCY",
+        "brandingVisible": true,
+        "highlightedAds": false,
+        "enhancedBrandingFeatures": [
+         "ENHANCED_BRANDING_SELLER_TYPE",
+         "ENHANCED_BRANDING_LOGO_DISPLAY",
+         "ENHANCED_BRANDING_COMPANY_NAME"
+        ],
+        "__typename": "AgencyListingDetails"
+       },
+       "openDays": "",
+       "totalPrice": {
+        "value": 525000,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "rentPrice": null,
+       "priceFromPerSquareMeter": null,
+       "pricePerSquareMeter": {
+        "value": 416.67,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "areaInSquareMeters": 1260,
+       "terrainAreaInSquareMeters": null,
+       "roomsNumber": null,
+       "hidePrice": false,
+       "floorNumber": null,
+       "investmentState": null,
+       "investmentUnitsAreaInSquareMeters": null,
+       "peoplePerRoom": null,
+       "dateCreated": "2026-10-03 11:46:34",
+       "createdAtFirst": "2026-10-03T11:45:05Z",
+       "investmentUnitsNumber": null,
+       "investmentUnitsRoomsNumber": null,
+       "investmentUnitsFloorsRange": null,
+       "investmentEstimatedDelivery": null,
+       "pushedUpAt": null,
+       "specialOffer": null,
+       "shortDescription": "Witam ZainteresowanychOFERTA TYLKO U NASOferujemy do sprzedaży teren budowlany w Mogilanach o powierzchni 12,60 ara i drogi wewnętrznej 1,72 ara.Możliwość zakupu sąsiednich działek :-14.43 ara  o wymi",
+       "organisationAssignedMember": null,
+       "advertOwner": {
+        "name": "Krzysztof Kumala",
+        "imageUrl": "",
+        "contacts": [],
+        "__typename": "LegacyAdvertOwner"
+       },
+       "tags": [],
+       "__typename": "AdvertListItem",
+       "showPremiumTile": false,
+       "development": null,
+       "href": "[lang]/ad/dzialka-z-widokiem-na-tatry-ID4DmMY"
+      },
+      {
+       "id": 68487613,
+       "title": "Działka budowlana widokowa 24a Olszowice, Kraków 10km",
+       "slug": "dzialka-budowlana-widokowa-24a-olszowice-krakow-10km-ID4DmKW",
+       "estate": "TERRAIN",
+       "developmentId": 0,
+       "developmentTitle": "",
+       "developmentUrl": "",
+       "transaction": "SELL",
+       "location": {
+        "mapDetails": {
+         "radius": 0,
+         "__typename": "MapDetails"
+        },
+        "address": {
+         "street": null,
+         "city": {
+          "name": "Olszowice",
+          "__typename": "City"
+         },
+         "province": {
+          "name": "małopolskie",
+          "__typename": "Province"
+         },
+         "__typename": "Address"
+        },
+        "reverseGeocoding": {
+         "locations": [
+          {
+           "id": "malopolskie",
+           "name": "małopolskie",
+           "locationLevel": "voivodeship",
+           "fullName": "małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/krakowski",
+           "name": "krakowski",
+           "locationLevel": "county",
+           "fullName": "krakowski, małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/krakowski/swiatniki-gorne",
+           "name": "Świątniki Górne",
+           "locationLevel": "commune",
+           "fullName": "Świątniki Górne, krakowski, małopolskie",
+           "__typename": "BasicLocationObject"
+          },
+          {
+           "id": "malopolskie/krakowski/swiatniki-gorne/rzeszotary",
+           "name": "Rzeszotary",
+           "locationLevel": "city_or_village",
+           "fullName": "Rzeszotary, Świątniki Górne, krakowski, małopolskie",
+           "__typename": "BasicLocationObject"
+          }
+         ],
+         "__typename": "ReverseGeocoding"
+        },
+        "__typename": "LocationDetails"
+       },
+       "totalPossibleImages": 1,
+       "isExclusiveOffer": false,
+       "isPrivateOwner": false,
+       "isPromoted": false,
+       "extendedAdvertiserType": null,
+       "source": "urn:site:local",
+       "agency": {
+        "id": 11477800,
+        "name": "Tomasz Bodek Real Estate Nieruchomości",
+        "slug": "tomasz-bodek-real-estate-nieruchomosci-ID11477800",
+        "imageUrl": null,
+        "type": "AGENCY",
+        "brandingVisible": true,
+        "highlightedAds": false,
+        "enhancedBrandingFeatures": [
+         "ENHANCED_BRANDING_SELLER_TYPE",
+         "ENHANCED_BRANDING_LOGO_DISPLAY",
+         "ENHANCED_BRANDING_COMPANY_NAME"
+        ],
+        "__typename": "AgencyListingDetails"
+       },
+       "openDays": "",
+       "totalPrice": {
+        "value": 569000,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "rentPrice": null,
+       "priceFromPerSquareMeter": null,
+       "pricePerSquareMeter": {
+        "value": 237.08,
+        "currency": "PLN",
+        "__typename": "Money"
+       },
+       "areaInSquareMeters": 2400,
+       "terrainAreaInSquareMeters": null,
+       "roomsNumber": null,
+       "hidePrice": false,
+       "floorNumber": null,
+       "investmentState": null,
+       "investmentUnitsAreaInSquareMeters": null,
+       "peoplePerRoom": null,
+       "dateCreated": "2026-10-03 10:56:32",
+       "createdAtFirst": "2026-10-03T10:56:27Z",
+       "investmentUnitsNumber": null,
+       "investmentUnitsRoomsNumber": null,
+       "investmentUnitsFloorsRange": null,
+       "investmentEstimatedDelivery": null,
+       "pushedUpAt": null,
+       "specialOffer": null,
+       "shortDescription": "Piękna działka budowlana 24a w części widokowa w Olszowicach gm. Świątniki Górne – ok. 3km od Urzędu Miasta w Świątnikach. Działka o lekkim południowym nachyleniu. Media: prąd i woda w drodze asfaltow",
+       "organisationAssignedMember": null,
+       "advertOwner": {
+        "name": "Tomasz Bodek",
+        "imageUrl": "",
+        "contacts": [],
+        "__typename": "LegacyAdvertOwner"
+       },
+       "tags": [],
+       "__typename": "AdvertListItem",
+       "showPremiumTile": false,
+       "development": null,
+       "href": "[lang]/ad/dzialka-budowlana-widokowa-24a-olszowice-krakow-10km-ID4DmKW"
+      }
+     ],
+     "pagination": {
+      "totalItems": 1663,
+      "totalPages": 24,
+      "currentPage": 1,
+      "itemsPerPage": 72,
+      "__typename": "SearchPagination"
+     }
+    }
+   },
+   "filteringQueryParams": {
+    "distanceRadius": 25,
+    "limit": 72,
+    "page": 1
+   },
+   "location": "malopolskie/krakow/krakow/krakow"
+  }
+ },
+ "buildId": "mGqk5wgHgzkZ129f54Sjh",
+ "page": "/pl/wyniki/[[...searchingCriteria]]"
+}
