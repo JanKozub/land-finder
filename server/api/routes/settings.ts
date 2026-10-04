@@ -1,6 +1,6 @@
 import { zValidator } from "@hono/zod-validator";
 import type { Hono } from "hono";
-import { OTODOM_ESTATE, OTODOM_RADII } from "../../../shared/constants";
+import { OTODOM_ESTATE } from "../../../shared/constants";
 import { OlxCitySchema, OtodomValidateSchema, SettingsSchema } from "../../../shared/schemas";
 import { ensureSettings, saveSettings } from "../../db/queries/settings";
 import { resolveOlxCity } from "../../sources/olx/resolve-city";
@@ -27,7 +27,7 @@ export function registerSettingsRoutes(app: Hono, ctx: RouteContext): void {
   app.post("/api/otodom/validate-url", zValidator("json", OtodomValidateSchema), async (c) => {
     const parsed = parseOtodomSearchUrl(c.req.valid("json").url);
     if (!parsed || !parsed.locationPath) throw new ApiError(400, "not_a_search_url");
-    const radius = parsed.radiusKm !== null && (OTODOM_RADII as readonly number[]).includes(parsed.radiusKm) ? parsed.radiusKm : 15;
+    const radius = parsed.radiusKm !== null && Number.isInteger(parsed.radiusKm) && parsed.radiusKm >= 0 && parsed.radiusKm <= 100 ? parsed.radiusKm : 15;
     const estate = parsed.estate ?? OTODOM_ESTATE.plot;
     const [withRadius, noRadius] = await Promise.all([
       probeOtodomTotal(ctx.fetchClient, { estate, locationPath: parsed.locationPath, radiusKm: radius }),

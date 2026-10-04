@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { KINDS, OTODOM_RADII, SOURCES } from "./constants";
+import { KINDS, SOURCES } from "./constants";
 
 export const KindSchema = z.enum(KINDS);
 export const SourceSchema = z.enum(SOURCES);
@@ -22,7 +22,8 @@ export const SettingsSchema = z.object({
       .string()
       .min(1)
       .regex(/^[a-z0-9-]+(\/[a-z0-9-]+)*$/, "Ścieżka lokalizacji Otodom: małe litery, cyfry, myślniki, ukośniki"),
-    radiusKm: z.number().refine((v) => (OTODOM_RADII as readonly number[]).includes(v), "Niedozwolony promień Otodom"),
+    /** Any integer; Otodom honours most values but ignores some (see OTODOM_RADII), so the UI offers a check. */
+    radiusKm: z.number().int().min(0).max(100),
   }),
   autoScrape: z.object({
     enabled: z.boolean(),

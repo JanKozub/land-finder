@@ -6,7 +6,7 @@ import { SettingsSchema, type Settings } from "@shared/schemas";
 import { api } from "@/api/client";
 import { useSaveSettings, useSettings } from "@/api/hooks";
 import { CenterPicker } from "@/components/settings/CenterPicker";
-import { Button, Card, ErrorText, Field, Input, Select, Spinner, Switch } from "@/components/ui";
+import { Button, Card, ErrorText, Field, Input, Spinner, Switch } from "@/components/ui";
 import { KIND_LABEL_PLURAL } from "@/i18n/pl";
 
 function toggle<T>(list: T[], v: T): T[] {
@@ -82,12 +82,21 @@ export function SettingsPage() {
           <Field label="ID miasta (city_id)" hint="Wieliczka = 128097, Kraków = 8959, Niepołomice = 121091, Skawina = 94873">
             <Input type="number" value={f.olx.cityId} onChange={(e) => set((s) => (s.olx.cityId = Number(e.target.value)))} />
           </Field>
-          <Field label="Odległość (km)">
-            <Select value={f.olx.distanceKm} onChange={(e) => set((s) => (s.olx.distanceKm = Number(e.target.value)))}>
+          <Field label="Odległość (km)" hint="Dowolna liczba całkowita 0–100 (OLX przyjmuje każdą); 0 = tylko miasto.">
+            <Input
+              type="number"
+              min={0}
+              max={100}
+              step={1}
+              list="olx-distances"
+              value={f.olx.distanceKm}
+              onChange={(e) => set((s) => (s.olx.distanceKm = Number(e.target.value)))}
+            />
+            <datalist id="olx-distances">
               {OLX_DISTANCES.map((d) => (
-                <option key={d} value={d}>{d === 0 ? "tylko miasto" : `${d} km`}</option>
+                <option key={d} value={d} label={d === 0 ? "tylko miasto" : `${d} km`} />
               ))}
-            </Select>
+            </datalist>
           </Field>
           <Field label="Znajdź ID po nazwie" hint="Szuka w ogłoszeniach OLX; nie zawsze się uda — wtedy wpisz ID ręcznie.">
             <div className="flex gap-2">
@@ -116,12 +125,31 @@ export function SettingsPage() {
           <Field label="Ścieżka lokalizacji" hint="Z adresu wyszukiwania, np. malopolskie/wielicki/wieliczka (poziom gminy działa poprawnie z promieniem).">
             <Input value={f.otodom.locationPath} onChange={(e) => set((s) => (s.otodom.locationPath = e.target.value.trim()))} />
           </Field>
-          <Field label="Promień (km)">
-            <Select value={f.otodom.radiusKm} onChange={(e) => set((s) => (s.otodom.radiusKm = Number(e.target.value)))}>
-              {OTODOM_RADII.map((r) => (
-                <option key={r} value={r}>{r === 0 ? "bez promienia" : `${r} km`}</option>
-              ))}
-            </Select>
+          <Field label="Promień (km)" hint="Dowolna liczba całkowita 0–100; 0 = bez promienia. Otodom bywa kapryśny i czasem zwraca wynik jak bez promienia — sprawdź przyciskiem.">
+            <div className="flex gap-2">
+              <Input
+                type="number"
+                min={0}
+                max={100}
+                step={1}
+                list="otodom-radii"
+                value={f.otodom.radiusKm}
+                onChange={(e) => set((s) => (s.otodom.radiusKm = Number(e.target.value)))}
+              />
+              <datalist id="otodom-radii">
+                {OTODOM_RADII.map((r) => (
+                  <option key={r} value={r} label={r === 0 ? "bez promienia" : `${r} km`} />
+                ))}
+              </datalist>
+              <Button
+                onClick={() => otodomCheck.mutate(`https://www.otodom.pl/pl/wyniki/sprzedaz/dzialka/${f.otodom.locationPath}?distanceRadius=${f.otodom.radiusKm}`)}
+                loading={otodomCheck.isPending}
+                disabled={!f.otodom.locationPath || f.otodom.radiusKm <= 0}
+                title="Porównuje liczbę ofert z promieniem i bez niego"
+              >
+                Sprawdź promień
+              </Button>
+            </div>
           </Field>
         </div>
         <Field label="Sprawdź adres wyszukiwania Otodom" hint="Wklej URL z otodom.pl po ustawieniu miejscowości i promienia; sprawdzimy, czy portal respektuje promień." className="mt-3">
@@ -137,11 +165,14 @@ export function SettingsPage() {
               Ścieżka <code>{otodomCheck.data.locationPath}</code>, promień {otodomCheck.data.radiusKm} km → {otodomCheck.data.totalWithRadius ?? "?"} ofert
               {otodomCheck.data.totalWithoutRadius !== null && ` (bez promienia: ${otodomCheck.data.totalWithoutRadius})`}.
             </p>
-            {otodomCheck.data.radiusIgnored && (
+            {otodomCheck.data.radiusIgnored ? (
               <p className="text-amber-700">
-                Otodom ignoruje promień dla tej ścieżki.{" "}
+                Otodom zignorował promień {otodomCheck.data.radiusKm} km dla tej ścieżki — wynik jest taki sam jak bez promienia. Sprawdź ponownie za chwilę
+                albo spróbuj sąsiedniej wartości (np. 18, 20 lub 22).{" "}
                 {otodomCheck.data.suggestedPath && `Proponowana ścieżka gminy: ${otodomCheck.data.suggestedPath} (${otodomCheck.data.suggestedTotal ?? "?"} ofert).`}
               </p>
+            ) : (
+              otodomCheck.data.radiusKm > 0 && <p className="text-emerald-700">Otodom respektuje ten promień.</p>
             )}
             <div className="flex gap-2">
               <Button size="sm" onClick={() => set((s) => { s.otodom.locationPath = otodomCheck.data!.locationPath; s.otodom.radiusKm = otodomCheck.data!.radiusKm; })}>Użyj tej ścieżki</Button>

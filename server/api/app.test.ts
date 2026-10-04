@@ -31,6 +31,12 @@ describe("API", () => {
     const ok = await app.request("/api/settings", json({ ...DEFAULT_SETTINGS, radiusKm: 20 }, "PUT"));
     expect(ok.status).toBe(200);
     expect((await ok.json()).radiusKm).toBe(20);
+    // Portal radii are free integers (Otodom honours most values; the UI offers a check), bounded to 0–100.
+    const otodom20 = await app.request("/api/settings", json({ ...DEFAULT_SETTINGS, otodom: { ...DEFAULT_SETTINGS.otodom, radiusKm: 20 } }, "PUT"));
+    expect(otodom20.status).toBe(200);
+    expect((await otodom20.json()).otodom.radiusKm).toBe(20);
+    const otodomTooFar = await app.request("/api/settings", json({ ...DEFAULT_SETTINGS, otodom: { ...DEFAULT_SETTINGS.otodom, radiusKm: 101 } }, "PUT"));
+    expect(otodomTooFar.status).toBe(400);
     const props = await (await app.request("/api/properties?kinds=plot&priceMax=300000")).json();
     expect(props.items).toEqual([]);
     expect((await app.request("/api/properties/999")).status).toBe(404);

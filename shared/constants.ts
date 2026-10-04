@@ -12,11 +12,16 @@ export const OLX_CATEGORY: Record<Kind, number> = { plot: 24, house: 18 };
 /** Otodom estate slugs used in search URLs. */
 export const OTODOM_ESTATE: Record<Kind, string> = { plot: "dzialka", house: "dom" };
 
-/** Otodom accepts only these radius values (km). */
-export const OTODOM_RADII = [0, 5, 10, 15, 25, 50, 75] as const;
+/**
+ * Radius suggestions for Otodom (km). The site accepts any integer, but it intermittently answers with the
+ * no-radius result set for some (location, radius) pairs (seen 2026-10-04 for wielicki/wieliczka: 25 km returned the
+ * radius-0 count twice, then the real count minutes later), so the settings page offers a check that compares result
+ * counts with and without the radius.
+ */
+export const OTODOM_RADII = [0, 5, 10, 15, 20, 25, 50, 75] as const;
 
 /** Commonly used OLX distance values (km); the API accepts any integer. */
-export const OLX_DISTANCES = [0, 2, 5, 10, 15, 30, 50, 75, 100] as const;
+export const OLX_DISTANCES = [0, 2, 5, 10, 15, 20, 25, 30, 50, 75, 100] as const;
 
 /** Price bucket edges (PLN) used to keep each OLX query under the ~1000 result cap. Last bucket is open-ended. */
 export const OLX_PRICE_BUCKETS: Record<Kind, number[]> = {
