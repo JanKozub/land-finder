@@ -1,4 +1,5 @@
 import { RotateCcw } from "lucide-react";
+import type { ReactNode } from "react";
 import { KINDS, SOURCES } from "@shared/constants";
 import type { Filters } from "@shared/schemas";
 import { KIND_LABEL_PLURAL, SOURCE_LABEL } from "@/i18n/pl";
@@ -12,13 +13,15 @@ export interface FiltersPanelProps {
   onlyNew: boolean;
   setOnlyNew: (v: boolean) => void;
   hasLastVisit: boolean;
+  /** Extra controls rendered below the switches (e.g. the planned-S7 overlay). */
+  extra?: ReactNode;
 }
 
 function toggle<T>(list: T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
 }
 
-export function FiltersPanel({ filters, onChange, onReset, onlyNew, setOnlyNew, hasLastVisit }: FiltersPanelProps) {
+export function FiltersPanel({ filters, onChange, onReset, onlyNew, setOnlyNew, hasLastVisit, extra }: FiltersPanelProps) {
   return (
     <div className="space-y-3 border-b border-slate-200 bg-white p-3 text-sm">
       <div className="flex flex-wrap items-center gap-2">
@@ -106,6 +109,7 @@ export function FiltersPanel({ filters, onChange, onReset, onlyNew, setOnlyNew, 
         />
         <Switch checked={filters.favorites === "only"} onChange={(v) => onChange({ favorites: v ? "only" : "all" })} label="Tylko ulubione" />
       </div>
+      {extra}
     </div>
   );
 }

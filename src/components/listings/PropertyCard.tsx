@@ -2,10 +2,12 @@ import { ExternalLink, Eye, EyeOff, Heart, Info } from "lucide-react";
 import { memo } from "react";
 import type { PropertyDto } from "@shared/schemas";
 import type { Source } from "@shared/constants";
+import type { S7Proximity } from "@shared/s7";
 import { KIND_LABEL, SOURCE_LABEL } from "@/i18n/pl";
 import { formatArea, formatKm, formatPln, formatPricePerM2, formatRelative } from "@/lib/format";
 import { Badge, Button } from "../ui";
 import { cn } from "../ui/cn";
+import { S7Badge, s7FarNote } from "./S7Badge";
 
 export interface PropertyCardProps {
   item: PropertyDto;
@@ -17,6 +19,8 @@ export interface PropertyCardProps {
   onToggleHidden: (item: PropertyDto) => void;
   onToggleFavorite?: (item: PropertyDto) => void;
   compact?: boolean;
+  /** Distances to the enabled planned-S7 variants, nearest first (null when unknown or overlay off). */
+  s7?: readonly S7Proximity[] | null;
 }
 
 export function KindBadge({ kind }: { kind: PropertyDto["kind"] }) {
@@ -57,8 +61,9 @@ export function FavoriteButton({ favorite, onClick, loading }: { favorite: boole
   );
 }
 
-export const PropertyCard = memo(function PropertyCard({ item, isNew, distanceKm, active, onFocus, onDetails, onToggleHidden, onToggleFavorite, compact }: PropertyCardProps) {
+export const PropertyCard = memo(function PropertyCard({ item, isNew, distanceKm, active, onFocus, onDetails, onToggleHidden, onToggleFavorite, compact, s7 }: PropertyCardProps) {
   const ppm = formatPricePerM2(item.pricePerM2);
+  const s7Far = s7FarNote(s7);
   return (
     <article
       className={cn(
@@ -80,6 +85,7 @@ export const PropertyCard = memo(function PropertyCard({ item, isNew, distanceKm
             {item.locationPrecision === "approx" ? "~lokalizacja" : "brak współrzędnych"}
           </Badge>
         )}
+        <S7Badge proximity={s7} />
         {item.priceMin !== null && item.price !== null && item.priceMax !== null && item.priceMax > item.price && (
           <Badge className="bg-emerald-100 text-emerald-700" title={`Wcześniej do ${formatPln(item.priceMax)}`}>
             cena spadła
@@ -101,6 +107,7 @@ export const PropertyCard = memo(function PropertyCard({ item, isNew, distanceKm
         {distanceKm !== null && ` · ${formatKm(distanceKm)}`}
         {item.isPrivate === true && " · prywatny"}
         {item.isPrivate === false && " · agencja"}
+        {s7Far && <span title="Odległość od osi najbliższego włączonego wariantu planowanej S7"> · {s7Far}</span>}
       </p>
       {!compact && (
         <div className="mt-2 flex flex-wrap items-center gap-1.5" onClick={(e) => e.stopPropagation()}>

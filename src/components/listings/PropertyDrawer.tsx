@@ -1,13 +1,15 @@
 import { Ban, ExternalLink, Eye, EyeOff, Heart, RotateCcw, Scissors, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Source } from "@shared/constants";
 import type { ListingDto } from "@shared/schemas";
+import type { S7Proximity } from "@shared/s7";
 import { useDetachListing, useFavoriteProperty, useHideProperty, useIgnoreListing, useIgnoreProperty, useMergeProperty, useProperty, useSaveNote } from "@/api/hooks";
 import { SOURCE_LABEL } from "@/i18n/pl";
 import { formatArea, formatDateTime, formatPln, formatPricePerM2 } from "@/lib/format";
 import { Badge, Button, ErrorText, Input, Spinner } from "../ui";
 import { cn } from "../ui/cn";
 import { KindBadge } from "./PropertyCard";
+import { S7Distances } from "./S7Badge";
 
 function ListingRow({
   listing,
@@ -77,8 +79,22 @@ function ListingRow({
   );
 }
 
-export function PropertyDrawer({ id, onClose, onNavigate }: { id: number; onClose: () => void; onNavigate: (id: number) => void }) {
+export function PropertyDrawer({
+  id,
+  onClose,
+  onNavigate,
+  s7For,
+}: {
+  id: number;
+  onClose: () => void;
+  onNavigate: (id: number) => void;
+  /** Distances to the enabled planned-S7 variants for a location; omitted when the overlay is off. */
+  s7For?: (lat: number, lon: number) => S7Proximity[];
+}) {
   const { data, isLoading, error } = useProperty(id);
+  const lat = data?.lat ?? null;
+  const lon = data?.lon ?? null;
+  const s7 = useMemo(() => (s7For && lat !== null && lon !== null ? s7For(lat, lon) : []), [s7For, lat, lon]);
   const hide = useHideProperty();
   const saveNote = useSaveNote();
   const detach = useDetachListing();
@@ -160,6 +176,16 @@ export function PropertyDrawer({ id, onClose, onNavigate }: { id: number; onClos
                 )}
               </div>
             </div>
+
+            {s7.length > 0 && (
+              <section>
+                <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">Planowana S7 Kraków–Myślenice</h4>
+                <S7Distances proximity={s7} />
+                <p className="mt-1 text-[11px] text-slate-500">
+                  Odległość od osi trasy każdego włączonego wariantu. Do ok. 150 m = na trasie, do 500 m = bezpośrednie sąsiedztwo.
+                </p>
+              </section>
+            )}
 
             <section>
               <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">Notatka</h4>

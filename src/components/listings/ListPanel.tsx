@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { PropertyDto } from "@shared/schemas";
+import type { S7Proximity } from "@shared/s7";
 import { Button, Select } from "../ui";
 import { PropertyCard } from "./PropertyCard";
 
@@ -43,6 +44,7 @@ export function ListPanel({
   onToggleFavorite,
   isNew,
   distance,
+  s7,
   loading,
 }: {
   items: PropertyDto[];
@@ -56,6 +58,7 @@ export function ListPanel({
   onToggleFavorite: (item: PropertyDto) => void;
   isNew: (item: PropertyDto) => boolean;
   distance: (item: PropertyDto) => number | null;
+  s7?: (item: PropertyDto) => readonly S7Proximity[] | null;
   loading: boolean;
 }) {
   const [limit, setLimit] = useState(PAGE);
@@ -87,6 +90,7 @@ export function ListPanel({
             onDetails={onDetails}
             onToggleHidden={onToggleHidden}
             onToggleFavorite={onToggleFavorite}
+            s7={s7?.(item) ?? null}
           />
         ))}
         {items.length === 0 && !loading && (

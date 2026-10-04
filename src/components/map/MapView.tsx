@@ -3,11 +3,15 @@ import type { LatLngBounds } from "leaflet";
 import { memo, useEffect, useMemo, useRef } from "react";
 import { Circle, CircleMarker, MapContainer, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import type { PropertyDto } from "@shared/schemas";
+import type { S7Proximity, S7Variant } from "@shared/s7";
+import type { S7Collections } from "@/hooks/useS7";
 import { formatArea, formatPln, formatPricePerM2 } from "@/lib/format";
 import type { Bounds } from "@/lib/geo";
 import { Button } from "../ui";
 import { cn } from "../ui/cn";
 import { KindBadge, SourceLinks } from "../listings/PropertyCard";
+import { S7Badge, S7Distances } from "../listings/S7Badge";
+import { S7Overlay } from "./S7Overlay";
 
 export interface MapViewProps {
   items: PropertyDto[];
@@ -20,7 +24,14 @@ export interface MapViewProps {
   isNew: (item: PropertyDto) => boolean;
   onToggleFavorite: (item: PropertyDto) => void;
   onToggleIgnored: (item: PropertyDto) => void;
+  /** Planned S7 overlay: loaded variant geometries and which variants to draw. */
+  s7Collections: S7Collections;
+  s7Variants: readonly S7Variant[];
+  /** Distances of a property to the enabled variants, nearest first. */
+  s7Of: (item: PropertyDto) => readonly S7Proximity[] | null;
 }
+
+const POPUP_OFFSET: [number, number] = [0, -6];
 
 const COLORS = {
   plot: "#38bdf8",
@@ -83,11 +94,13 @@ const PropertyMarker = memo(function PropertyMarker(p: MarkerProps) {
 
 function PopupContent({
   item,
+  s7,
   onDetails,
   onToggleFavorite,
   onToggleIgnored,
 }: {
   item: PropertyDto;
+  s7: readonly S7Proximity[] | null;
   onDetails: (id: number) => void;
   onToggleFavorite: (item: PropertyDto) => void;
   onToggleIgnored: (item: PropertyDto) => void;
@@ -96,6 +109,7 @@ function PopupContent({
     <div className="space-y-1 text-sm">
       <div className="flex flex-wrap items-center gap-1.5">
         <KindBadge kind={item.kind} />
+        <S7Badge proximity={s7} />
         {item.favorite && <span className="rounded-sm bg-pink-100 px-1.5 py-0.5 text-[11px] font-semibold text-pink-700">♥ ulubione</span>}
         {item.ignored && <span className="rounded-sm bg-slate-200 px-1.5 py-0.5 text-[11px] font-semibold text-slate-600">ignorowane</span>}
         {item.hidden && <span className="rounded-sm bg-slate-200 px-1.5 py-0.5 text-[11px] font-semibold text-slate-600">ukryte</span>}
@@ -108,6 +122,12 @@ function PopupContent({
         {item.kind === "house" && item.plotAreaM2 !== null && ` · działka ${formatArea(item.plotAreaM2, "plot")}`}
       </p>
       <p className="text-xs text-slate-500">{[item.city, item.district].filter(Boolean).join(", ")}</p>
+      {s7 && s7.length > 0 && (
+        <div className="pt-0.5">
+          <p className="text-[11px] font-semibold text-slate-500">Planowana S7 – odległość od osi wariantów</p>
+          <S7Distances proximity={s7} className="mt-0.5" />
+        </div>
+      )}
       <div className="flex flex-wrap items-center gap-1.5 pt-1">
         <Button size="sm" variant="primary" onClick={() => window.open(item.url, "_blank", "noopener,noreferrer")}>
           Otwórz ofertę
@@ -136,20 +156,41 @@ function PopupContent({
   );
 }
 
-export function MapView({ items, center, radiusKm, focusId, onFocus, onDetails, onBoundsChange, isNew, onToggleFavorite, onToggleIgnored }: MapViewProps) {
+export function MapView({
+  items,
+  center,
+  radiusKm,
+  focusId,
+  onFocus,
+  onDetails,
+  onBoundsChange,
+  isNew,
+  onToggleFavorite,
+  onToggleIgnored,
+  s7Collections,
+  s7Variants,
+  s7Of,
+}: MapViewProps) {
   const focused = useMemo(() => items.find((i) => i.id === focusId) ?? null, [items, focusId]);
   const located = useMemo(() => items.filter((i) => i.lat !== null && i.lon !== null), [items]);
   const focusIdRef = useRef(focusId);
   focusIdRef.current = focusId;
+  const focusedId = focused?.id ?? null;
+  const focusedLat = focused?.lat ?? null;
+  const focusedLon = focused?.lon ?? null;
+  // Stable position object: react-leaflet re-creates the popup whenever `position` changes identity, and a
+  // re-created popup fires `remove`, which would close it on every re-render (map move, sort change, drawer).
+  const popupPosition = useMemo<[number, number] | null>(() => (focusedLat !== null && focusedLon !== null ? [focusedLat, focusedLon] : null), [focusedLat, focusedLon]);
 
-  // A single popup for the focused property; closing it (× or map click) clears the focus.
+  // A single popup for the focused property; closing it (× or map click) clears the focus. The handler is bound to
+  // the popup's own property, so swapping the focus to another property (which removes this popup) keeps the new one.
   const popupEvents = useMemo(
     () => ({
       remove: () => {
-        if (focusIdRef.current !== null) onFocus(null);
+        if (focusedId !== null && focusIdRef.current === focusedId) onFocus(null);
       },
     }),
-    [onFocus],
+    [focusedId, onFocus],
   );
 
   return (
@@ -158,6 +199,7 @@ export function MapView({ items, center, radiusKm, focusId, onFocus, onDetails, 
       <Circle center={[center.lat, center.lon]} radius={radiusKm * 1000} pathOptions={{ color: "#334155", weight: 1, dashArray: "6 6", fill: false }} interactive={false} />
       <ViewportSync onBoundsChange={onBoundsChange} />
       <FocusController focusId={focusId} lat={focused?.lat ?? null} lon={focused?.lon ?? null} />
+      <S7Overlay collections={s7Collections} variants={s7Variants} />
       {located.map((item) => {
         const isFocused = item.id === focusId;
         const muted = item.hidden || item.ignored;
@@ -178,9 +220,9 @@ export function MapView({ items, center, radiusKm, focusId, onFocus, onDetails, 
           />
         );
       })}
-      {focused && focused.lat !== null && focused.lon !== null && (
-        <Popup position={[focused.lat, focused.lon]} eventHandlers={popupEvents} offset={[0, -6]}>
-          <PopupContent item={focused} onDetails={onDetails} onToggleFavorite={onToggleFavorite} onToggleIgnored={onToggleIgnored} />
+      {focused && popupPosition && (
+        <Popup key={focused.id} position={popupPosition} eventHandlers={popupEvents} offset={POPUP_OFFSET}>
+          <PopupContent item={focused} s7={s7Of(focused)} onDetails={onDetails} onToggleFavorite={onToggleFavorite} onToggleIgnored={onToggleIgnored} />
         </Popup>
       )}
     </MapContainer>

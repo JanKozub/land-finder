@@ -1,4 +1,5 @@
 import type { Kind, Source } from "@shared/constants";
+import type { S7Kind } from "@shared/s7";
 
 export const KIND_LABEL: Record<Kind, string> = { plot: "Działka", house: "Dom" };
 export const KIND_LABEL_PLURAL: Record<Kind, string> = { plot: "Działki", house: "Domy" };
@@ -27,3 +28,16 @@ export const JOB_STATUS_LABEL = {
 } as const;
 
 export const TRIGGER_LABEL = { manual: "ręcznie", schedule: "harmonogram", cli: "lokalnie" } as const;
+
+export const S7_KIND_LABEL: Record<S7Kind, string> = {
+  axis: "oś S7",
+  axisTunnel: "oś S7 w tunelu",
+  bdi: "oś BDI (Beskidzka Droga Integracyjna)",
+  bdiTunnel: "oś BDI w tunelu",
+  tunnel: "tunel",
+  bridge: "estakada / most",
+  interchange: "węzeł drogowy",
+  interchangeName: "węzeł drogowy",
+  extent: "zakres budowy lub przebudowy",
+  km: "kilometraż",
+};

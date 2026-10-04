@@ -31,6 +31,10 @@ export function formatKm(km: number): string {
   return `${dec1.format(km)} km`;
 }
 
+export function formatMeters(m: number): string {
+  return m < 1000 ? `${pln.format(Math.round(m))} m` : formatKm(m / 1000);
+}
+
 export function formatRelative(iso: string | null | undefined): string {
   if (!iso) return "—";
   const diffMs = Date.now() - new Date(iso).getTime();

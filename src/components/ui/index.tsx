@@ -1,5 +1,5 @@
 import { Loader2 } from "lucide-react";
-import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from "react";
+import type { ButtonHTMLAttributes, CSSProperties, InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from "react";
 import { cn } from "./cn";
 
 type Variant = "primary" | "secondary" | "ghost" | "danger";
@@ -84,9 +84,9 @@ export function Switch({ checked, onChange, label, disabled }: { checked: boolea
   );
 }
 
-export function Badge({ children, className, title }: { children: ReactNode; className?: string; title?: string }) {
+export function Badge({ children, className, title, style }: { children: ReactNode; className?: string; title?: string; style?: CSSProperties }) {
   return (
-    <span title={title} className={cn("inline-flex items-center rounded-sm px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide", className)}>
+    <span title={title} style={style} className={cn("inline-flex items-center rounded-sm px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide", className)}>
       {children}
     </span>
   );

@@ -72,6 +72,17 @@ pnpm worker --mode backfill
 - **Ulubione**: kolumna `properties.favorite` (`POST /api/properties/:id/favorite`), gwiazdka w popupie markera, na
   karcie i w szczegółach; markery ulubionych mają złotą obwódkę. Przełącznik „Tylko ulubione” (domyślnie wyłączony,
   parametr `favorites=only`) zawęża mapę i listę do ulubionych. Przy scalaniu nieruchomości flaga jest zachowywana.
+- **Planowana S7 Kraków–Myślenice**: nakładka na mapie z sześcioma wariantami trasy (A–F) ze Studium
+  techniczno-ekonomiczno-środowiskowego GDDKiA (2025). Dane to statyczne pliki `public/data/s7/<wariant>.geojson`
+  pobrane skryptem `pnpm s7:fetch` z oficjalnych map wariantów (`https://wariant-w<x>.s7-krakow-myslenice-stes.pl/`,
+  warstwy qgis2web: oś S7 i odcinki w tunelu, oś BDI, estakady/mosty, tunele, węzły z nazwami, zakres robót,
+  kilometraż). Linie mają kolory wariantów jak na mapach GDDKiA; po zbliżeniu (zoom ≥ 13) pojawiają się estakady,
+  tunele, węzły i zakres robót. Węzły to klikalne kółka na trasie — kliknięcie pokazuje lub chowa nazwę węzła.
+  Przyciski A–F w panelu filtrów włączają warianty
+  (parametr `s7=A,C` albo `s7=none`), a filtr „S7” (`s7f=near:500` / `s7f=far:1000`) zawęża oferty do położonych
+  blisko lub z dala od osi najbliższego włączonego wariantu. Odległość do osi każdego wariantu liczona jest w
+  przeglądarce (`shared/s7.ts`); karta pokazuje najbliższy wariant (plakietka do 150 m = „na trasie”, do 500 m =
+  „w pobliżu”), popup i szczegóły — wszystkie warianty.
 
 ## Skrypty
 
@@ -82,6 +93,7 @@ pnpm worker --mode backfill
 | `pnpm db:generate` / `pnpm db:migrate` / `pnpm db:studio` | migracje Drizzle |
 | `pnpm worker --mode incremental\|backfill\|sweep [--sources olx,otodom]` | lokalny worker |
 | `pnpm fixtures:record` | nagrywa prawdziwe odpowiedzi portali jako fixture'y testów |
+| `pnpm s7:fetch` | pobiera warianty planowanej S7 z map GDDKiA do `public/data/s7/*.geojson` |
 
 ## Zmienne środowiskowe
 

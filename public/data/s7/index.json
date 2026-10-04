@@ -1,0 +1,139 @@
+{
+  "generatedAt": "2026-10-04T08:13:18.161Z",
+  "source": "https://s7-krakow-myslenice-stes.gddkia.gov.pl/",
+  "variants": {
+    "A": {
+      "file": "/data/s7/a.geojson",
+      "kinds": {
+        "axis": 6,
+        "axisTunnel": 5,
+        "bdi": 5,
+        "bdiTunnel": 2,
+        "tunnel": 7,
+        "bridge": 43,
+        "interchange": 5,
+        "interchangeName": 6,
+        "extent": 72,
+        "km": 31
+      },
+      "interchanges": [
+        "Węzeł Kraków Łagiewniki",
+        "Węzeł Wrząsowice",
+        "Węzeł Siepraw",
+        "Węzeł Krzyszkowice",
+        "Węzeł Myślenice Północ",
+        "Węzeł Głogoczów"
+      ],
+      "bytes": 147657
+    },
+    "B": {
+      "file": "/data/s7/b.geojson",
+      "kinds": {
+        "axis": 14,
+        "axisTunnel": 6,
+        "bdi": 4,
+        "bdiTunnel": 3,
+        "tunnel": 7,
+        "bridge": 34,
+        "interchange": 5,
+        "interchangeName": 6,
+        "extent": 78,
+        "km": 30
+      },
+      "interchanges": [
+        "Węzeł Kraków Tuchowska",
+        "Węzeł Rzeszotary",
+        "Węzeł Siepraw",
+        "Węzeł Zawada",
+        "Węzeł Myślenice Północ",
+        "Węzeł Głogoczów"
+      ],
+      "bytes": 165147
+    },
+    "C": {
+      "file": "/data/s7/c.geojson",
+      "kinds": {
+        "axis": 15,
+        "axisTunnel": 6,
+        "bdi": 5,
+        "bdiTunnel": 4,
+        "tunnel": 8,
+        "bridge": 29,
+        "interchange": 5,
+        "interchangeName": 6,
+        "extent": 74,
+        "km": 29
+      },
+      "interchanges": [
+        "Węzeł Kraków Blacharska",
+        "Węzeł Podstolice",
+        "Węzeł Siepraw",
+        "Węzeł Krzyszkowice",
+        "Węzeł Myślenice Północ",
+        "Węzeł Głogoczów"
+      ],
+      "bytes": 183438
+    },
+    "D": {
+      "file": "/data/s7/d.geojson",
+      "kinds": {
+        "axis": 2,
+        "axisTunnel": 2,
+        "tunnel": 3,
+        "bridge": 32,
+        "interchangeName": 4,
+        "extent": 47,
+        "km": 27
+      },
+      "interchanges": [
+        "Węzeł Kraków Łagiewniki",
+        "Węzeł Myślenice Północ",
+        "Węzeł Głogoczów",
+        "Węzeł Lusina"
+      ],
+      "bytes": 135019
+    },
+    "E": {
+      "file": "/data/s7/e.geojson",
+      "kinds": {
+        "axis": 1,
+        "axisTunnel": 1,
+        "tunnel": 2,
+        "bridge": 18,
+        "interchangeName": 7,
+        "extent": 38,
+        "km": 29
+      },
+      "interchanges": [
+        "Węzeł Kraków Tuchowska",
+        "Węzeł Myślenice Północ",
+        "Węzeł Głogoczów",
+        "Węzeł Świątniki Górne",
+        "Węzeł Krzyszkowice",
+        "Węzeł Jawornik",
+        "Węzeł Myślenice"
+      ],
+      "bytes": 153413
+    },
+    "F": {
+      "file": "/data/s7/f.geojson",
+      "kinds": {
+        "axis": 4,
+        "axisTunnel": 2,
+        "tunnel": 3,
+        "bridge": 34,
+        "interchangeName": 5,
+        "extent": 45,
+        "km": 30
+      },
+      "interchanges": [
+        "Węzeł Kraków Blacharska",
+        "Węzeł Myślenice Północ",
+        "Węzeł Głogoczów",
+        "Węzeł Golkowice",
+        "Węzeł Świątniki Górne"
+      ],
+      "bytes": 200453
+    }
+  }
+}

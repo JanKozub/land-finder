@@ -18,7 +18,8 @@
     "db:migrate": "tsx scripts/migrate.ts",
     "db:studio": "drizzle-kit studio",
     "worker": "tsx scripts/worker.ts",
-    "fixtures:record": "tsx scripts/record-fixture.ts"
+    "fixtures:record": "tsx scripts/record-fixture.ts",
+    "s7:fetch": "tsx scripts/fetch-s7-variants.ts"
   },
   "dependencies": {
     "@date-fns/tz": "^1.5.0",
@@ -47,6 +48,7 @@
     "@netlify/functions": "^6.0.2",
     "@netlify/vite-plugin": "^3.0.1",
     "@tailwindcss/vite": "^4.3.3",
+    "@types/geojson": "^7946.0.16",
     "@types/leaflet": "^1.9.22",
     "@types/node": "^22.20.5",
     "@types/react": "^19.3.0",
