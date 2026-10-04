@@ -1,10 +1,12 @@
 import { Ban, Heart, RotateCcw } from "lucide-react";
 import type { LatLngBounds } from "leaflet";
-import { memo, useEffect, useMemo, useRef } from "react";
-import { CircleMarker, MapContainer, Popup, Rectangle, TileLayer, useMap, useMapEvents } from "react-leaflet";
+import type { Popup as LeafletPopup } from "leaflet";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { CircleMarker, MapContainer, Polyline, Popup, Rectangle, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import type { Area } from "@shared/area";
 import type { PropertyDto } from "@shared/schemas";
 import type { S7Proximity, S7Variant } from "@shared/s7";
+import { spreadOverlapping } from "@shared/spread";
 import type { S7Collections } from "@/hooks/useS7";
 import { formatArea, formatPln, formatPricePerM2 } from "@/lib/format";
 import type { Bounds } from "@/lib/geo";
@@ -157,6 +159,84 @@ function PopupContent({
   );
 }
 
+type LatLon = [number, number];
+
+const LEG_STYLE = { color: "#64748b", weight: 1, opacity: 0.55 } as const;
+
+/**
+ * The popup of the focused property. react-leaflet re-creates a popup whenever its `position` prop changes identity
+ * (which fires `remove` and would clear the focus), so the prop stays at the first position and later moves — the
+ * spread ring shifts with the zoom level — are applied to the Leaflet instance directly.
+ */
+function FocusedPopup({ pos, events, children }: { pos: LatLon; events: { remove: () => void }; children: React.ReactNode }) {
+  const [initial] = useState<LatLon>(pos);
+  const ref = useRef<LeafletPopup>(null);
+  const [lat, lon] = pos;
+  useEffect(() => {
+    ref.current?.setLatLng([lat, lon]);
+  }, [lat, lon]);
+  return (
+    <Popup ref={ref} position={initial} eventHandlers={events} offset={POPUP_OFFSET}>
+      {children}
+    </Popup>
+  );
+}
+
+interface MarkerLayerProps {
+  items: PropertyDto[];
+  focused: PropertyDto | null;
+  focusId: number | null;
+  onFocus: (id: number | null) => void;
+  isNew: (item: PropertyDto) => boolean;
+  popupEvents: { remove: () => void };
+  popupContent: React.ReactNode;
+}
+
+/** Property dots, the overlap spreading, the focus controller and the single popup (all need the map instance). */
+function MarkerLayer({ items, focused, focusId, onFocus, isNew, popupEvents, popupContent }: MarkerLayerProps) {
+  const map = useMap();
+  const [zoom, setZoom] = useState(() => map.getZoom());
+  useMapEvents({ zoomend: () => setZoom(map.getZoom()) });
+  // Recomputed per zoom level: the spread is defined in pixels.
+  const spread = useMemo(() => spreadOverlapping(map, items), [map, items, zoom]);
+  const focusedPos: LatLon | null = focused && focused.lat !== null && focused.lon !== null ? (spread.positions.get(focused.id) ?? [focused.lat, focused.lon]) : null;
+
+  return (
+    <>
+      {spread.legs.map((groupLegs, i) => (
+        <Polyline key={`legs-${i}-${groupLegs[0]?.[0]?.join(",")}`} positions={groupLegs} pathOptions={LEG_STYLE} interactive={false} />
+      ))}
+      <FocusController focusId={focusId} lat={focusedPos?.[0] ?? null} lon={focusedPos?.[1] ?? null} />
+      {items.map((item) => {
+        const isFocused = item.id === focusId;
+        const muted = item.hidden || item.ignored;
+        const fill = muted ? COLORS.hidden : item.favorite ? COLORS.favorite : !item.isActive ? COLORS.inactive : COLORS[item.kind];
+        const pos = spread.positions.get(item.id);
+        return (
+          <PropertyMarker
+            key={item.id}
+            id={item.id}
+            lat={pos ? pos[0] : item.lat!}
+            lon={pos ? pos[1] : item.lon!}
+            radius={isFocused ? 10 : item.favorite || isNew(item) ? 8 : 6}
+            stroke={isFocused ? COLORS.focus : item.favorite && !muted ? COLORS.favoriteStroke : fill}
+            weight={isFocused ? 3 : item.favorite && !muted ? 2 : item.locationPrecision === "approx" ? 1.5 : 1}
+            dashed={item.locationPrecision === "approx"}
+            fill={fill}
+            fillOpacity={muted ? 0.4 : 0.85}
+            onFocus={onFocus}
+          />
+        );
+      })}
+      {focused && focusedPos && (
+        <FocusedPopup key={focused.id} pos={focusedPos} events={popupEvents}>
+          {popupContent}
+        </FocusedPopup>
+      )}
+    </>
+  );
+}
+
 export function MapView({
   items,
   center,
@@ -177,11 +257,6 @@ export function MapView({
   const focusIdRef = useRef(focusId);
   focusIdRef.current = focusId;
   const focusedId = focused?.id ?? null;
-  const focusedLat = focused?.lat ?? null;
-  const focusedLon = focused?.lon ?? null;
-  // Stable position object: react-leaflet re-creates the popup whenever `position` changes identity, and a
-  // re-created popup fires `remove`, which would close it on every re-render (map move, sort change, drawer).
-  const popupPosition = useMemo<[number, number] | null>(() => (focusedLat !== null && focusedLon !== null ? [focusedLat, focusedLon] : null), [focusedLat, focusedLon]);
 
   // A single popup for the focused property; closing it (× or map click) clears the focus. The handler is bound to
   // the popup's own property, so swapping the focus to another property (which removes this popup) keeps the new one.
@@ -208,31 +283,15 @@ export function MapView({
       <ViewportSync onBoundsChange={onBoundsChange} />
       <FocusController focusId={focusId} lat={focused?.lat ?? null} lon={focused?.lon ?? null} />
       <S7Overlay collections={s7Collections} variants={s7Variants} />
-      {located.map((item) => {
-        const isFocused = item.id === focusId;
-        const muted = item.hidden || item.ignored;
-        const fill = muted ? COLORS.hidden : item.favorite ? COLORS.favorite : !item.isActive ? COLORS.inactive : COLORS[item.kind];
-        return (
-          <PropertyMarker
-            key={item.id}
-            id={item.id}
-            lat={item.lat!}
-            lon={item.lon!}
-            radius={isFocused ? 10 : item.favorite || isNew(item) ? 8 : 6}
-            stroke={isFocused ? COLORS.focus : item.favorite && !muted ? COLORS.favoriteStroke : fill}
-            weight={isFocused ? 3 : item.favorite && !muted ? 2 : item.locationPrecision === "approx" ? 1.5 : 1}
-            dashed={item.locationPrecision === "approx"}
-            fill={fill}
-            fillOpacity={muted ? 0.4 : 0.85}
-            onFocus={onFocus}
-          />
-        );
-      })}
-      {focused && popupPosition && (
-        <Popup key={focused.id} position={popupPosition} eventHandlers={popupEvents} offset={POPUP_OFFSET}>
-          <PopupContent item={focused} s7={s7Of(focused)} onDetails={onDetails} onToggleFavorite={onToggleFavorite} onToggleIgnored={onToggleIgnored} />
-        </Popup>
-      )}
+      <MarkerLayer
+        items={located}
+        focused={focused}
+        focusId={focusId}
+        onFocus={onFocus}
+        isNew={isNew}
+        popupEvents={popupEvents}
+        popupContent={focused ? <PopupContent item={focused} s7={s7Of(focused)} onDetails={onDetails} onToggleFavorite={onToggleFavorite} onToggleIgnored={onToggleIgnored} /> : null}
+      />
     </MapContainer>
   );
 }
