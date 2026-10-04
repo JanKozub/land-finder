@@ -20,7 +20,7 @@ export function registerSettingsRoutes(app: Hono, ctx: RouteContext): void {
   app.get("/api/olx/cities", async (c) => {
     const parsed = OlxCitySchema.safeParse({ q: c.req.query("q") ?? "" });
     if (!parsed.success) throw new ApiError(400, "invalid_query");
-    const candidates = await resolveOlxCity(ctx.fetchClient, parsed.data.q);
+    const candidates = await resolveOlxCity(ctx.olxFetchClient, parsed.data.q);
     return c.json({ candidates });
   });
 

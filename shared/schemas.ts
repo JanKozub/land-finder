@@ -98,8 +98,16 @@ export function parseFilterQuery(q: Record<string, string | undefined>): Filters
     active: q.active,
   };
   const cleaned = Object.fromEntries(Object.entries(raw).filter(([, v]) => v !== undefined));
-  const parsed = FilterSchema.safeParse(cleaned);
-  return parsed.success ? parsed.data : FilterSchema.parse({});
+  return parseLeniently(FilterSchema, cleaned);
+}
+
+/** Parses with the schema, dropping only the offending fields (falling back to their defaults) instead of everything. */
+export function parseLeniently<T extends z.ZodObject>(schema: T, input: Record<string, unknown>): z.infer<T> {
+  const first = schema.safeParse(input);
+  if (first.success) return first.data;
+  const bad = new Set(first.error.issues.map((i) => String(i.path[0])));
+  const retry = schema.safeParse(Object.fromEntries(Object.entries(input).filter(([k]) => !bad.has(k))));
+  return retry.success ? retry.data : schema.parse({});
 }
 
 export function filtersToQuery(f: Partial<Filters>): Record<string, string> {
@@ -269,8 +277,7 @@ export type ListingsQuery = z.infer<typeof ListingsQuerySchema>;
 
 export function parseListingsQuery(q: Record<string, string | undefined>): ListingsQuery {
   const cleaned = Object.fromEntries(Object.entries(q).filter(([, v]) => v !== undefined && v !== ""));
-  const parsed = ListingsQuerySchema.safeParse(cleaned);
-  return parsed.success ? parsed.data : ListingsQuerySchema.parse({});
+  return parseLeniently(ListingsQuerySchema, cleaned);
 }
 
 export function listingsQueryToParams(q: Partial<ListingsQuery>): Record<string, string> {

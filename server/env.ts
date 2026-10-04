@@ -29,6 +29,8 @@ export const env = {
   tickBudgetMs: int(process.env.SCRAPE_TICK_BUDGET_MS, 20000),
   workerSources: csv(process.env.WORKER_SOURCES),
   olxProxyUrl: process.env.OLX_PROXY_URL || "",
+  /** "browser" (default) sends OLX requests with a browser-like TLS/header fingerprint; "fetch" uses plain Node fetch. */
+  olxClient: (process.env.OLX_CLIENT === "fetch" ? "fetch" : "browser") as "browser" | "fetch",
   appSecret: process.env.APP_SECRET || "",
   storeRaw: process.env.STORE_RAW === "1",
   logLevel: (process.env.LOG_LEVEL || "info") as "debug" | "info" | "warn" | "error",

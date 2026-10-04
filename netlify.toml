@@ -8,6 +8,9 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+  # got-scraping/header-generator read JSON data files relative to their package dir, so they must be
+  # copied as-is instead of being inlined into the bundle.
+  external_node_modules = ["got-scraping"]
 
 [functions."scrape-tick"]
   schedule = "*/30 * * * *"

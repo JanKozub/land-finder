@@ -57,3 +57,44 @@ export function createFetchClient(opts: FetchClientOptions = {}): FetchClient {
     },
   };
 }
+
+/**
+ * Browser-like client (Chrome TLS ciphers, HTTP/2 and header set via got-scraping). OLX's CloudFront
+ * rules reject plain Node fetch from IPs they have flagged, while this fingerprint keeps passing.
+ */
+export function createBrowserLikeClient(opts: FetchClientOptions = {}): FetchClient {
+  const timeoutMs = opts.timeoutMs ?? 20_000;
+  let gotPromise: Promise<typeof import("got-scraping")> | undefined;
+  return {
+    async get(url, headers = {}) {
+      gotPromise ??= import("got-scraping");
+      const { gotScraping } = await gotPromise;
+      try {
+        const res = await gotScraping({
+          url,
+          headers,
+          responseType: "text",
+          throwHttpErrors: false,
+          timeout: { request: timeoutMs },
+          retry: { limit: 0 },
+          proxyUrl: opts.proxyUrl || undefined,
+          headerGeneratorOptions: {
+            browsers: [{ name: "chrome", minVersion: 120 }],
+            devices: ["desktop"],
+            operatingSystems: ["macos", "windows"],
+            locales: ["pl-PL", "pl"],
+          },
+        });
+        const out = new Headers();
+        for (const [k, v] of Object.entries(res.headers)) {
+          if (typeof v === "string") out.set(k, v);
+          else if (Array.isArray(v)) out.set(k, v.join(", "));
+        }
+        return { status: res.statusCode, headers: out, text: String(res.body) };
+      } catch (err) {
+        if (err instanceof Error && /timeout/i.test(err.name + err.message)) throw new HttpError(0, url, `timeout after ${timeoutMs} ms`);
+        throw err;
+      }
+    },
+  };
+}

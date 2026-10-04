@@ -5,6 +5,7 @@ import type { ContentfulStatusCode } from "hono/utils/http-status";
 import type { Source } from "../../shared/constants";
 import type { Db } from "../db/client";
 import { env } from "../env";
+import { clientForSource } from "../http/clients";
 import { createFetchClient, type FetchClient } from "../http/fetch-client";
 import { createLogger, type Logger } from "../logger";
 import { defaultNotifiers } from "../notify";
@@ -24,6 +25,7 @@ export interface AppDeps {
   log?: Logger;
   now?: () => Date;
   fetchClient?: FetchClient;
+  olxFetchClient?: FetchClient;
   notifiers?: Notifier[];
   appSecret?: string;
   stepBudgetMs?: number;
@@ -40,6 +42,7 @@ export function createApp(deps: AppDeps): Hono {
     log,
     now: deps.now ?? (() => new Date()),
     fetchClient: deps.fetchClient ?? createFetchClient(),
+    olxFetchClient: deps.olxFetchClient ?? clientForSource("olx", deps.fetchClient ?? createFetchClient()),
     notifiers: deps.notifiers ?? defaultNotifiers(),
     stepBudgetMs: deps.stepBudgetMs ?? env.stepBudgetMs,
     workerSources: deps.workerSources === undefined ? (env.workerSources as Source[] | null) : deps.workerSources,

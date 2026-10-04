@@ -24,7 +24,7 @@ export function registerSourceRoutes(app: Hono, ctx: RouteContext): void {
       source === "olx"
         ? buildOlxOffersUrl({ categoryId: OLX_CATEGORY.plot, cityId: settings.olx.cityId, distanceKm: settings.olx.distanceKm, offset: 0, limit: 1 })
         : buildOtodomListHtmlUrl({ estate: OTODOM_ESTATE.plot, locationPath: settings.otodom.locationPath, radiusKm: settings.otodom.radiusKm, page: 1, limit: 24 });
-    const client = clientForSource(source, ctx.fetchClient);
+    const client = clientForSource(source, ctx.fetchClient, ctx.olxFetchClient);
     const started = Date.now();
     let status = 0;
     let error: string | null = null;

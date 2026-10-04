@@ -50,8 +50,10 @@ pnpm worker --mode backfill
 - **Kolejka zadań w Postgresie + worker z budżetem czasu** (`server/jobs`). Każde wywołanie (porcja z UI, tick
   harmonogramu, lokalny CLI) przetwarza zadania przez ≤ `SCRAPE_STEP_BUDGET_MS` i zapisuje kursor, więc praca
   jest wznawialna i mieści się w limicie 10 s funkcji Netlify. Jedna blokada (`worker_lease`) — jeden worker naraz.
-- **Źródła** (`server/sources`): OLX przez publiczne JSON API (kategorie 24 = działki, 18 = domy; tylko nagłówki
-  `User-Agent` + `Accept`, ≥2 s odstępu, ≤20 żądań/10 min, backoff po 403). Otodom przez JSON osadzony w stronach
+- **Źródła** (`server/sources`): OLX przez publiczne JSON API (kategorie 24 = działki, 18 = domy; ≥2 s odstępu,
+  ≤20 żądań/10 min, backoff po 403). Żądania do OLX idą przez klienta z odciskiem przeglądarki (`got-scraping`,
+  nagłówki i TLS jak Chrome), bo CloudFront OLX po serii żądań odrzuca zwykły `fetch` z Node z danego IP, a taki
+  klient nadal przechodzi; `OLX_CLIENT=fetch` przywraca zwykły `fetch`. Otodom przez JSON osadzony w stronach
   (`__NEXT_DATA__` / `_next/data`), współrzędne z strony oferty (1 żądanie na nową ofertę, cache w bazie).
 - **Deduplikacja** (`server/dedup`): ogłoszenia → nieruchomości; reguły na współrzędnych (dokładne/przybliżone),
   powierzchni, cenie, podobieństwie tytułu i sprzedawcy. Ręcznie: „To nie ta sama oferta” (trwałe wykluczenie)

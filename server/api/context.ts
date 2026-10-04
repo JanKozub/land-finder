@@ -10,6 +10,8 @@ export interface RouteContext {
   log: Logger;
   now: () => Date;
   fetchClient: FetchClient;
+  /** Client used for OLX requests (browser-like by default); injectable for tests. */
+  olxFetchClient: FetchClient;
   notifiers: Notifier[];
   stepBudgetMs: number;
   workerSources: Source[] | null;

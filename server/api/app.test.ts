@@ -21,7 +21,7 @@ const json = (body: unknown, method = "POST") => ({ method, headers: { "content-
 
 describe("API", () => {
   it("serves health, settings and an empty property list", async () => {
-    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, appSecret: "" });
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "" });
     expect((await app.request("/api/health")).status).toBe(200);
     const settings = await (await app.request("/api/settings")).json();
     expect(settings.center).toEqual(DEFAULT_SETTINGS.center);
@@ -37,7 +37,7 @@ describe("API", () => {
   });
 
   it("starts, reports and cancels scrape runs", async () => {
-    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, appSecret: "" });
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "" });
     const started = await app.request("/api/scrape", json({ mode: "incremental" }));
     expect(started.status).toBe(201);
     const again = await app.request("/api/scrape", json({ mode: "incremental" }));
@@ -52,7 +52,7 @@ describe("API", () => {
   });
 
   it("requires the shared secret for writes when configured", async () => {
-    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, appSecret: "s3cret" });
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "s3cret" });
     expect((await app.request("/api/settings")).status).toBe(200);
     expect((await app.request("/api/scrape/cancel", { method: "POST" })).status).toBe(401);
     expect((await app.request("/api/scrape/cancel", { method: "POST", headers: { "x-app-secret": "s3cret" } })).status).toBe(200);
@@ -60,7 +60,7 @@ describe("API", () => {
   });
 
   it("lists all listings as a sortable, searchable, paginated table", async () => {
-    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, appSecret: "" });
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "" });
     const now = new Date("2026-10-03T12:00:00Z");
     await upsertListings(
       handle.db,
@@ -91,12 +91,13 @@ describe("API", () => {
     const page2 = await (await app.request("/api/listings?pageSize=10&page=2")).json();
     expect(page2.rows).toHaveLength(0);
     expect(page2.page).toBe(2);
-    const invalid = await (await app.request("/api/listings?sort=nope&pageSize=99999")).json();
+    const invalid = await (await app.request("/api/listings?sort=nope&pageSize=99999&source=otodom")).json();
     expect(invalid.pageSize).toBe(100);
+    expect(invalid.rows.map((r: { sourceId: string }) => r.sourceId)).toEqual(["T4"]); // valid fields survive
   });
 
   it("ignores a listing: the property disappears from the map until 'show ignored' is on", async () => {
-    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, appSecret: "" });
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "" });
     const now = new Date("2026-10-04T08:00:00Z");
     const [a] = await upsertListings(handle.db, [makeListing({ source: "olx", sourceId: "IGN1", title: "Ignorowana działka", lat: 49.95, lon: 20.2 })], now);
     const [b] = await upsertListings(handle.db, [makeListing({ source: "otodom", sourceId: "IGN2", title: "Ignorowana działka", lat: 49.9501, lon: 20.2001 })], now);
@@ -138,7 +139,7 @@ describe("API", () => {
   });
 
   it("marks favorites and ignores whole properties from the map popup", async () => {
-    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, appSecret: "" });
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "" });
     const now = new Date("2026-10-04T09:00:00Z");
     const [a] = await upsertListings(handle.db, [makeListing({ source: "olx", sourceId: "FAV1", title: "Ulubiona działka", lat: 49.93, lon: 20.25 })], now);
     const [b] = await upsertListings(handle.db, [makeListing({ source: "otodom", sourceId: "FAV2", title: "Ulubiona działka", lat: 49.9301, lon: 20.2501 })], now);
@@ -169,7 +170,7 @@ describe("API", () => {
   });
 
   it("probes a source and resets its app-side block", async () => {
-    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, appSecret: "" });
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "" });
     const probe = await (await app.request("/api/sources/olx/probe")).json();
     expect(probe.ok).toBe(false);
     expect(probe.status).toBe(500);
