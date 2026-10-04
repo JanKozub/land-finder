@@ -1,7 +1,8 @@
-import { Ban, Download, RefreshCw, Search } from "lucide-react";
+import { Ban, Download, RefreshCw, Search, Stethoscope, Unlock } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import type { Source } from "@shared/constants";
-import { api } from "@/api/client";
+import { api, type SourceProbe } from "@/api/client";
 import { queryKeys, useRuns, useScrapeStatus } from "@/api/hooks";
 import { Badge, Button, Card, ErrorText } from "@/components/ui";
 import { useScrapeLoop } from "@/hooks/useScrapeLoop";
@@ -29,6 +30,15 @@ export function ScrapePage() {
       void qc.invalidateQueries({ queryKey: queryKeys.status });
       void qc.invalidateQueries({ queryKey: queryKeys.runs });
     },
+  });
+  const [probes, setProbes] = useState<Partial<Record<Source, SourceProbe>>>({});
+  const probe = useMutation({
+    mutationFn: (source: Source) => api.probeSource(source),
+    onSuccess: (res) => setProbes((p) => ({ ...p, [res.source]: res })),
+  });
+  const reset = useMutation({
+    mutationFn: (source: Source) => api.resetSource(source),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: queryKeys.status }),
   });
   const s = status.data;
   const run = s?.currentRun;
@@ -148,8 +158,32 @@ export function ScrapePage() {
                   <p className="text-xs text-slate-500">
                     ostatnie żądanie {formatRelative(src.lastRequestAt)} · ostatni sukces {formatRelative(src.lastSuccessAt)}
                     {src.lastError && ` · ${src.lastError}`}
+                    {src.consecutiveBlocks > 0 && ` · blokad z rzędu: ${src.consecutiveBlocks}`}
                     {typeof src.meta.buildId === "string" && ` · buildId ${src.meta.buildId}`}
                   </p>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <Button size="sm" onClick={() => probe.mutate(src.source as Source)} loading={probe.isPending && probe.variables === src.source} title="Wysyła jedno zapytanie testowe (poza limitem)">
+                      <Stethoscope className="h-3.5 w-3.5" /> Sprawdź połączenie
+                    </Button>
+                    {src.blockedUntil && (
+                      <Button size="sm" onClick={() => reset.mutate(src.source as Source)} loading={reset.isPending && reset.variables === src.source} title="Czyści blokadę po stronie aplikacji; portal może nadal odrzucać">
+                        <Unlock className="h-3.5 w-3.5" /> Zresetuj blokadę
+                      </Button>
+                    )}
+                    {probes[src.source as Source] && (
+                      <span className={probes[src.source as Source]!.ok ? "text-xs text-emerald-700" : "text-xs text-rose-700"}>
+                        {probes[src.source as Source]!.ok
+                          ? `odpowiada (HTTP 200, ${probes[src.source as Source]!.ms} ms)`
+                          : `nie odpowiada: ${probes[src.source as Source]!.error ?? `HTTP ${probes[src.source as Source]!.status}${probes[src.source as Source]!.server ? ` (${probes[src.source as Source]!.server})` : ""}`}`}
+                        {probes[src.source as Source]!.viaProxy && " · przez proxy"}
+                      </span>
+                    )}
+                  </div>
+                  {src.source === "olx" && src.blockedUntil && (
+                    <p className="mt-1 text-xs text-amber-700">
+                      OLX blokuje adres IP po serii żądań i taka blokada po stronie portalu może trwać wiele godzin. Najpierw „Sprawdź połączenie”; jeśli odpowiada, zresetuj blokadę. Jeśli nie — zmień adres IP (np. proxy w <code>OLX_PROXY_URL</code>) albo poczekaj.
+                    </p>
+                  )}
                 </li>
               ))}
             </ul>

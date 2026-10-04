@@ -16,6 +16,7 @@ import { registerNotifyRoutes } from "./routes/notify";
 import { registerPropertyRoutes } from "./routes/properties";
 import { registerScrapeRoutes } from "./routes/scrape";
 import { registerSettingsRoutes } from "./routes/settings";
+import { registerSourceRoutes } from "./routes/sources";
 
 export interface AppDeps {
   db: Db;
@@ -70,6 +71,7 @@ export function createApp(deps: AppDeps): Hono {
   registerListingRoutes(app, ctx);
   registerSettingsRoutes(app, ctx);
   registerScrapeRoutes(app, ctx);
+  registerSourceRoutes(app, ctx);
   registerNotifyRoutes(app, ctx);
   return app;
 }

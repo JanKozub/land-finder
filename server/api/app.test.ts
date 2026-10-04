@@ -167,4 +167,20 @@ describe("API", () => {
     expect((await app.request(`/api/properties/${pid}/favorite`, json({ favorite: false }))).status).toBe(200);
     expect((await app.request("/api/properties/999999/favorite", json({ favorite: true }))).status).toBe(404);
   });
+
+  it("probes a source and resets its app-side block", async () => {
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, appSecret: "" });
+    const probe = await (await app.request("/api/sources/olx/probe")).json();
+    expect(probe.ok).toBe(false);
+    expect(probe.status).toBe(500);
+    expect(probe.state.source).toBe("olx");
+    const { updateSourceState } = await import("../db/queries/source-state");
+    await updateSourceState(handle.db, "olx", { blockedUntil: new Date(Date.now() + 3_600_000), consecutiveBlocks: 2, lastError: "HTTP 403" });
+    const before = await (await app.request("/api/scrape/status")).json();
+    expect(before.sources.find((x: { source: string }) => x.source === "olx").blockedUntil).not.toBeNull();
+    const reset = await (await app.request("/api/sources/olx/reset", { method: "POST" })).json();
+    expect(reset.blockedUntil).toBeNull();
+    expect(reset.consecutiveBlocks).toBe(0);
+    expect((await app.request("/api/sources/nope/probe")).status).toBe(400);
+  });
 });

@@ -1,3 +1,4 @@
+import type { Source } from "@shared/constants";
 import type { Filters, ListingDto, ListingsPageDto, ListingsQuery, PropertyDetailDto, PropertyDto, RunDto, ScrapeMode, ScrapeStatusDto, Settings } from "@shared/schemas";
 import { filtersToQuery, listingsQueryToParams } from "@shared/schemas";
 
@@ -32,6 +33,17 @@ export interface PropertiesResponse {
 export interface SliceResponse {
   summary: { skipped: "locked" | null; processed: number; completed: number; paused: number; failed: number; notified: number };
   status: ScrapeStatusDto;
+}
+
+export interface SourceProbe {
+  source: Source;
+  ok: boolean;
+  status: number;
+  server: string | null;
+  error: string | null;
+  ms: number;
+  viaProxy: boolean;
+  state: ScrapeStatusDto["sources"][number];
 }
 
 export interface OlxCityCandidate {
@@ -74,5 +86,7 @@ export const api = {
   cancelScrape: () => request<{ cancelled: number }>("POST", "/api/scrape/cancel"),
   workerSlice: () => request<SliceResponse>("POST", "/api/worker/slice"),
   notifyTest: () => request<{ sent: string[] }>("POST", "/api/notify/test"),
+  probeSource: (source: Source) => request<SourceProbe>("GET", `/api/sources/${source}/probe`),
+  resetSource: (source: Source) => request<ScrapeStatusDto["sources"][number]>("POST", `/api/sources/${source}/reset`),
   health: () => request<{ ok: boolean; db: string }>("GET", "/api/health"),
 };

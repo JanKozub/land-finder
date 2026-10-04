@@ -19,6 +19,7 @@ import { ensureSettings } from "../db/queries/settings";
 import { getSourceState, listSourceStates, patchSourceMeta } from "../db/queries/source-state";
 import { scrapeJobs } from "../db/schema";
 import { env } from "../env";
+import { clientForSource } from "../http/clients";
 import { createFetchClient, type FetchClient } from "../http/fetch-client";
 import { createSourceHttp } from "../http/rate-limiter";
 import { createLogger, type Logger } from "../logger";
@@ -96,7 +97,7 @@ export async function runWorker(opts: WorkerOptions): Promise<WorkerSummary> {
     return summary;
   }
   const defaultClient = opts.fetchClient ?? createFetchClient();
-  const olxClient = opts.olxFetchClient ?? (env.olxProxyUrl ? createFetchClient({ proxyUrl: env.olxProxyUrl }) : defaultClient);
+  const olxClient = opts.olxFetchClient ?? clientForSource("olx", defaultClient);
   const clientFor = (source: Source): FetchClient => (source === "olx" ? olxClient : defaultClient);
 
   try {
