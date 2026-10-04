@@ -6,6 +6,17 @@ import * as schema from "./schema";
 
 export type Db = PgDatabase<PgQueryResultHKT, typeof schema>;
 
+const OPTIONAL_MODULES = { pglite: "@electric-sql/pglite", drizzlePglite: "drizzle-orm/pglite" } as const;
+
+/**
+ * Loads a dev/test-only module at runtime. The lookup through a parameter keeps esbuild and
+ * node-file-trace (Netlify's function packaging) from bundling PGlite's WASM into production functions.
+ */
+function loadOptional<T>(name: keyof typeof OPTIONAL_MODULES): Promise<T> {
+  const specifier = OPTIONAL_MODULES[name];
+  return import(/* @vite-ignore */ specifier) as Promise<T>;
+}
+
 export interface DbHandle {
   db: Db;
   kind: "pglite" | "postgres";
@@ -20,12 +31,9 @@ export interface DbHandle {
 export async function createDb(url: string = env.databaseUrl): Promise<DbHandle> {
   if (url.startsWith("pglite://")) {
     const dir = url.slice("pglite://".length);
-    // Non-literal specifiers keep esbuild from bundling (or copying) the PGlite WASM into Netlify functions;
-    // the import only runs for local dev and tests.
-    const pgliteModule = "@electric-sql/pglite";
-    const drizzlePgliteModule = "drizzle-orm/pglite";
-    const { PGlite } = (await import(/* @vite-ignore */ pgliteModule)) as typeof import("@electric-sql/pglite");
-    const { drizzle } = (await import(/* @vite-ignore */ drizzlePgliteModule)) as typeof import("drizzle-orm/pglite");
+    // This path only runs in local dev and tests; production uses postgres.js below.
+    const { PGlite } = await loadOptional<typeof import("@electric-sql/pglite")>("pglite");
+    const { drizzle } = await loadOptional<typeof import("drizzle-orm/pglite")>("drizzlePglite");
     const client = dir === "memory" || dir === "" ? new PGlite() : new PGlite(dir);
     await client.waitReady;
     const db = drizzle(client, { schema }) as unknown as Db;
