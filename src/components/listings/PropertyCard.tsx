@@ -1,4 +1,4 @@
-import { ExternalLink, Eye, EyeOff, Info, Star } from "lucide-react";
+import { ExternalLink, Eye, EyeOff, Heart, Info } from "lucide-react";
 import { memo } from "react";
 import type { PropertyDto } from "@shared/schemas";
 import type { Source } from "@shared/constants";
@@ -52,7 +52,7 @@ export function SourceLinks({ links, className }: { links: PropertyDto["links"];
 export function FavoriteButton({ favorite, onClick, loading }: { favorite: boolean; onClick: () => void; loading?: boolean }) {
   return (
     <Button size="sm" variant="ghost" onClick={onClick} loading={loading} title={favorite ? "Usuń z ulubionych" : "Dodaj do ulubionych"} aria-pressed={favorite}>
-      <Star className={cn("h-3.5 w-3.5", favorite ? "fill-amber-400 text-amber-500" : "text-slate-500")} />
+      <Heart className={cn("h-3.5 w-3.5", favorite ? "fill-pink-500 text-pink-600" : "text-slate-500")} />
     </Button>
   );
 }
@@ -70,7 +70,7 @@ export const PropertyCard = memo(function PropertyCard({ item, isNew, distanceKm
     >
       <div className="mb-1 flex flex-wrap items-center gap-1.5">
         <KindBadge kind={item.kind} />
-        {item.favorite && <Badge className="bg-amber-100 text-amber-700">★ ulubione</Badge>}
+        {item.favorite && <Badge className="bg-pink-100 text-pink-700">♥ ulubione</Badge>}
         {isNew && <Badge className="bg-violet-100 text-violet-700">nowe</Badge>}
         {item.hidden && <Badge className="bg-slate-200 text-slate-600">ukryte</Badge>}
         {item.ignored && <Badge className="bg-slate-200 text-slate-600" title="Wszystkie ogłoszenia tej nieruchomości są ignorowane">ignorowane</Badge>}

@@ -1,4 +1,4 @@
-import { Ban, ExternalLink, Eye, EyeOff, RotateCcw, Scissors, Star, X } from "lucide-react";
+import { Ban, ExternalLink, Eye, EyeOff, Heart, RotateCcw, Scissors, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Source } from "@shared/constants";
 import type { ListingDto } from "@shared/schemas";
@@ -106,7 +106,7 @@ export function PropertyDrawer({ id, onClose, onNavigate }: { id: number; onClos
             <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-1.5">
                 <KindBadge kind={data.kind} />
-                {data.favorite && <Badge className="bg-amber-100 text-amber-700">★ ulubione</Badge>}
+                {data.favorite && <Badge className="bg-pink-100 text-pink-700">♥ ulubione</Badge>}
                 {data.hidden && <Badge className="bg-slate-200 text-slate-600">ukryte</Badge>}
                 {data.ignored && <Badge className="bg-slate-200 text-slate-600">ignorowane</Badge>}
                 {!data.isActive && <Badge className="bg-rose-100 text-rose-700">wygasłe</Badge>}
@@ -132,7 +132,7 @@ export function PropertyDrawer({ id, onClose, onNavigate }: { id: number; onClos
                   <ExternalLink className="h-3.5 w-3.5" /> Otwórz ofertę
                 </Button>
                 <Button size="sm" onClick={() => favorite.mutate({ id, favorite: !data.favorite })} loading={favorite.isPending} aria-pressed={data.favorite}>
-                  <Star className={cn("h-3.5 w-3.5", data.favorite ? "fill-amber-400 text-amber-500" : "")} />
+                  <Heart className={cn("h-3.5 w-3.5", data.favorite ? "fill-pink-500 text-pink-600" : "")} />
                   {data.favorite ? "Ulubione" : "Do ulubionych"}
                 </Button>
                 <Button size="sm" onClick={() => hide.mutate({ id, hidden: !data.hidden })} loading={hide.isPending}>

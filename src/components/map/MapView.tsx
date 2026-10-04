@@ -1,4 +1,4 @@
-import { Ban, RotateCcw, Star } from "lucide-react";
+import { Ban, Heart, RotateCcw } from "lucide-react";
 import type { LatLngBounds } from "leaflet";
 import { memo, useEffect, useMemo, useRef } from "react";
 import { Circle, CircleMarker, MapContainer, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
@@ -22,7 +22,15 @@ export interface MapViewProps {
   onToggleIgnored: (item: PropertyDto) => void;
 }
 
-const COLORS = { plot: "#38bdf8", house: "#d97706", hidden: "#94a3b8", inactive: "#e11d48", favorite: "#ca8a04", focus: "#0f172a" } as const;
+const COLORS = {
+  plot: "#38bdf8",
+  house: "#d97706",
+  hidden: "#94a3b8",
+  inactive: "#475569",
+  favorite: "#ec4899",
+  favoriteStroke: "#be185d",
+  focus: "#0f172a",
+} as const;
 
 function toBounds(b: LatLngBounds): Bounds {
   return { south: b.getSouth(), west: b.getWest(), north: b.getNorth(), east: b.getEast() };
@@ -88,7 +96,7 @@ function PopupContent({
     <div className="space-y-1 text-sm">
       <div className="flex flex-wrap items-center gap-1.5">
         <KindBadge kind={item.kind} />
-        {item.favorite && <span className="rounded-sm bg-amber-100 px-1.5 py-0.5 text-[11px] font-semibold text-amber-700">★ ulubione</span>}
+        {item.favorite && <span className="rounded-sm bg-pink-100 px-1.5 py-0.5 text-[11px] font-semibold text-pink-700">♥ ulubione</span>}
         {item.ignored && <span className="rounded-sm bg-slate-200 px-1.5 py-0.5 text-[11px] font-semibold text-slate-600">ignorowane</span>}
         {item.hidden && <span className="rounded-sm bg-slate-200 px-1.5 py-0.5 text-[11px] font-semibold text-slate-600">ukryte</span>}
         <span className="font-bold">{formatPln(item.price)}</span>
@@ -111,7 +119,7 @@ function PopupContent({
           Szczegóły
         </Button>
         <Button size="sm" variant="ghost" onClick={() => onToggleFavorite(item)} title={item.favorite ? "Usuń z ulubionych" : "Dodaj do ulubionych"} aria-pressed={item.favorite}>
-          <Star className={cn("h-3.5 w-3.5", item.favorite ? "fill-amber-400 text-amber-500" : "")} />
+          <Heart className={cn("h-3.5 w-3.5", item.favorite ? "fill-pink-500 text-pink-600" : "")} />
           {item.favorite ? "Ulubione" : "Do ulubionych"}
         </Button>
         <Button
@@ -153,16 +161,16 @@ export function MapView({ items, center, radiusKm, focusId, onFocus, onDetails, 
       {located.map((item) => {
         const isFocused = item.id === focusId;
         const muted = item.hidden || item.ignored;
-        const fill = muted ? COLORS.hidden : !item.isActive ? COLORS.inactive : COLORS[item.kind];
+        const fill = muted ? COLORS.hidden : item.favorite ? COLORS.favorite : !item.isActive ? COLORS.inactive : COLORS[item.kind];
         return (
           <PropertyMarker
             key={item.id}
             id={item.id}
             lat={item.lat!}
             lon={item.lon!}
-            radius={isFocused ? 10 : isNew(item) ? 8 : 6}
-            stroke={isFocused ? COLORS.focus : item.favorite ? COLORS.favorite : fill}
-            weight={isFocused || item.favorite ? 3 : item.locationPrecision === "approx" ? 1.5 : 1}
+            radius={isFocused ? 10 : item.favorite || isNew(item) ? 8 : 6}
+            stroke={isFocused ? COLORS.focus : item.favorite && !muted ? COLORS.favoriteStroke : fill}
+            weight={isFocused ? 3 : item.favorite && !muted ? 2 : item.locationPrecision === "approx" ? 1.5 : 1}
             dashed={item.locationPrecision === "approx"}
             fill={fill}
             fillOpacity={muted ? 0.4 : 0.85}
