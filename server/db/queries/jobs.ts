@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, lte, notInArray, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, lte, notInArray, or, sql } from "drizzle-orm";
 import type { Source } from "../../../shared/constants";
 import type { RunStats, ScrapeMode } from "../../../shared/schemas";
 import type { Db } from "../client";
@@ -181,17 +181,25 @@ export async function getRun(db: Db, id: number): Promise<ScrapeRunRow | null> {
 
 // ---- worker lease (single worker at a time) ----
 
-export async function acquireLease(db: Db, holder: string, ttlMs: number, now: Date): Promise<boolean> {
+/**
+ * Builds the lease upsert. Note: never interpolate raw Date objects into `sql` templates — with the
+ * postgres.js driver Drizzle disables timestamp serialization, so only column-bound operators map Dates.
+ */
+export function acquireLeaseQuery(db: Db, holder: string, ttlMs: number, now: Date) {
   const lockedUntil = new Date(now.getTime() + ttlMs);
-  const rows = await db
+  return db
     .insert(workerLease)
     .values({ id: 1, holder, lockedUntil, heartbeatAt: now })
     .onConflictDoUpdate({
       target: workerLease.id,
       set: { holder, lockedUntil, heartbeatAt: now },
-      setWhere: sql`${workerLease.lockedUntil} <= ${now} OR ${workerLease.holder} = ${holder}`,
+      setWhere: or(lte(workerLease.lockedUntil, now), eq(workerLease.holder, holder)),
     })
     .returning({ holder: workerLease.holder });
+}
+
+export async function acquireLease(db: Db, holder: string, ttlMs: number, now: Date): Promise<boolean> {
+  const rows = await acquireLeaseQuery(db, holder, ttlMs, now);
   return rows.length > 0;
 }
 

@@ -5,7 +5,7 @@ import { DEFAULT_SETTINGS } from "../../shared/schemas";
 import { createTestDb } from "../../tests/helpers/pglite-db";
 import { makeListing } from "../../tests/helpers/factories";
 import type { DbHandle } from "../db/client";
-import { cancelOpenJobs, getRun, jobCounts, listJobs } from "../db/queries/jobs";
+import { acquireLeaseQuery, cancelOpenJobs, getRun, jobCounts, listJobs } from "../db/queries/jobs";
 import { saveSettings } from "../db/queries/settings";
 import { listings, properties } from "../db/schema";
 import { silentLogger } from "../logger";
@@ -124,5 +124,12 @@ describe("worker", () => {
     if (!b.ok) expect(b.reason).toBe("already_running");
     expect(await cancelOpenJobs(db, now())).toBeGreaterThan(0);
     expect((await jobCounts(db)).queued).toBe(0);
+  });
+
+  it("binds lease timestamps through columns (postgres.js would reject raw Date params)", async () => {
+    const q = acquireLeaseQuery(handle.db, "t", 1000, new Date("2026-10-04T07:00:00Z")).toSQL();
+    expect(q.params.some((p) => p instanceof Date)).toBe(false);
+    expect(q.sql).toContain("on conflict");
+    expect(await acquireLeaseQuery(handle.db, "t", 1000, new Date("2026-10-04T07:00:00Z"))).toHaveLength(1);
   });
 });
