@@ -22,7 +22,8 @@ const json = (body: unknown, method = "POST") => ({ method, headers: { "content-
 describe("API", () => {
   it("serves health, settings and an empty property list", async () => {
     const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "" });
-    expect((await app.request("/api/health")).status).toBe(200);
+    const health = await (await app.request("/api/health")).json();
+    expect(health).toMatchObject({ ok: true, db: "pglite", schemaReady: true });
     const settings = await (await app.request("/api/settings")).json();
     expect(settings.center).toEqual(DEFAULT_SETTINGS.center);
     const bad = await app.request("/api/settings", json({ ...DEFAULT_SETTINGS, radiusKm: 0 }, "PUT"));

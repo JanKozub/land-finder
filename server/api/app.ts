@@ -67,7 +67,15 @@ export function createApp(deps: AppDeps): Hono {
 
   app.get("/api/health", async (c) => {
     await ctx.db.execute(sql`select 1`);
-    return c.json({ ok: true, db: ctx.dbKind, time: ctx.now().toISOString() });
+    // Does the schema exist? (migrations applied) — checked via the settings table.
+    const rows = (await ctx.db.select({ ready: sql<boolean>`to_regclass('public.settings') is not null` }).from(sql`(select 1) as probe`)) as { ready: boolean }[];
+    let dbHost: string | null = null;
+    try {
+      dbHost = env.databaseUrl.startsWith("pglite://") ? "pglite (local file)" : new URL(env.databaseUrl).hostname;
+    } catch {
+      dbHost = null;
+    }
+    return c.json({ ok: true, db: ctx.dbKind, dbHost, schemaReady: rows[0]?.ready === true, time: ctx.now().toISOString() });
   });
 
   registerPropertyRoutes(app, ctx);
