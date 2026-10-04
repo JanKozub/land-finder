@@ -1,10 +1,22 @@
-export const SOURCES = ["olx", "otodom"] as const;
+/** Portals with the generic "location + radius" settings (see PortalSettingsSchema); OLX and Otodom have their own. */
+export const PORTAL_SOURCES = ["nieruchomosci_online", "morizon", "gratka", "domiporta", "adresowo"] as const;
+export type PortalSource = (typeof PORTAL_SOURCES)[number];
+
+export const SOURCES = ["olx", "otodom", ...PORTAL_SOURCES] as const;
 export type Source = (typeof SOURCES)[number];
 
 export const KINDS = ["plot", "house"] as const;
 export type Kind = (typeof KINDS)[number];
 
-export const SOURCE_LABELS: Record<Source, string> = { olx: "OLX", otodom: "Otodom" };
+export const SOURCE_LABELS: Record<Source, string> = {
+  olx: "OLX",
+  otodom: "Otodom",
+  nieruchomosci_online: "Nieruchomosci-online",
+  morizon: "Morizon",
+  gratka: "Gratka",
+  domiporta: "Domiporta",
+  adresowo: "Adresowo",
+};
 
 /** OLX "Nieruchomości" sub-categories for sale (verified 2026-10-03). */
 export const OLX_CATEGORY: Record<Kind, number> = { plot: 24, house: 18 };

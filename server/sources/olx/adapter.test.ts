@@ -10,7 +10,9 @@ describe("OLX adapter cursors", () => {
     const c = olxAdapter.initialCursor("plot", "incremental", DEFAULT_SETTINGS);
     expect(c).toEqual({ kind: "plot", mode: "incremental", page: 0 });
     expect(olxAdapter.nextCursor(c, page({ hasMore: true }), { newCount: 5 })).toMatchObject({ page: 1 });
-    expect(olxAdapter.nextCursor(c, page({ hasMore: true }), { newCount: 0 })).toBeNull();
+    // One page without news is tolerated (promoted ads sit on top); the second one ends the run.
+    expect(olxAdapter.nextCursor(c, page({ hasMore: true }), { newCount: 0 })).toMatchObject({ page: 1, emptyStreak: 1 });
+    expect(olxAdapter.nextCursor({ ...c, page: 1, emptyStreak: 1 }, page({ hasMore: true }), { newCount: 0 })).toBeNull();
     expect(olxAdapter.nextCursor(c, page({ hasMore: false }), { newCount: 5 })).toBeNull();
     expect(olxAdapter.nextCursor({ ...c, page: 4 }, page({ hasMore: true }), { newCount: 5 })).toBeNull();
   });

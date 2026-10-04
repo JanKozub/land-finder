@@ -1,0 +1,561 @@
+{
+ "data": {
+  "decode-listing-url-query-/dzialki/wielicki/miasto-wieliczka/": {
+   "data": {
+    "decodeListingUrl": {
+     "totalCount": 34,
+     "listingParameters": {
+      "numberOfResults": 35,
+      "pageNumber": 1,
+      "searchOrder": {
+       "sortKey": "REFRESHED_AT",
+       "sortOrder": "DESC"
+      },
+      "locations": [
+       {
+        "id": "86237",
+        "mapBounds": {
+         "northeast": {
+          "latitude": 50.004597,
+          "longitude": 20.088936
+         },
+         "southwest": {
+          "latitude": 49.970902,
+          "longitude": 20.002744
+         }
+        },
+        "name": "Wieliczka",
+        "nameFull": [
+         "małopolskie",
+         "wielicki",
+         "Wieliczka",
+         "Wieliczka"
+        ],
+        "nameLocCase": null,
+        "type": "TOWN",
+        "uniqueName": "Wieliczka",
+        "uniqueUrlParts": [
+         "wielicki",
+         "miasto-wieliczka"
+        ],
+        "outline": null
+       }
+      ]
+     }
+    }
+   }
+  },
+  "property-listing-data-/dzialki/wielicki/miasto-wieliczka/": {
+   "data": {
+    "searchResult": {
+     "properties": {
+      "nodes": [
+       {
+        "addedAt": "2026-09-22",
+        "refreshedAt": null,
+        "advertisementText": "Działka na sprzedaż, 1005 m², Wieliczka Wieliczka",
+        "area": "1 005",
+        "contact": {
+         "company": {
+          "address": [
+           "Rynek 12/3",
+           "32-005 Niepołomice (gm.)"
+          ],
+          "faxes": [],
+          "name": "DĘBOSZ Nieruchomości",
+          "id": 236681,
+          "logo": {
+           "alt": "DĘBOSZ Nieruchomości",
+           "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1wbG9nby8zZC9hOS8yMzY2ODFfMTU5ODUzMDAxNy5qcGc=",
+           "name": "debosz-nieruchomosci"
+          },
+          "phones": [
+           "50 304 72 23"
+          ],
+          "type": "AGENCY"
+         },
+         "person": {
+          "faxes": [],
+          "name": "Borowska-Dębosz Karolina",
+          "phones": [
+           "535573640"
+          ],
+          "photo": {
+           "alt": "Borowska-Dębosz Karolina",
+           "id": "aHR0cHM6Ly9pbWcxLnN0YXRpY21vcml6b24uY29tLnBsL3RodW1ibmFpbC9hSFIwY0RvdkwyMWxaR2xoTG1SdmJYa3VjR3d2YVcxbkwzVjZlWFJyYjNkdWFXTjVMelptWkRSalpXUmtZbVl6TnpWbU5USmxaRGhrTlRGaU9EazBOakUwTWpnMkxuQnVadz09LzIwMC8yMDAvMi90aHVtYm5haWwuanBn",
+           "name": "borowska-debosz-karolina"
+          },
+          "type": "AGENT",
+          "url": "/posrednik/borowska-debosz-karolina-48343643"
+         }
+        },
+        "development": null,
+        "description": "Bardzo atrakcyjna działka budowlana o powierzchni 10.05 ar (1005 m2), oznaczona jako C10MN - tereny zabudowany mieszkaniowej jednorodzinnej - wg miejscowego pla",
+        "floorFormatted": null,
+        "highlightText": "",
+        "id": 1543027761,
+        "idOnFrontend": "mzn2048078266",
+        "isTopPromoted": false,
+        "isHighlighted": false,
+        "isRecommended": false,
+        "location": {
+         "location": [
+          "małopolskie",
+          "wielicki",
+          "Wieliczka",
+          "Wieliczka"
+         ],
+         "street": null
+        },
+        "numberOfRooms": null,
+        "photos": [],
+        "photosNumber": 13,
+        "promotionPoints": 0,
+        "has3dView": false,
+        "hasVideo": false,
+        "plans": [],
+        "price": {
+         "amount": "250000.00",
+         "currency": "PLN"
+        },
+        "priceFormatted": "250 000 zł",
+        "priceM2": {
+         "amount": "248.76",
+         "currency": "PLN"
+        },
+        "priceM2Formatted": "249 zł/m²",
+        "title": "działka na sprzedaż",
+        "url": "/oferta/sprzedaz-dzialka-wielicki-wieliczka-1005m2-mzn2048078266",
+        "servicePromocenaIsActive": false,
+        "omnibusPreviousSalePrice": null,
+        "omnibusPreviousLowestPrice": null
+       },
+       {
+        "addedAt": "2026-09-21",
+        "refreshedAt": null,
+        "advertisementText": "Działka budowlana",
+        "area": "1 495",
+        "contact": {
+         "company": {
+          "address": [
+           "Staromostowa 4/1",
+           "30-506 Kraków"
+          ],
+          "faxes": [],
+          "name": "ap7 group",
+          "id": 49679,
+          "logo": {
+           "alt": "ap7 group",
+           "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1wbG9nby9iOS8xZi80OTY3OV8xNTk4ODMxMzgzLmpwZw==",
+           "name": "ap7-group"
+          },
+          "phones": [
+           "12 263 09 75"
+          ],
+          "type": "AGENCY"
+         },
+         "person": {
+          "faxes": [],
+          "name": "Krystyna Krawczyk",
+          "phones": [
+           "+48 797 604 858"
+          ],
+          "photo": {
+           "alt": "Krystyna Krawczyk",
+           "id": "aHR0cHM6Ly9pbWczLnN0YXRpY21vcml6b24uY29tLnBsL3RodW1ibmFpbC9hSFIwY0RvdkwyMWxaR2xoTG1SdmJYa3VjR3d2TDJsdFp5OTFlbmwwYTI5M2JtbGplUzgwTlRaak1XVmpaRGswWmpBell6SXhNVEUzT0dFM01EYzFZemhpWlRRNE5pNXFjR2M9LzIwMC8yMDAvMi90aHVtYm5haWwuanBn",
+           "name": "krystyna-krawczyk"
+          },
+          "type": "AGENT",
+          "url": "/posrednik/krystyna-krawczyk-47775807"
+         }
+        },
+        "development": null,
+        "description": "Do sprzedaży działka budowlana - widokowa o powierzchni 14,95 ar w miejscowości Dobranowice gm. Wieliczka Oferowana działka, położona jest w spokojnej okolicy w",
+        "floorFormatted": null,
+        "highlightText": "",
+        "id": 1543024873,
+        "idOnFrontend": "mzn2048075378",
+        "isTopPromoted": false,
+        "isHighlighted": false,
+        "isRecommended": false,
+        "location": {
+         "location": [
+          "małopolskie",
+          "wielicki",
+          "Wieliczka",
+          "Wieliczka"
+         ],
+         "street": null
+        },
+        "numberOfRooms": null,
+        "photos": [],
+        "photosNumber": 5,
+        "promotionPoints": 0,
+        "has3dView": false,
+        "hasVideo": false,
+        "plans": [],
+        "price": {
+         "amount": "328900.00",
+         "currency": "PLN"
+        },
+        "priceFormatted": "328 900 zł",
+        "priceM2": {
+         "amount": "220.00",
+         "currency": "PLN"
+        },
+        "priceM2Formatted": "220 zł/m²",
+        "title": "działka na sprzedaż",
+        "url": "/oferta/sprzedaz-dzialka-wielicki-wieliczka-1495m2-mzn2048075378",
+        "servicePromocenaIsActive": false,
+        "omnibusPreviousSalePrice": null,
+        "omnibusPreviousLowestPrice": null
+       },
+       {
+        "addedAt": "2026-09-14",
+        "refreshedAt": "2026-09-18 12:11:15",
+        "advertisementText": "Budowlana 19 ar w Pawlikowicach – widok na góry",
+        "area": "1 900",
+        "contact": {
+         "company": {
+          "address": [
+           "Czyżówka 16",
+           "30-526 Kraków"
+          ],
+          "faxes": [],
+          "name": "DG Estate",
+          "id": 427613,
+          "logo": {
+           "alt": "DG Estate",
+           "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1wbG9nby85NS83NC80Mjc2MTNfMTYwMjAwMDUwNS5qcGc=",
+           "name": "dg-estate"
+          },
+          "phones": [
+           "50 686 80 86"
+          ],
+          "type": "AGENCY"
+         },
+         "person": {
+          "faxes": [],
+          "name": "Mateusz Kurek",
+          "phones": [
+           "+48 694 008 086"
+          ],
+          "photo": {
+           "alt": "Mateusz Kurek",
+           "id": "aHR0cHM6Ly9pbWcxLnN0YXRpY21vcml6b24uY29tLnBsL3RodW1ibmFpbC9hSFIwY0RvdkwyMWxaR2xoTG1SdmJYa3VjR3d2YVcxbkwzVjZlWFJyYjNkdWFXTjVMelkxTnpWa1lqbGtPV1V4TW1NMFlXTmhObVl3T1RVNVkyTTBNV0UzWkRGaUxtcHdadz09LzIwMC8yMDAvMi90aHVtYm5haWwuanBn",
+           "name": "mateusz-kurek"
+          },
+          "type": "AGENT",
+          "url": "/posrednik/mateusz-kurek-49142747"
+         }
+        },
+        "development": null,
+        "description": "Na sprzedaż działka o powierzchni ok. 1900 m² (19 ar) położona w Pawlikowicach, w spokojnym otoczeniu domów jednorodzinnych. Nieruchomość objęta jest miejscowym",
+        "floorFormatted": null,
+        "highlightText": "",
+        "id": 1542988482,
+        "idOnFrontend": "mzn2047038987",
+        "isTopPromoted": false,
+        "isHighlighted": false,
+        "isRecommended": false,
+        "location": {
+         "location": [
+          "małopolskie",
+          "wielicki",
+          "Wieliczka",
+          "Wieliczka"
+         ],
+         "street": null
+        },
+        "numberOfRooms": null,
+        "photos": [],
+        "photosNumber": 7,
+        "promotionPoints": 0,
+        "has3dView": false,
+        "hasVideo": false,
+        "plans": [],
+        "price": {
+         "amount": "380000.00",
+         "currency": "PLN"
+        },
+        "priceFormatted": "380 000 zł",
+        "priceM2": {
+         "amount": "200.00",
+         "currency": "PLN"
+        },
+        "priceM2Formatted": "200 zł/m²",
+        "title": "działka na sprzedaż",
+        "url": "/oferta/sprzedaz-dzialka-wielicki-wieliczka-1900m2-mzn2047038987",
+        "servicePromocenaIsActive": false,
+        "omnibusPreviousSalePrice": null,
+        "omnibusPreviousLowestPrice": null
+       },
+       {
+        "addedAt": "2026-09-15",
+        "refreshedAt": null,
+        "advertisementText": "Działka na sprzedaż, 2400 m², Wieliczka Wieliczka",
+        "area": "2 400",
+        "contact": {
+         "company": {
+          "address": [
+           "Rynek 12/3",
+           "32-005 Niepołomice (gm.)"
+          ],
+          "faxes": [],
+          "name": "DĘBOSZ Nieruchomości",
+          "id": 236681,
+          "logo": {
+           "alt": "DĘBOSZ Nieruchomości",
+           "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1wbG9nby8zZC9hOS8yMzY2ODFfMTU5ODUzMDAxNy5qcGc=",
+           "name": "debosz-nieruchomosci"
+          },
+          "phones": [
+           "50 304 72 23"
+          ],
+          "type": "AGENCY"
+         },
+         "person": {
+          "faxes": [],
+          "name": "Raj Joanna",
+          "phones": [
+           "530641969"
+          ],
+          "photo": {
+           "alt": "Raj Joanna",
+           "id": "aHR0cHM6Ly9pbWcyLnN0YXRpY21vcml6b24uY29tLnBsL3RodW1ibmFpbC9hSFIwY0RvdkwyMWxaR2xoTG1SdmJYa3VjR3d2YVcxbkwzVjZlWFJyYjNkdWFXTjVMemN4TkRCak1tTXpZemN5WVRVd05HUmpZamxtWkdRNFpqQmxZamxoTlRoaExuQnVadz09LzIwMC8yMDAvMi90aHVtYm5haWwuanBn",
+           "name": "raj-joanna"
+          },
+          "type": "AGENT",
+          "url": "/posrednik/raj-joanna-48116915"
+         }
+        },
+        "development": null,
+        "description": "Bardzo atrakcyjna działka inwestycyjna o powierzchni ok. 24 ar (2400 m2) – obecnie oznaczona jako 20Z- tereny zieleni nieurządzonej. W studium PU - tereny zabud",
+        "floorFormatted": null,
+        "highlightText": "",
+        "id": 1542996300,
+        "idOnFrontend": "mzn2047046805",
+        "isTopPromoted": false,
+        "isHighlighted": false,
+        "isRecommended": false,
+        "location": {
+         "location": [
+          "małopolskie",
+          "wielicki",
+          "Wieliczka",
+          "Wieliczka"
+         ],
+         "street": null
+        },
+        "numberOfRooms": null,
+        "photos": [],
+        "photosNumber": 15,
+        "promotionPoints": 0,
+        "has3dView": false,
+        "hasVideo": false,
+        "plans": [],
+        "price": {
+         "amount": "255000.00",
+         "currency": "PLN"
+        },
+        "priceFormatted": "255 000 zł",
+        "priceM2": {
+         "amount": "106.25",
+         "currency": "PLN"
+        },
+        "priceM2Formatted": "106 zł/m²",
+        "title": "działka na sprzedaż",
+        "url": "/oferta/sprzedaz-dzialka-wielicki-wieliczka-2400m2-mzn2047046805",
+        "servicePromocenaIsActive": false,
+        "omnibusPreviousSalePrice": null,
+        "omnibusPreviousLowestPrice": null
+       },
+       {
+        "addedAt": "2026-09-14",
+        "refreshedAt": null,
+        "advertisementText": "Działka na sprzedaż, 1045 m², Wieliczka Wieliczka",
+        "area": "1 045",
+        "contact": {
+         "company": {
+          "address": [
+           "Rynek 12/3",
+           "32-005 Niepołomice (gm.)"
+          ],
+          "faxes": [],
+          "name": "DĘBOSZ Nieruchomości",
+          "id": 236681,
+          "logo": {
+           "alt": "DĘBOSZ Nieruchomości",
+           "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1wbG9nby8zZC9hOS8yMzY2ODFfMTU5ODUzMDAxNy5qcGc=",
+           "name": "debosz-nieruchomosci"
+          },
+          "phones": [
+           "50 304 72 23"
+          ],
+          "type": "AGENCY"
+         },
+         "person": {
+          "faxes": [],
+          "name": "Raj Joanna",
+          "phones": [
+           "530641969"
+          ],
+          "photo": {
+           "alt": "Raj Joanna",
+           "id": "aHR0cHM6Ly9pbWcyLnN0YXRpY21vcml6b24uY29tLnBsL3RodW1ibmFpbC9hSFIwY0RvdkwyMWxaR2xoTG1SdmJYa3VjR3d2YVcxbkwzVjZlWFJyYjNkdWFXTjVMemN4TkRCak1tTXpZemN5WVRVd05HUmpZamxtWkdRNFpqQmxZamxoTlRoaExuQnVadz09LzIwMC8yMDAvMi90aHVtYm5haWwuanBn",
+           "name": "raj-joanna"
+          },
+          "type": "AGENT",
+          "url": "/posrednik/raj-joanna-48116915"
+         }
+        },
+        "development": null,
+        "description": "Zborczyce| Piękna działka budowlana ok. 10 ar! 245.000 zł Bardzo atrakcyjna działka budowlana o powierzchni ok. 10 ar (1049 m2), 3.MN - tereny zabudowy mieszkan",
+        "floorFormatted": null,
+        "highlightText": "",
+        "id": 1542989145,
+        "idOnFrontend": "mzn2047039650",
+        "isTopPromoted": false,
+        "isHighlighted": false,
+        "isRecommended": false,
+        "location": {
+         "location": [
+          "małopolskie",
+          "wielicki",
+          "Wieliczka",
+          "Wieliczka"
+         ],
+         "street": null
+        },
+        "numberOfRooms": null,
+        "photos": [],
+        "photosNumber": 11,
+        "promotionPoints": 0,
+        "has3dView": false,
+        "hasVideo": false,
+        "plans": [],
+        "price": {
+         "amount": "245000.00",
+         "currency": "PLN"
+        },
+        "priceFormatted": "245 000 zł",
+        "priceM2": {
+         "amount": "234.45",
+         "currency": "PLN"
+        },
+        "priceM2Formatted": "234 zł/m²",
+        "title": "działka na sprzedaż",
+        "url": "/oferta/sprzedaz-dzialka-wielicki-wieliczka-1045m2-mzn2047039650",
+        "servicePromocenaIsActive": false,
+        "omnibusPreviousSalePrice": null,
+        "omnibusPreviousLowestPrice": null
+       },
+       {
+        "addedAt": "2026-09-12",
+        "refreshedAt": null,
+        "advertisementText": "| 10 minut-Kraków | Centrum | 2 linia zabudowy | MPZP-MU | Media |",
+        "area": "1 470",
+        "contact": {
+         "company": {
+          "address": [
+           " 11",
+           "32-590 Libiąż"
+          ],
+          "faxes": [],
+          "name": "ADAM BRZEZIŃSKI FHU",
+          "id": 408075,
+          "logo": {
+           "alt": "ADAM BRZEZIŃSKI FHU",
+           "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1wbG9nby9lNC9hYS80MDgwNzVfMTU5ODgzMTQ4MS5qcGc=",
+           "name": "adam-brzezinski-fhu"
+          },
+          "phones": [
+           "791 276 207"
+          ],
+          "type": "AGENCY"
+         },
+         "person": {
+          "faxes": [],
+          "name": "Karolina Stachura",
+          "phones": [
+           "608648326"
+          ],
+          "photo": {
+           "alt": "Karolina Stachura",
+           "id": "aHR0cHM6Ly9pbWczLnN0YXRpY21vcml6b24uY29tLnBsL3RodW1ibmFpbC9hSFIwY0RvdkwyMWxaR2xoTG1SdmJYa3VjR3d2TDJsdFp5OTFlbmwwYTI5M2JtbGplUzg1TWpCaFlXVTVaamhsTUdNMllXTTBZMlZqTW1Wak5tSmpOemN4TXpFNVl5NXFjR2M9LzIwMC8yMDAvMi90aHVtYm5haWwuanBn",
+           "name": "karolina-stachura"
+          },
+          "type": "AGENT",
+          "url": "/posrednik/karolina-stachura-48586247"
+         }
+        },
+        "development": null,
+        "description": "Na sprzedaż działka budowlana o powierzchni 1470 m², położona w Wieliczce przy ul. Widok. To interesująca propozycja dla osób planujących budowę domu lub realiz",
+        "floorFormatted": null,
+        "highlightText": "",
+        "id": 1542975583,
+        "idOnFrontend": "mzn2047026088",
+        "isTopPromoted": false,
+        "isHighlighted": false,
+        "isRecommended": false,
+        "location": {
+         "location": [
+          "małopolskie",
+          "wielicki",
+          "Wieliczka",
+          "Wieliczka"
+         ],
+         "street": "Widok"
+        },
+        "numberOfRooms": null,
+        "photos": [],
+        "photosNumber": 19,
+        "promotionPoints": 0,
+        "has3dView": false,
+        "hasVideo": false,
+        "plans": [
+         {
+          "alt": "Plan nieruchomości",
+          "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1vZ3BkZi9mYS9jMS80ODkyODMzOV8xNTc5NTk1NjU1X2R6aWFsa2EtYnVkb3dsYW5hLXVsLXdpZG9rX3h4bGFyZ2UucG5n",
+          "name": "dzialka-lub-grunt-na-sprzedaz-1-470-m"
+         },
+         {
+          "alt": "Plan nieruchomości",
+          "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1vZ3BkZi9mYS9jMS80ODkyODMzOV8xNTc5NTk1NzMzX2R6aWFsa2EtYnVkb3dsYW5hLXVsLXdpZG9rX3h4bGFyZ2UucG5n",
+          "name": "dzialka-lub-grunt-na-sprzedaz-1-470-m"
+         },
+         {
+          "alt": "Plan nieruchomości",
+          "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1vZ3BkZi9mYS9jMS80ODkyODMzOV8xNTc5NTk1NzQzX2R6aWFsa2EtYnVkb3dsYW5hLXVsLXdpZG9rX3h4bGFyZ2UucG5n",
+          "name": "dzialka-lub-grunt-na-sprzedaz-1-470-m"
+         },
+         {
+          "alt": "Plan nieruchomości",
+          "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1vZ3BkZi9mYS9jMS80ODkyODMzOV8xNTc5NTk1NzQ1X2R6aWFsa2EtYnVkb3dsYW5hLXVsLXdpZG9rX3h4bGFyZ2UucG5n",
+          "name": "dzialka-lub-grunt-na-sprzedaz-1-470-m"
+         }
+        ],
+        "price": {
+         "amount": "479000.00",
+         "currency": "PLN"
+        },
+        "priceFormatted": "479 000 zł",
+        "priceM2": {
+         "amount": "325.85",
+         "currency": "PLN"
+        },
+        "priceM2Formatted": "326 zł/m²",
+        "title": "działka na sprzedaż",
+        "url": "/oferta/sprzedaz-dzialka-wielicki-wieliczka-widok-1470m2-mzn2047026088",
+        "servicePromocenaIsActive": false,
+        "omnibusPreviousSalePrice": null,
+        "omnibusPreviousLowestPrice": null
+       }
+      ],
+      "totalCount": 34
+     }
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,160 @@
+{
+ "data": {
+  "property-details-/nieruchomosci/dom-wielicki-wieliczka-grabie/ob/49162141-false": {
+   "data": {
+    "propertyData": {
+     "id": 1543093652,
+     "idOnFrontend": "49162141",
+     "url": "/nieruchomosci/dom-wielicki-wieliczka-grabie/ob/49162141",
+     "title": "Dom wolnostojący Wieliczka | Grabie282 m2+6 pokoi+garaż piękny ogród",
+     "advertisementText": "Dom wolnostojący Wieliczka | Grabie282 m2+6 pokoi+garaż piękny ogród",
+     "area": "282",
+     "price": {
+      "amount": "1600000.00",
+      "currency": "PLN"
+     },
+     "priceM2": {
+      "amount": "5673.76",
+      "currency": "PLN"
+     },
+     "location": {
+      "countryCode": "PL",
+      "location": [
+       "małopolskie",
+       "wielicki",
+       "Wieliczka",
+       "Wieliczka"
+      ],
+      "map": {
+       "center": {
+        "latitude": 50.0391487,
+        "longitude": 20.1328103
+       },
+       "zoom": 13
+      },
+      "number": null,
+      "street": "Grabie",
+      "county": "wielicki",
+      "commune": "Wieliczka"
+     },
+     "detailedInformation": [
+      {
+       "label": "Typ domu",
+       "value": "Wolnostojący",
+       "url": "/nieruchomosci/domy/wolnostojacy/wieliczka"
+      },
+      {
+       "label": "Pow. całkowita",
+       "value": "282 m²",
+       "url": null
+      },
+      {
+       "label": "Liczba pięter",
+       "value": "2",
+       "url": null
+      },
+      {
+       "label": "Liczba sypialni",
+       "value": "2",
+       "url": null
+      },
+      {
+       "label": "Liczba łazienek",
+       "value": "2",
+       "url": null
+      },
+      {
+       "label": "łazienka razem z WC",
+       "value": "Tak",
+       "url": null
+      },
+      {
+       "label": "Balkon",
+       "value": "Tak",
+       "url": null
+      },
+      {
+       "label": "Stolarka okienna",
+       "value": "Drewniane stare",
+       "url": null
+      },
+      {
+       "label": "Pow. działki",
+       "value": "0,15 m²",
+       "url": null
+      },
+      {
+       "label": "Rynek",
+       "value": "Wtórny",
+       "url": "/nieruchomosci/domy/wieliczka/wtorny"
+      },
+      {
+       "label": "Forma własności",
+       "value": "Własność",
+       "url": null
+      },
+      {
+       "label": "Rodzaj umowy",
+       "value": "Na wyłączność",
+       "url": null
+      }
+     ],
+     "buildingDetailedInformation": [
+      {
+       "label": "Materiał budowlany",
+       "value": "Cegła",
+       "url": null
+      },
+      {
+       "label": "Rok budowy",
+       "value": "1990",
+       "url": null
+      },
+      {
+       "label": "Stan budynku",
+       "value": "Dobry",
+       "url": null
+      },
+      {
+       "label": "Kominek",
+       "value": "Tak",
+       "url": null
+      }
+     ],
+     "offerDetailedInformation": [
+      {
+       "label": "Data dodania",
+       "value": "02.10.2026"
+      },
+      {
+       "label": "Aktualizacja",
+       "value": "02.10.2026"
+      },
+      {
+       "label": "Numer ogłoszenia",
+       "value": "gratka-12783"
+      },
+      {
+       "label": "Liczba odsłon",
+       "value": "41"
+      }
+     ],
+     "presentationType": "ACTIVE",
+     "archiveCategoryRedirectUrl": null,
+     "reference": "12783",
+     "types": {
+      "primaryType": "HOUSE",
+      "primaryTypeRoot": "HOUSE",
+      "mainType": "HOUSE",
+      "mainTypeRoot": "HOUSE"
+     },
+     "transaction": "SALE",
+     "marketType": "Rynek wtórny",
+     "refreshedAt": null,
+     "lastModified": "Fri, 02 Oct 2026 14:27:19 GMT",
+     "description": "<p><b>DOM wolnostojący - 6 POKOJI + GARAŻ + OGRÓD + PIWNICA - 282 m2 // Wieliczka - Grabie</b></p><p>FORMA Estates prezentuje do sprzedaży nowoczesny trzykondygnacyjny<b> dom wolnostojący</b> z garaże"
+    }
+   }
+  }
+ }
+}

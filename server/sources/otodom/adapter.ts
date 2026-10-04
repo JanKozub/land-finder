@@ -1,8 +1,9 @@
 import type { Kind } from "../../../shared/constants";
-import { MAX_INCREMENTAL_PAGES, OTODOM_ESTATE, OTODOM_PAGE_SIZE } from "../../../shared/constants";
+import { OTODOM_ESTATE, OTODOM_PAGE_SIZE } from "../../../shared/constants";
 import type { ScrapeMode, Settings } from "../../../shared/schemas";
 import type { ListingRow } from "../../db/schema";
 import { HttpError } from "../../http/errors";
+import { incrementalStep } from "../paging";
 import type { Cursor, EnrichResult, ListPage, SourceAdapter, SourceContext } from "../types";
 import { parseOtodomAd } from "./parse-ad";
 import { extractNextData, parseOtodomSearch } from "./parse-list";
@@ -51,6 +52,11 @@ export const otodomAdapter: SourceAdapter = {
   estimatedPageCostMs: 2500,
   estimatedEnrichCostMs: 1200,
 
+  probe(settings: Settings) {
+    const url = buildOtodomListHtmlUrl({ estate: OTODOM_ESTATE.plot, locationPath: settings.otodom.locationPath, radiusKm: settings.otodom.radiusKm, page: 1, limit: 24 });
+    return { url, headers: OTODOM_HTML_HEADERS };
+  },
+
   initialCursor(kind: Kind, mode: ScrapeMode): OtodomCursor {
     return { kind, mode, page: 1 };
   },
@@ -86,9 +92,9 @@ export const otodomAdapter: SourceAdapter = {
 
   nextCursor(cursor: Cursor, page: ListPage, info: { newCount: number }): Cursor | null {
     const c = cursor as OtodomCursor;
-    if (!page.hasMore) return null;
-    if (c.mode === "incremental" && (info.newCount === 0 || c.page >= MAX_INCREMENTAL_PAGES)) return null;
-    return { ...c, page: c.page + 1, totalPages: page.totalPages };
+    const step = incrementalStep(c, page, info, c.page);
+    if (step.stop) return null;
+    return { ...c, page: c.page + 1, totalPages: page.totalPages, emptyStreak: step.emptyStreak };
   },
 
   async enrich(listing: ListingRow, ctx: SourceContext): Promise<EnrichResult> {

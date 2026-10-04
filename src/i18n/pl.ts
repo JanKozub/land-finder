@@ -1,9 +1,20 @@
-import type { Kind, Source } from "@shared/constants";
+import { SOURCE_LABELS, type Kind, type Source } from "@shared/constants";
 import type { S7Kind } from "@shared/s7";
 
 export const KIND_LABEL: Record<Kind, string> = { plot: "Działka", house: "Dom" };
 export const KIND_LABEL_PLURAL: Record<Kind, string> = { plot: "Działki", house: "Domy" };
-export const SOURCE_LABEL: Record<Source, string> = { olx: "OLX", otodom: "Otodom" };
+export const SOURCE_LABEL: Record<Source, string> = SOURCE_LABELS;
+
+/** One-line notes per portal shown next to the automatically derived search settings. */
+export const PORTAL_NOTES: Partial<Record<Source, string>> = {
+  olx: "Szuka w promieniu od miasta najbliższego środka obszaru (OLX nie ma wyszukiwania po współrzędnych).",
+  otodom: "Promień od gminy w środku obszaru; portal czasem ignoruje promień — sprawdź przyciskiem.",
+  nieruchomosci_online: "Promień liczony od miejscowości, więc pojedyncze oferty bywają dalej; odpadają przy filtrze obszaru.",
+  domiporta: "Promień od miejscowości w środku obszaru.",
+  gratka: "Bez promienia: przeszukiwane są gminy objęte prostokątem.",
+  morizon: "Ten sam system i te same oferty co Gratka — włącz tylko jeden z nich.",
+  adresowo: "Bez promienia: przeszukiwane są gminy objęte prostokątem.",
+};
 
 export const MODE_LABEL = {
   incremental: "Pobierz nowe oferty",

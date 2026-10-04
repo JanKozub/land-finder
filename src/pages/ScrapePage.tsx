@@ -1,13 +1,32 @@
-import { Ban, Download, RefreshCw, Search, Stethoscope, Unlock } from "lucide-react";
+import { Ban, Download, GitMerge, RefreshCw, Search, Stethoscope, Unlock } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import type { Source } from "@shared/constants";
+import { useRef, useState } from "react";
+import { KINDS, type Kind, type Source } from "@shared/constants";
+import type { SourceTotals } from "@shared/schemas";
 import { api, type SourceProbe } from "@/api/client";
 import { queryKeys, useRuns, useScrapeStatus } from "@/api/hooks";
 import { Badge, Button, Card, ErrorText } from "@/components/ui";
 import { useScrapeLoop } from "@/hooks/useScrapeLoop";
 import { JOB_STATUS_LABEL, KIND_LABEL_PLURAL, MODE_LABEL, RUN_STATUS_LABEL, SOURCE_LABEL, TRIGGER_LABEL } from "@/i18n/pl";
 import { formatDateTime, formatRelative } from "@/lib/format";
+
+/** "mamy X z Y" per kind: our active listings vs. the totals the portal reported for the configured query. */
+function Coverage({ have, totals }: { have: Partial<Record<Kind, number>> | undefined; totals: SourceTotals | undefined }) {
+  const parts = KINDS.map((kind) => {
+    const reported = totals?.[kind] ? Object.values(totals[kind]!).reduce((sum, t) => sum + t.total, 0) : null;
+    const ours = have?.[kind] ?? 0;
+    if (reported === null && ours === 0) return null;
+    const pct = reported ? Math.min(100, Math.round((ours / reported) * 100)) : null;
+    return (
+      <span key={kind} className={pct !== null && pct < 70 ? "text-amber-700" : "text-slate-600"} title={reported === null ? "Portal nie podał liczby wyników" : "Nasze aktywne ogłoszenia / wyniki zgłaszane przez portal dla tego zapytania"}>
+        {KIND_LABEL_PLURAL[kind].toLowerCase()}: {ours}
+        {reported !== null && ` z ${reported}${pct !== null ? ` (${pct}%)` : ""}`}
+      </span>
+    );
+  }).filter(Boolean);
+  if (!parts.length) return null;
+  return <p className="mt-1 flex flex-wrap gap-x-3 text-xs">{parts}</p>;
+}
 
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
@@ -44,6 +63,36 @@ export function ScrapePage() {
   const run = s?.currentRun;
   const busy = loop.running || (s?.queue.queued ?? 0) + (s?.queue.running ?? 0) > 0;
 
+  // Re-matching of all listings runs in short batches so it also works within Netlify's function time limit.
+  const [dedup, setDedup] = useState<{ running: boolean; processed: number; moved: number; done: boolean; error: string | null }>({ running: false, processed: 0, moved: 0, done: false, error: null });
+  const dedupStop = useRef(false);
+  const recomputeDuplicates = async () => {
+    if (dedup.running) {
+      dedupStop.current = true;
+      return;
+    }
+    dedupStop.current = false;
+    setDedup({ running: true, processed: 0, moved: 0, done: false, error: null });
+    let afterId = 0;
+    let processed = 0;
+    let moved = 0;
+    try {
+      for (;;) {
+        const r = await api.dedupReassign(afterId);
+        processed += r.processed;
+        moved += r.moved;
+        setDedup({ running: true, processed, moved, done: false, error: null });
+        if (r.nextAfterId === null || dedupStop.current) break;
+        afterId = r.nextAfterId;
+      }
+      setDedup({ running: false, processed, moved, done: !dedupStop.current, error: null });
+      void qc.invalidateQueries({ queryKey: ["properties"] });
+      void qc.invalidateQueries({ queryKey: queryKeys.status });
+    } catch (err) {
+      setDedup({ running: false, processed, moved, done: false, error: err instanceof Error ? err.message : String(err) });
+    }
+  };
+
   return (
     <div className="mx-auto max-w-5xl space-y-4 overflow-y-auto p-4" style={{ maxHeight: "100%" }}>
       <Card
@@ -64,9 +113,23 @@ export function ScrapePage() {
                 <Ban className="h-4 w-4" /> Anuluj
               </Button>
             )}
+            <Button
+              onClick={() => void recomputeDuplicates()}
+              disabled={loop.running}
+              title="Ponownie dopasowuje wszystkie ogłoszenia do nieruchomości według aktualnych reguł (po dodaniu portali lub zmianie reguł)"
+            >
+              <GitMerge className="h-4 w-4" /> {dedup.running ? "Zatrzymaj scalanie" : "Przelicz duplikaty"}
+            </Button>
           </div>
         }
       >
+        {(dedup.running || dedup.done || dedup.error) && (
+          <p className={dedup.error ? "mb-3 text-sm text-rose-700" : "mb-3 text-sm text-slate-700"}>
+            {dedup.error
+              ? `Przeliczanie przerwane: ${dedup.error}`
+              : `${dedup.running ? "Przeliczam duplikaty…" : "Przeliczono duplikaty."} Sprawdzono ${dedup.processed} ogłoszeń, ${dedup.moved} zmieniło nieruchomość.`}
+          </p>
+        )}
         <p className="mb-3 text-sm text-slate-600">
           „{MODE_LABEL.incremental}” przegląda najnowsze strony każdego portalu, aż trafi na znane ogłoszenia. Praca dzieje się w krótkich
           porcjach, więc możesz zostawić tę kartę otwartą albo zamknąć — niedokończone zadania dokończy harmonogram lub kolejne kliknięcie.
@@ -155,6 +218,7 @@ export function ScrapePage() {
                     )}
                     <span className="ml-auto text-xs text-slate-500">{src.requestsLast10Min} żądań / 10 min</span>
                   </div>
+                  <Coverage have={s.counts.bySource[src.source]} totals={src.meta.totals as SourceTotals | undefined} />
                   <p className="text-xs text-slate-500">
                     ostatnie żądanie {formatRelative(src.lastRequestAt)} · ostatni sukces {formatRelative(src.lastSuccessAt)}
                     {src.lastError && ` · ${src.lastError}`}

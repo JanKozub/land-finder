@@ -26,8 +26,8 @@ import { createLogger, type Logger } from "../logger";
 import { defaultNotifiers } from "../notify";
 import { notifyNewProperties } from "../notify/run-notifications";
 import type { Notifier } from "../notify/types";
-import { adapters as defaultAdapters } from "../sources";
-import type { SourceAdapter, SourceContext } from "../sources/types";
+import { adapters as defaultAdapters, type AdapterRegistry } from "../sources";
+import type { SourceContext } from "../sources/types";
 import { classifyError } from "./classify";
 import { handleEnrichJob } from "./handlers/enrich";
 import { handleListJob } from "./handlers/list";
@@ -45,7 +45,7 @@ export interface WorkerOptions {
   log?: Logger;
   fetchClient?: FetchClient;
   olxFetchClient?: FetchClient;
-  adapters?: Record<Source, SourceAdapter>;
+  adapters?: AdapterRegistry;
   notifiers?: Notifier[];
   appBaseUrl?: string;
 }
@@ -117,6 +117,11 @@ export async function runWorker(opts: WorkerOptions): Promise<WorkerSummary> {
         continue;
       }
       const adapter = adapters[job.source];
+      if (!adapter) {
+        // A job for a source without an adapter (disabled build, test registry) cannot run; fail it instead of looping.
+        await opts.db.update(scrapeJobs).set({ status: "failed", finishedAt: t, lastError: `no adapter for ${job.source}` }).where(eq(scrapeJobs.id, job.id));
+        continue;
+      }
       const state = await getSourceState(opts.db, job.source);
       const jobLog = log.child({ job: job.id, source: job.source, type: job.type, kind: job.kind });
       const http = createSourceHttp({

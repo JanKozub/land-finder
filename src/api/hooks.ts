@@ -33,6 +33,8 @@ export function useSaveSettings() {
     onSuccess: (saved) => {
       qc.setQueryData(queryKeys.settings, saved);
       void qc.invalidateQueries({ queryKey: ["properties"] });
+      // A new rectangle changes which stored listings are "outside".
+      void qc.invalidateQueries({ queryKey: ["area-outside"] });
     },
   });
 }
@@ -67,6 +69,31 @@ export function useIgnoreProperty() {
 export function useIgnoreListing() {
   const invalidate = useInvalidateProperties();
   return useMutation({ mutationFn: ({ id, ignored }: { id: number; ignored: boolean }) => api.ignoreListing(id, ignored), onSuccess: invalidate });
+}
+
+export function useAreaOutside() {
+  return useQuery({ queryKey: ["area-outside"], queryFn: api.areaOutside, staleTime: 30_000 });
+}
+
+export function useAreaPrune() {
+  const qc = useQueryClient();
+  const invalidate = useInvalidateProperties();
+  return useMutation({
+    mutationFn: api.areaPrune,
+    onSuccess: () => {
+      invalidate();
+      void qc.invalidateQueries({ queryKey: ["area-outside"] });
+      void qc.invalidateQueries({ queryKey: queryKeys.status });
+    },
+  });
+}
+
+export function useBulkIgnoreListings() {
+  const invalidate = useInvalidateProperties();
+  return useMutation({
+    mutationFn: ({ query, ignored }: { query: Partial<ListingsQuery>; ignored: boolean }) => api.bulkIgnoreListings(query, ignored),
+    onSuccess: invalidate,
+  });
 }
 
 export function useHideProperty() {

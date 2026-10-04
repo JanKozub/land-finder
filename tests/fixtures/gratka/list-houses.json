@@ -1,0 +1,539 @@
+{
+ "data": {
+  "decode-listing-url-query-/nieruchomosci/domy/wieliczka": {
+   "data": {
+    "decodeListingUrl": {
+     "totalCount": 53,
+     "listingParameters": {
+      "numberOfResults": 35,
+      "pageNumber": 1,
+      "searchOrder": {
+       "sortKey": "REFRESHED_AT",
+       "sortOrder": "DESC"
+      },
+      "locations": [
+       {
+        "id": "86237",
+        "mapBounds": {
+         "northeast": {
+          "latitude": 50.004597,
+          "longitude": 20.088936
+         },
+         "southwest": {
+          "latitude": 49.970902,
+          "longitude": 20.002744
+         }
+        },
+        "name": "Wieliczka",
+        "nameFull": [
+         "małopolskie",
+         "wielicki",
+         "Wieliczka",
+         "Wieliczka"
+        ],
+        "nameLocCase": null,
+        "type": "TOWN",
+        "uniqueName": "Wieliczka",
+        "uniqueUrlParts": [
+         "wieliczka"
+        ],
+        "outline": null
+       }
+      ]
+     }
+    }
+   }
+  },
+  "property-listing-data-/nieruchomosci/domy/wieliczka": {
+   "data": {
+    "searchResult": {
+     "properties": {
+      "nodes": [
+       {
+        "addedAt": "2026-10-02",
+        "refreshedAt": null,
+        "advertisementText": "Dom wolnostojący Wieliczka | Grabie282 m2+6 pokoi+garaż piękny ogród",
+        "area": "282",
+        "contact": {
+         "company": {
+          "address": [
+           " 7/3",
+           "31-108 Katowice"
+          ],
+          "faxes": [],
+          "name": "Forma Estates",
+          "id": 82937,
+          "logo": {
+           "alt": "Forma Estates",
+           "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1wbG9nby84ZC9jZC84MjkzN18xNjAxNjgxMTAxLmpwZw==",
+           "name": "forma-estates"
+          },
+          "phones": [
+           "697 002 400"
+          ],
+          "type": "AGENCY"
+         },
+         "person": {
+          "faxes": [],
+          "name": "Oddział Kraków Forma Estates",
+          "phones": [
+           "697002400",
+           "+48697002400"
+          ],
+          "photo": {
+           "alt": "Oddział Kraków Forma Estates",
+           "id": "aHR0cHM6Ly9pbWcyLnN0YXRpY21vcml6b24uY29tLnBsL3RodW1ibmFpbC9hSFIwY0RvdkwyMWxaR2xoTG1SdmJYa3VjR3d2YVcxbkwzVjZlWFJyYjNkdWFXTjUvMjAwLzIwMC8yL3RodW1ibmFpbC5qcGc=",
+           "name": "oddzial-krakow-forma-estates"
+          },
+          "type": "AGENT",
+          "url": "/posrednik/oddzial-krakow-forma-estates-47236727"
+         }
+        },
+        "development": null,
+        "description": "DOM wolnostojący - 6 POKOJI + GARAŻ + OGRÓD + PIWNICA - 282 m2 // Wieliczka - Grabie FORMA Estates prezentuje do sprzedaży nowoczesny trzykondygnacyjny dom woln",
+        "floorFormatted": null,
+        "highlightText": "",
+        "id": 1543093652,
+        "idOnFrontend": "49162141",
+        "isTopPromoted": false,
+        "isHighlighted": false,
+        "isRecommended": false,
+        "location": {
+         "location": [
+          "małopolskie",
+          "wielicki",
+          "Wieliczka",
+          "Wieliczka"
+         ],
+         "street": null
+        },
+        "numberOfRooms": "6 pokoi",
+        "photos": [],
+        "photosNumber": 22,
+        "promotionPoints": 0,
+        "has3dView": false,
+        "hasVideo": true,
+        "plans": [],
+        "price": {
+         "amount": "1600000.00",
+         "currency": "PLN"
+        },
+        "priceFormatted": "1 600 000 zł",
+        "priceM2": {
+         "amount": "5673.76",
+         "currency": "PLN"
+        },
+        "priceM2Formatted": "5 674 zł/m²",
+        "title": "dom na sprzedaż",
+        "url": "/nieruchomosci/dom-wielicki-wieliczka-grabie/ob/49162141",
+        "servicePromocenaIsActive": false,
+        "omnibusPreviousSalePrice": null,
+        "omnibusPreviousLowestPrice": null
+       },
+       {
+        "addedAt": "2026-10-02",
+        "refreshedAt": null,
+        "advertisementText": "Zewnętrzny segment Wieliczka",
+        "area": "145",
+        "contact": {
+         "company": {
+          "address": [
+           "Kapelanka 1a/1",
+           "30-347 Kraków"
+          ],
+          "faxes": [],
+          "name": "Bracia Sadurscy Nieruchomości",
+          "id": 36837,
+          "logo": {
+           "alt": "Bracia Sadurscy Nieruchomości",
+           "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1wbG9nby83OC9lNS8zNjgzN18xNjAxOTIyNTg1LmpwZw==",
+           "name": "bracia-sadurscy-nieruchomosci"
+          },
+          "phones": [
+           "12 311 01 88"
+          ],
+          "type": "AGENCY"
+         },
+         "person": {
+          "faxes": [],
+          "name": "Katarzyna Rozwadowska-Różana",
+          "phones": [
+           "+48 791-023-893"
+          ],
+          "photo": {
+           "alt": "Katarzyna Rozwadowska-Różana",
+           "id": "aHR0cHM6Ly9pbWcxLnN0YXRpY21vcml6b24uY29tLnBsL3RodW1ibmFpbC9hSFIwY0RvdkwyMWxaR2xoTG1SdmJYa3VjR3d2TDJsdFp5OTFlbmwwYTI5M2JtbGplUzg0T0RRek4yVTJNR1UzWVRrek5ETmlOMk14TjJFMlpqSTFOREppTVRnMU5DNXFjR2M9LzIwMC8yMDAvMi90aHVtYm5haWwuanBn",
+           "name": "katarzyna-rozwadowska-rozana"
+          },
+          "type": "AGENT",
+          "url": "/posrednik/katarzyna-rozwadowska-rozana-49130657"
+         }
+        },
+        "development": null,
+        "description": "Wieliczka | Narożny dom w zabudowie szeregowej z ogródkiem Biuro nieruchomości prezentuje na sprzedaż funkcjonalny, narożny segment domu o powierzchni około 145",
+        "floorFormatted": null,
+        "highlightText": "",
+        "id": 1543092795,
+        "idOnFrontend": "49160167",
+        "isTopPromoted": false,
+        "isHighlighted": false,
+        "isRecommended": false,
+        "location": {
+         "location": [
+          "małopolskie",
+          "wielicki",
+          "Wieliczka",
+          "Wieliczka"
+         ],
+         "street": "Mietniowska"
+        },
+        "numberOfRooms": "4 pokoje",
+        "photos": [],
+        "photosNumber": 39,
+        "promotionPoints": 0,
+        "has3dView": true,
+        "hasVideo": true,
+        "plans": [],
+        "price": {
+         "amount": "1390000.00",
+         "currency": "PLN"
+        },
+        "priceFormatted": "1 390 000 zł",
+        "priceM2": {
+         "amount": "9586.21",
+         "currency": "PLN"
+        },
+        "priceM2Formatted": "9 586 zł/m²",
+        "title": "dom na sprzedaż",
+        "url": "/nieruchomosci/dom-wielicki-wieliczka-mietniowska/ob/49160167",
+        "servicePromocenaIsActive": false,
+        "omnibusPreviousSalePrice": null,
+        "omnibusPreviousLowestPrice": null
+       },
+       {
+        "addedAt": "2026-10-02",
+        "refreshedAt": null,
+        "advertisementText": "Nowe domy wolnostojace",
+        "area": "120",
+        "contact": {
+         "company": {
+          "address": [
+           "Modrzewiowa 12",
+           "32-010 Goszyce"
+          ],
+          "faxes": [],
+          "name": "NIERUCHOMOŚCI A-Z",
+          "id": 232505,
+          "logo": null,
+          "phones": [
+           "717077669"
+          ],
+          "type": "AGENCY"
+         },
+         "person": {
+          "faxes": [],
+          "name": "Ryszard Bojczuk",
+          "phones": [
+           "71 717 64 98"
+          ],
+          "photo": {
+           "alt": "Ryszard Bojczuk",
+           "id": "aHR0cHM6Ly9pbWcyLnN0YXRpY21vcml6b24uY29tLnBsL3RodW1ibmFpbC9hSFIwY0RvdkwyMWxaR2xoTG1SdmJYa3VjR3d2YVcxbkwzVjZlWFJyYjNkdWFXTjUvMjAwLzIwMC8yL3RodW1ibmFpbC5qcGc=",
+           "name": "ryszard-bojczuk"
+          },
+          "type": "AGENT",
+          "url": "/posrednik/ryszard-bojczuk-47810169"
+         }
+        },
+        "development": null,
+        "description": "Nowoczesny dom 120 m w Węgrzcach Wielkich koło Wieliczki gotowy z pozwoleniem PINB na użytkowanie. Na sprzedaż dwa nowe domy jednorodzinne wolnostojące położone",
+        "floorFormatted": null,
+        "highlightText": "",
+        "id": 1543091039,
+        "idOnFrontend": "49156201",
+        "isTopPromoted": false,
+        "isHighlighted": false,
+        "isRecommended": false,
+        "location": {
+         "location": [
+          "małopolskie",
+          "wielicki",
+          "Wieliczka",
+          "Wieliczka"
+         ],
+         "street": null
+        },
+        "numberOfRooms": "5 pokoi",
+        "photos": [],
+        "photosNumber": 17,
+        "promotionPoints": 0,
+        "has3dView": false,
+        "hasVideo": false,
+        "plans": [],
+        "price": {
+         "amount": "1085000.00",
+         "currency": "PLN"
+        },
+        "priceFormatted": "1 085 000 zł",
+        "priceM2": {
+         "amount": "9041.67",
+         "currency": "PLN"
+        },
+        "priceM2Formatted": "9 042 zł/m²",
+        "title": "dom na sprzedaż",
+        "url": "/nieruchomosci/dom-wielicki-wieliczka/ob/49156201",
+        "servicePromocenaIsActive": false,
+        "omnibusPreviousSalePrice": null,
+        "omnibusPreviousLowestPrice": null
+       },
+       {
+        "addedAt": "2026-09-09",
+        "refreshedAt": "2026-09-30 15:42:53",
+        "advertisementText": "Blisko Wieliczki,urocze miejce,piękny dom.",
+        "area": "93",
+        "contact": {
+         "company": {
+          "address": [
+           "Aleja 29 Listopada 75/4",
+           "31-425 Kraków"
+          ],
+          "faxes": [],
+          "name": "ABCDOM Biuro Nieruchomości",
+          "id": 50235,
+          "logo": {
+           "alt": "ABCDOM Biuro Nieruchomości",
+           "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1wbG9nby83Ni83Zi81MDIzNV8xNjAzMzUzNDk1LmpwZw==",
+           "name": "abcdom-biuro-nieruchomosci"
+          },
+          "phones": [
+           "12 633 39 33"
+          ],
+          "type": "AGENCY"
+         },
+         "person": {
+          "faxes": [],
+          "name": "Barbara Kurleto",
+          "phones": [
+           "607 100 103",
+           "12 633 39 33"
+          ],
+          "photo": {
+           "alt": "Barbara Kurleto",
+           "id": "aHR0cHM6Ly9pbWcyLnN0YXRpY21vcml6b24uY29tLnBsL3RodW1ibmFpbC9hSFIwY0RvdkwyMWxaR2xoTG1SdmJYa3VjR3d2YVcxbkwzVjZlWFJyYjNkdWFXTjUvMjAwLzIwMC8yL3RodW1ibmFpbC5qcGc=",
+           "name": "barbara-kurleto"
+          },
+          "type": "AGENT",
+          "url": "/posrednik/barbara-kurleto-48999259"
+         }
+        },
+        "development": null,
+        "description": "GORZKÓW gm. WIELICZKA  Do sprzedania dom wolnostojący   w stanie deweloperskim w uroczym  miejscu z pięknym widokiem na okolicę.  Dom wybudowany wg projektu biu",
+        "floorFormatted": null,
+        "highlightText": "",
+        "id": 1542963938,
+        "idOnFrontend": "48900349",
+        "isTopPromoted": false,
+        "isHighlighted": false,
+        "isRecommended": false,
+        "location": {
+         "location": [
+          "małopolskie",
+          "wielicki",
+          "Wieliczka",
+          "Wieliczka"
+         ],
+         "street": null
+        },
+        "numberOfRooms": "5 pokoi",
+        "photos": [],
+        "photosNumber": 16,
+        "promotionPoints": 0,
+        "has3dView": false,
+        "hasVideo": false,
+        "plans": [],
+        "price": {
+         "amount": "950000.00",
+         "currency": "PLN"
+        },
+        "priceFormatted": "950 000 zł",
+        "priceM2": {
+         "amount": "10114.99",
+         "currency": "PLN"
+        },
+        "priceM2Formatted": "10 115 zł/m²",
+        "title": "dom na sprzedaż",
+        "url": "/nieruchomosci/dom-wielicki-wieliczka-gorzkow/ob/48900349",
+        "servicePromocenaIsActive": false,
+        "omnibusPreviousSalePrice": null,
+        "omnibusPreviousLowestPrice": null
+       },
+       {
+        "addedAt": "2026-09-30",
+        "refreshedAt": "2026-09-30 15:39:01",
+        "advertisementText": "Koźmice Wielkie,bliźniak,5 pokoi,garaż,",
+        "area": "130",
+        "contact": {
+         "company": {
+          "address": [
+           "Aleja 29 Listopada 75/4",
+           "31-425 Kraków"
+          ],
+          "faxes": [],
+          "name": "ABCDOM Biuro Nieruchomości",
+          "id": 50235,
+          "logo": {
+           "alt": "ABCDOM Biuro Nieruchomości",
+           "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1wbG9nby83Ni83Zi81MDIzNV8xNjAzMzUzNDk1LmpwZw==",
+           "name": "abcdom-biuro-nieruchomosci"
+          },
+          "phones": [
+           "12 633 39 33"
+          ],
+          "type": "AGENCY"
+         },
+         "person": {
+          "faxes": [],
+          "name": "Barbara Kurleto",
+          "phones": [
+           "607 100 103",
+           "12 633 39 33"
+          ],
+          "photo": {
+           "alt": "Barbara Kurleto",
+           "id": "aHR0cHM6Ly9pbWcyLnN0YXRpY21vcml6b24uY29tLnBsL3RodW1ibmFpbC9hSFIwY0RvdkwyMWxaR2xoTG1SdmJYa3VjR3d2YVcxbkwzVjZlWFJyYjNkdWFXTjUvMjAwLzIwMC8yL3RodW1ibmFpbC5qcGc=",
+           "name": "barbara-kurleto"
+          },
+          "type": "AGENT",
+          "url": "/posrednik/barbara-kurleto-48983351"
+         }
+        },
+        "development": null,
+        "description": "Koźmice Wielkie gm. Wieliczka Na sprzedaż nowoczesny dom w zabudowie bliźniaczej połączony garażami . Idealna lokalizacja dla osób ceniących sobie spokój od gwa",
+        "floorFormatted": null,
+        "highlightText": "",
+        "id": 1543069929,
+        "idOnFrontend": "49131655",
+        "isTopPromoted": false,
+        "isHighlighted": false,
+        "isRecommended": false,
+        "location": {
+         "location": [
+          "małopolskie",
+          "wielicki",
+          "Wieliczka",
+          "Wieliczka"
+         ],
+         "street": null
+        },
+        "numberOfRooms": "5 pokoi",
+        "photos": [],
+        "photosNumber": 21,
+        "promotionPoints": 0,
+        "has3dView": false,
+        "hasVideo": false,
+        "plans": [],
+        "price": {
+         "amount": "945000.00",
+         "currency": "PLN"
+        },
+        "priceFormatted": "945 000 zł",
+        "priceM2": {
+         "amount": "7269.23",
+         "currency": "PLN"
+        },
+        "priceM2Formatted": "7 269 zł/m²",
+        "title": "dom na sprzedaż",
+        "url": "/nieruchomosci/dom-wielicki-wieliczka-kozmice-wielkie/ob/49131655",
+        "servicePromocenaIsActive": false,
+        "omnibusPreviousSalePrice": null,
+        "omnibusPreviousLowestPrice": null
+       },
+       {
+        "addedAt": "2026-09-15",
+        "refreshedAt": "2026-09-28 07:12:32",
+        "advertisementText": "NOWOCZESNY DOM Z POMPĄ CIEPŁA - bliźniak!",
+        "area": "99",
+        "contact": {
+         "company": {
+          "address": [
+           "Plac Wolnica 13/21",
+           "31-060 Kraków"
+          ],
+          "faxes": [],
+          "name": "N20 Nieruchomości s.c.",
+          "id": 235695,
+          "logo": {
+           "alt": "N20 Nieruchomości s.c.",
+           "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1wbG9nby8xMS82MS8yMzU2OTVfMTU5ODgzMTYwNy5qcGc=",
+           "name": "n20-nieruchomosci-s-c"
+          },
+          "phones": [
+           "12 433 38 78"
+          ],
+          "type": "AGENCY"
+         },
+         "person": {
+          "faxes": [],
+          "name": "Piotr Kudła",
+          "phones": [
+           "+48 790 557 504",
+           "+48 12 433 38 78"
+          ],
+          "photo": {
+           "alt": "Piotr Kudła",
+           "id": "aHR0cHM6Ly9pbWcxLnN0YXRpY21vcml6b24uY29tLnBsL3RodW1ibmFpbC9hSFIwY0RvdkwyMWxaR2xoTG1SdmJYa3VjR3d2TDJsdFp5OTFlbmwwYTI5M2JtbGplUzloT1RFd1ptUTVaVGMzWVRGbE1UbGxOV0ptTldFNE1UY3dPR05tWVRWaFlTNXdibWM9LzIwMC8yMDAvMi90aHVtYm5haWwuanBn",
+           "name": "piotr-kudla"
+          },
+          "type": "AGENT",
+          "url": "/posrednik/piotr-kudla-46340909"
+         }
+        },
+        "development": null,
+        "description": "DOM wolnostojący Z POMPĄ CIEPŁA! N20 Nieruchomości oferuje do sprzedaży nowoczesny dom wolnostojący oraz domy w zabudowie bliźniaczej położone w malowniczej i s",
+        "floorFormatted": null,
+        "highlightText": "",
+        "id": 1542997641,
+        "idOnFrontend": "48972935",
+        "isTopPromoted": false,
+        "isHighlighted": false,
+        "isRecommended": false,
+        "location": {
+         "location": [
+          "małopolskie",
+          "wielicki",
+          "Wieliczka",
+          "Wieliczka"
+         ],
+         "street": null
+        },
+        "numberOfRooms": "5 pokoi",
+        "photos": [],
+        "photosNumber": 14,
+        "promotionPoints": 0,
+        "has3dView": false,
+        "hasVideo": false,
+        "plans": [],
+        "price": {
+         "amount": "1049000.00",
+         "currency": "PLN"
+        },
+        "priceFormatted": "1 049 000 zł",
+        "priceM2": {
+         "amount": "10588.47",
+         "currency": "PLN"
+        },
+        "priceM2Formatted": "10 588 zł/m²",
+        "title": "dom na sprzedaż",
+        "url": "/nieruchomosci/dom-wielicki-wieliczka/ob/48972935",
+        "servicePromocenaIsActive": false,
+        "omnibusPreviousSalePrice": null,
+        "omnibusPreviousLowestPrice": null
+       }
+      ],
+      "totalCount": 53
+     }
+    }
+   }
+  }
+ }
+}

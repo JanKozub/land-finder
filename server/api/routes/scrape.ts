@@ -4,6 +4,7 @@ import type { Hono } from "hono";
 import { ScrapeStartSchema } from "../../../shared/schemas";
 import { cancelOpenJobs, listRuns } from "../../db/queries/jobs";
 import { ensureSettings } from "../../db/queries/settings";
+import { reassignBatch } from "../../dedup/reassign";
 import { startRun } from "../../jobs/plans";
 import { runWorker } from "../../jobs/worker";
 import type { RouteContext } from "../context";
@@ -36,6 +37,13 @@ export function registerScrapeRoutes(app: Hono, ctx: RouteContext): void {
   app.post("/api/scrape/cancel", async (c) => {
     const cancelled = await cancelOpenJobs(ctx.db, ctx.now());
     return c.json({ cancelled });
+  });
+
+  /** Re-matches listings to properties in id order; the client loops on `nextAfterId` (each call fits a function's time limit). */
+  app.post("/api/dedup/reassign", async (c) => {
+    const afterId = Math.max(0, Number(c.req.query("afterId") ?? 0) || 0);
+    const result = await reassignBatch(ctx.db, { afterId, limit: 150, budgetMs: Math.max(2000, ctx.stepBudgetMs - 1500), now: ctx.now() });
+    return c.json(result);
   });
 
   app.post("/api/worker/slice", async (c) => {

@@ -4,8 +4,7 @@ import type { Db } from "../db/client";
 import { createRun, currentRun, insertJobs, openJobsExist, type NewJob } from "../db/queries/jobs";
 import { countProperties } from "../db/queries/properties";
 import type { ScrapeJobRow, ScrapeRunRow } from "../db/schema";
-import { adapters as defaultAdapters } from "../sources";
-import type { SourceAdapter } from "../sources/types";
+import { adapters as defaultAdapters, type AdapterRegistry } from "../sources";
 
 export type StartRunResult =
   | { ok: true; run: ScrapeRunRow; jobs: ScrapeJobRow[] }
@@ -24,13 +23,14 @@ export async function startRun(
     sources?: Source[] | null;
     settings: Settings;
     now: Date;
-    adapters?: Record<Source, SourceAdapter>;
+    adapters?: AdapterRegistry;
   },
 ): Promise<StartRunResult> {
   if (await openJobsExist(db)) return { ok: false, reason: "already_running", run: await currentRun(db) };
   const adapters = input.adapters ?? defaultAdapters;
   const enabled = enabledSources(input.settings);
-  const chosen = (input.sources ?? enabled).filter((s) => enabled.includes(s));
+  // A source without an adapter (not implemented, or absent from a test registry) is simply skipped.
+  const chosen = (input.sources ?? enabled).filter((s) => enabled.includes(s) && adapters[s]);
   if (chosen.length === 0) return { ok: false, reason: "no_sources", run: null };
 
   const run = await createRun(db, { mode: input.mode, trigger: input.trigger, now: input.now });
@@ -39,7 +39,7 @@ export async function startRun(
   const suppress = input.mode === "backfill" || initialFill;
   const jobs: NewJob[] = [];
   for (const source of chosen) {
-    const adapter = adapters[source];
+    const adapter = adapters[source]!;
     for (const kind of input.settings.kinds) {
       jobs.push({
         runId: run.id,

@@ -3,7 +3,7 @@ import { bboxAround } from "../../shared/geo";
 import type { Db } from "../db/client";
 import { listings, properties, type ListingRow } from "../db/schema";
 import { decide, type DedupCandidate } from "./decide";
-import { normalizeAdvertiser } from "./normalize";
+import { dedupKeysFor, normalizeAdvertiser, sellerTokens } from "./normalize";
 import { aggregateListings, recomputeProperty } from "./recompute";
 
 const CANDIDATE_BBOX_KM = 10;
@@ -22,6 +22,8 @@ export function toCandidate(row: ListingRow): DedupCandidate {
     price: row.price,
     titleNorm: row.titleNorm,
     advertiserKey: normalizeAdvertiser(row.advertiserName, row.advertiserId),
+    sellerTokens: sellerTokens(row.advertiserName),
+    keys: dedupKeysFor(row.attributes),
     city: row.city,
   };
 }
@@ -72,9 +74,23 @@ async function findCandidates(db: Db, L: ListingRow, now: Date): Promise<Listing
     return [];
   }
   if (L.areaM2 !== null) {
-    conds.push(or(isNull(listings.areaM2), between(listings.areaM2, L.areaM2 * 0.94, L.areaM2 * 1.06))!);
+    const spread = L.kind === "house" ? 0.25 : 0.06;
+    conds.push(or(isNull(listings.areaM2), between(listings.areaM2, L.areaM2 * (1 - spread), L.areaM2 * (1 + spread)))!);
   }
-  return db.select().from(listings).where(and(...conds)).limit(CANDIDATE_LIMIT);
+  const rows = await db.select().from(listings).where(and(...conds)).limit(CANDIDATE_LIMIT);
+
+  // Listings sharing an identity key (same platform id, same agency reference) regardless of location/area.
+  const keys = dedupKeysFor(L.attributes);
+  if (keys.length) {
+    const byKey = await db
+      .select()
+      .from(listings)
+      .where(and(ne(listings.id, L.id), isNotNull(listings.propertyId), sql`${listings.attributes}->'dedupKeys' ?| array[${sql.join(keys.map((k) => sql`${k}`), sql`, `)}]`))
+      .limit(50);
+    const seen = new Set(rows.map((r) => r.id));
+    for (const r of byKey) if (!seen.has(r.id)) rows.push(r);
+  }
+  return rows;
 }
 
 /**

@@ -51,6 +51,8 @@ export interface ListPage {
   totalPages: number | null;
   hasMore: boolean;
   parseErrors: number;
+  /** Adapter-specific continuation data merged into the next cursor (e.g. a rel="next" URL). */
+  next?: Record<string, unknown>;
 }
 
 export interface SourceContext {
@@ -74,6 +76,8 @@ export interface SourceAdapter {
   rate: RateConfig;
   estimatedPageCostMs: number;
   estimatedEnrichCostMs?: number;
+  /** One cheap request (first list page) used by the "check connection" button, outside the rate limiter. */
+  probe?(settings: Settings): { url: string; headers: Record<string, string> };
   initialCursor(kind: Kind, mode: ScrapeMode, settings: Settings): Cursor;
   fetchListPage(cursor: Cursor, ctx: SourceContext): Promise<ListPage>;
   nextCursor(cursor: Cursor, page: ListPage, info: { newCount: number }): Cursor | null;

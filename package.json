@@ -19,7 +19,10 @@
     "db:studio": "drizzle-kit studio",
     "worker": "tsx scripts/worker.ts",
     "fixtures:record": "tsx scripts/record-fixture.ts",
-    "s7:fetch": "tsx scripts/fetch-s7-variants.ts"
+    "s7:fetch": "tsx scripts/fetch-s7-variants.ts",
+    "gminy:fetch": "tsx scripts/fetch-gminy.ts",
+    "dedup:report": "tsx scripts/dedup.ts report",
+    "dedup:reassign": "tsx scripts/dedup.ts reassign"
   },
   "dependencies": {
     "@date-fns/tz": "^1.5.0",
@@ -33,6 +36,7 @@
     "hono": "^4.13.12",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.51.0",
+    "node-html-parser": "^9.0.4",
     "postgres": "^3.4.9",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",

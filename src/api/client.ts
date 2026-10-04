@@ -1,5 +1,17 @@
 import type { Source } from "@shared/constants";
-import type { Filters, ListingDto, ListingsPageDto, ListingsQuery, PropertyDetailDto, PropertyDto, RunDto, ScrapeMode, ScrapeStatusDto, Settings } from "@shared/schemas";
+import type {
+  BulkIgnoreResultDto,
+  Filters,
+  ListingDto,
+  ListingsPageDto,
+  ListingsQuery,
+  PropertyDetailDto,
+  PropertyDto,
+  RunDto,
+  ScrapeMode,
+  ScrapeStatusDto,
+  Settings,
+} from "@shared/schemas";
 import { filtersToQuery, listingsQueryToParams } from "@shared/schemas";
 
 function describeError(status: number, body: unknown): string {
@@ -85,6 +97,8 @@ export const api = {
   detach: (listingId: number) => request<{ propertyId: number }>("POST", `/api/listings/${listingId}/detach`),
   ignoreListing: (listingId: number, ignored: boolean) =>
     request<{ listing: ListingDto; property: PropertyDto | null }>("POST", `/api/listings/${listingId}/ignore`, { ignored }),
+  bulkIgnoreListings: (query: Partial<ListingsQuery>, ignored: boolean) =>
+    request<BulkIgnoreResultDto>("POST", `/api/listings/bulk-ignore?${new URLSearchParams(listingsQueryToParams(query))}`, { ignored }),
   settings: () => request<Settings>("GET", "/api/settings"),
   saveSettings: (s: Settings) => request<Settings>("PUT", "/api/settings", s),
   olxCities: (q: string) => request<{ candidates: OlxCityCandidate[] }>("GET", `/api/olx/cities?q=${encodeURIComponent(q)}`),
@@ -93,6 +107,10 @@ export const api = {
   scrapeStatus: () => request<ScrapeStatusDto>("GET", "/api/scrape/status"),
   runs: (limit = 20) => request<{ runs: RunDto[] }>("GET", `/api/scrape/runs?limit=${limit}`),
   cancelScrape: () => request<{ cancelled: number }>("POST", "/api/scrape/cancel"),
+  areaOutside: () => request<{ count: number }>("GET", "/api/area/outside"),
+  areaPrune: () => request<{ deleted: number }>("POST", "/api/area/prune"),
+  dedupReassign: (afterId: number) =>
+    request<{ processed: number; moved: number; nextAfterId: number | null; removedProperties: number }>("POST", `/api/dedup/reassign?afterId=${afterId}`),
   workerSlice: () => request<SliceResponse>("POST", "/api/worker/slice"),
   notifyTest: () => request<{ sent: string[] }>("POST", "/api/notify/test"),
   probeSource: (source: Source) => request<SourceProbe>("GET", `/api/sources/${source}/probe`),

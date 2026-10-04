@@ -10,6 +10,12 @@
   add `Origin`/`sec-ch-ua` headers (triggers 403). Every parsed listing must carry an absolute `url`.
 - Worker invocations must finish within `SCRAPE_STEP_BUDGET_MS` (default 8 s): any new job type needs a cursor and
   must return `paused` when `remainingMs()` is low.
+- The search area is the rectangle `settings.area`; `center`/`radiusKm` are derived (normalizeSettings), portal
+  radii/gmina lists are derived on the settings page (`shared/area.ts`), and list/enrich jobs drop coordinates outside it.
+- Sources: one folder per portal under `server/sources/<portal>/` (`search-url.ts`, `parse-*.ts`, `adapter.ts`),
+  registered in `server/sources/index.ts`; portal settings use `PortalSettingsSchema` (location token + radius) with
+  per-portal hints in `src/i18n/pl.ts`. Pure parsers get fixture tests; record/trim fixtures with
+  `pnpm fixtures:record <portal>` (`scripts/lib/trim-fixtures.ts`), never commit full pages.
 - Tests: vitest; parsers use fixtures in `tests/fixtures`; DB/API tests use PGlite in memory (`tests/helpers/pglite-db.ts`).
   Run `pnpm typecheck && pnpm test` before finishing a change.
 - Deploys: production deploys cost Netlify credits — prefer deploy previews; never enable auto-merge or deploy

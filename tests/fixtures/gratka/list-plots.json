@@ -1,0 +1,539 @@
+{
+ "data": {
+  "decode-listing-url-query-/nieruchomosci/dzialki-grunty/powiat-wielicki": {
+   "data": {
+    "decodeListingUrl": {
+     "totalCount": 416,
+     "listingParameters": {
+      "numberOfResults": 35,
+      "pageNumber": 1,
+      "searchOrder": {
+       "sortKey": "REFRESHED_AT",
+       "sortOrder": "DESC"
+      },
+      "locations": [
+       {
+        "id": "681",
+        "mapBounds": {
+         "northeast": {
+          "latitude": 50.100196,
+          "longitude": 20.387566
+         },
+         "southwest": {
+          "latitude": 49.863447,
+          "longitude": 19.962877
+         }
+        },
+        "name": "wielicki",
+        "nameFull": [
+         "małopolskie",
+         "wielicki"
+        ],
+        "nameLocCase": null,
+        "type": "DISTRICT",
+        "uniqueName": "wielicki",
+        "uniqueUrlParts": [
+         "powiat-wielicki"
+        ],
+        "outline": null
+       }
+      ]
+     }
+    }
+   }
+  },
+  "property-listing-data-/nieruchomosci/dzialki-grunty/powiat-wielicki": {
+   "data": {
+    "searchResult": {
+     "properties": {
+      "nodes": [
+       {
+        "addedAt": "2026-06-12",
+        "refreshedAt": "2026-10-03 12:20:27",
+        "advertisementText": "Działka budowlana bardzo blisko Wieliczki i Krakowa!",
+        "area": "1 000",
+        "contact": {
+         "company": {
+          "address": [
+           "Księcia Józefa 188",
+           "30-243 Kraków"
+          ],
+          "faxes": [],
+          "name": "Janusz Pawlicki Pośrednictwo Nieruchomości Bielany",
+          "id": 80381,
+          "logo": {
+           "alt": "Janusz Pawlicki Pośrednictwo Nieruchomości Bielany",
+           "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1wbG9nby9mMS8wNy84MDM4MV8xNjAzNzM5Nzg1LmpwZw==",
+           "name": "janusz-pawlicki-posrednictwo-nieruchomosci-bielany"
+          },
+          "phones": [
+           "510 089 472"
+          ],
+          "type": "AGENCY"
+         },
+         "person": {
+          "faxes": [],
+          "name": "Janusz Pawlicki",
+          "phones": [
+           "510089472"
+          ],
+          "photo": {
+           "alt": "Janusz Pawlicki",
+           "id": "aHR0cHM6Ly9pbWcyLnN0YXRpY21vcml6b24uY29tLnBsL3RodW1ibmFpbC9hSFIwY0RvdkwyMWxaR2xoTG1SdmJYa3VjR3d2YVcxbkwzVjZlWFJyYjNkdWFXTjUvMjAwLzIwMC8yL3RodW1ibmFpbC5qcGc=",
+           "name": "janusz-pawlicki"
+          },
+          "type": "AGENT",
+          "url": "/posrednik/janusz-pawlicki-42250337"
+         }
+        },
+        "development": null,
+        "description": "Działka budowlana o pow. 10 ara i wymiarach 18,5m/54m. w Śledziejowicach , gmina Wieliczka, pow. Kraków, woj. Małopolskie, położona w sąsiedztwie granic Krakowa",
+        "floorFormatted": null,
+        "highlightText": "Tylko u nas!",
+        "id": 1542561381,
+        "idOnFrontend": "47807591",
+        "isTopPromoted": false,
+        "isHighlighted": true,
+        "isRecommended": false,
+        "location": {
+         "location": [
+          "małopolskie",
+          "wielicki",
+          "Wieliczka",
+          "Śledziejowice"
+         ],
+         "street": null
+        },
+        "numberOfRooms": null,
+        "photos": [],
+        "photosNumber": 5,
+        "promotionPoints": 25,
+        "has3dView": false,
+        "hasVideo": false,
+        "plans": [],
+        "price": {
+         "amount": "490000.00",
+         "currency": "PLN"
+        },
+        "priceFormatted": "490 000 zł",
+        "priceM2": {
+         "amount": "490.00",
+         "currency": "PLN"
+        },
+        "priceM2Formatted": "490 zł/m²",
+        "title": "działka lub grunt na sprzedaż",
+        "url": "/nieruchomosci/dzialka-wielicki-wieliczka/ob/47807591",
+        "servicePromocenaIsActive": false,
+        "omnibusPreviousSalePrice": null,
+        "omnibusPreviousLowestPrice": null
+       },
+       {
+        "addedAt": "2026-08-06",
+        "refreshedAt": "2026-10-02 14:53:05",
+        "advertisementText": "Nieruchomość pod SPA, REZYDENCJĘ, DOM SENIORA",
+        "area": "15 675",
+        "contact": {
+         "company": {
+          "address": [
+           "Kapelanka 1a/1",
+           "30-347 Kraków"
+          ],
+          "faxes": [],
+          "name": "Bracia Sadurscy Nieruchomości",
+          "id": 36837,
+          "logo": {
+           "alt": "Bracia Sadurscy Nieruchomości",
+           "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1wbG9nby83OC9lNS8zNjgzN18xNjAxOTIyNTg1LmpwZw==",
+           "name": "bracia-sadurscy-nieruchomosci"
+          },
+          "phones": [
+           "12 311 01 88"
+          ],
+          "type": "AGENCY"
+         },
+         "person": {
+          "faxes": [],
+          "name": "Rafał Duda",
+          "phones": [
+           "+48 507-894-500"
+          ],
+          "photo": {
+           "alt": "Rafał Duda",
+           "id": "aHR0cHM6Ly9pbWcyLnN0YXRpY21vcml6b24uY29tLnBsL3RodW1ibmFpbC9hSFIwY0RvdkwyMWxaR2xoTG1SdmJYa3VjR3d2YVcxbkwzVjZlWFJyYjNkdWFXTjVMemMzWVRNMlptVm1ZekUyTjJFeE1HTXhPVEE0Wm1Rek5XWTROalF3WmpjNExuQnVadz09LzIwMC8yMDAvMi90aHVtYm5haWwuanBn",
+           "name": "rafal-duda"
+          },
+          "type": "AGENT",
+          "url": "/posrednik/rafal-duda-49130657"
+         }
+        },
+        "development": null,
+        "description": "Nieruchomość, której nie da się odtworzyć. Na sprzedaż oferujemy wyjątkową nieruchomość inwestycyjną położoną w miejscowości Trąbki , w powiecie wielickim, zale",
+        "floorFormatted": null,
+        "highlightText": "",
+        "id": 1542826959,
+        "idOnFrontend": "48526389",
+        "isTopPromoted": false,
+        "isHighlighted": false,
+        "isRecommended": false,
+        "location": {
+         "location": [
+          "małopolskie",
+          "wielicki",
+          "Biskupice",
+          "Trąbki"
+         ],
+         "street": null
+        },
+        "numberOfRooms": null,
+        "photos": [],
+        "photosNumber": 49,
+        "promotionPoints": 0,
+        "has3dView": false,
+        "hasVideo": true,
+        "plans": [],
+        "price": {
+         "amount": "4000000.00",
+         "currency": "PLN"
+        },
+        "priceFormatted": "4 000 000 zł",
+        "priceM2": {
+         "amount": "255.18",
+         "currency": "PLN"
+        },
+        "priceM2Formatted": "255 zł/m²",
+        "title": "działka lub grunt na sprzedaż",
+        "url": "/nieruchomosci/dzialka-wielicki-biskupice/ob/48526389",
+        "servicePromocenaIsActive": false,
+        "omnibusPreviousSalePrice": null,
+        "omnibusPreviousLowestPrice": null
+       },
+       {
+        "addedAt": "2026-10-02",
+        "refreshedAt": null,
+        "advertisementText": "Działka na sprzedaż, 1100 m², Wieliczka Węgrzce Wielkie",
+        "area": "1 100",
+        "contact": {
+         "company": {
+          "address": [
+           "Michała Bałuckiego 12/9",
+           "30-318 Kraków"
+          ],
+          "faxes": [],
+          "name": "GRUPA B12",
+          "id": 41491,
+          "logo": {
+           "alt": "GRUPA B12",
+           "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1wbG9nby85ZS9jYy80MTQ5MV8xNTk4ODE5Mzc5LmpwZw==",
+           "name": "grupa-b12"
+          },
+          "phones": [
+           "12 357 27 57"
+          ],
+          "type": "AGENCY"
+         },
+         "person": {
+          "faxes": [],
+          "name": "Paulina Kukułka",
+          "phones": [
+           "602 150721",
+           "123572757"
+          ],
+          "photo": {
+           "alt": "Paulina Kukułka",
+           "id": "aHR0cHM6Ly9pbWcyLnN0YXRpY21vcml6b24uY29tLnBsL3RodW1ibmFpbC9hSFIwY0RvdkwyMWxaR2xoTG1SdmJYa3VjR3d2YVcxbkwzVjZlWFJyYjNkdWFXTjUvMjAwLzIwMC8yL3RodW1ibmFpbC5qcGc=",
+           "name": "paulina-kukulka"
+          },
+          "type": "AGENT",
+          "url": "/posrednik/paulina-kukulka-41699941"
+         }
+        },
+        "development": null,
+        "description": "lekko pochyła; Media/instalacje: gaz, prąd; Otoczenie: niska zabudowa, nowa zabudowa, zabudowa jednorodzinna; Wymiary: 28x39; Ogłoszenie sprzedaży działki budow",
+        "floorFormatted": null,
+        "highlightText": "",
+        "id": 1543093018,
+        "idOnFrontend": "49160641",
+        "isTopPromoted": false,
+        "isHighlighted": false,
+        "isRecommended": false,
+        "location": {
+         "location": [
+          "małopolskie",
+          "wielicki",
+          "Wieliczka",
+          "Węgrzce Wielkie"
+         ],
+         "street": "Zakątek"
+        },
+        "numberOfRooms": null,
+        "photos": [],
+        "photosNumber": 6,
+        "promotionPoints": 0,
+        "has3dView": false,
+        "hasVideo": false,
+        "plans": [],
+        "price": {
+         "amount": "506000.00",
+         "currency": "PLN"
+        },
+        "priceFormatted": "506 000 zł",
+        "priceM2": {
+         "amount": "460.00",
+         "currency": "PLN"
+        },
+        "priceM2Formatted": "460 zł/m²",
+        "title": "działka lub grunt na sprzedaż",
+        "url": "/nieruchomosci/dzialka-wielicki-wieliczka-zakatek/ob/49160641",
+        "servicePromocenaIsActive": false,
+        "omnibusPreviousSalePrice": null,
+        "omnibusPreviousLowestPrice": null
+       },
+       {
+        "addedAt": "2026-10-02",
+        "refreshedAt": null,
+        "advertisementText": "Widokowa działka z domkiem wakacyjnym",
+        "area": "5 072",
+        "contact": {
+         "company": {
+          "address": [
+           "Pomorska 8/3",
+           "30-039 Kraków"
+          ],
+          "faxes": [],
+          "name": "DOMINIKA DĄBROWSKA CONSULTING",
+          "id": 277373,
+          "logo": {
+           "alt": "DOMINIKA DĄBROWSKA CONSULTING",
+           "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1wbG9nby8yOS81My8yNzczNzNfMTYwNDc4NDQ1Ny5qcGc=",
+           "name": "dominika-dabrowska-consulting"
+          },
+          "phones": [
+           "510 146 918"
+          ],
+          "type": "AGENCY"
+         },
+         "person": {
+          "faxes": [],
+          "name": "Dominika Dąbrowska",
+          "phones": [
+           "510146918"
+          ],
+          "photo": {
+           "alt": "Dominika Dąbrowska",
+           "id": "aHR0cHM6Ly9pbWcyLnN0YXRpY21vcml6b24uY29tLnBsL3RodW1ibmFpbC9hSFIwY0RvdkwyMWxaR2xoTG1SdmJYa3VjR3d2YVcxbkwzVjZlWFJyYjNkdWFXTjVMMk0zTVRKaE5qWTRNMk5sTW1FeE5UWTBPRFpoTldZME5qRTVaRGt4T0dJM0xtcHdadz09LzIwMC8yMDAvMi90aHVtYm5haWwuanBn",
+           "name": "dominika-dabrowska"
+          },
+          "type": "AGENT",
+          "url": "/posrednik/dominika-dabrowska-49159777"
+         }
+        },
+        "development": null,
+        "description": "Twoja prywatna enklawa pod Krakowem: Ponad 50 arów z lasem, widokiem na Beskidy i uzbrojeniem Szukasz przestrzeni, w której odetchniesz od zgiełku miasta już dz",
+        "floorFormatted": null,
+        "highlightText": "",
+        "id": 1543092620,
+        "idOnFrontend": "49159777",
+        "isTopPromoted": false,
+        "isHighlighted": false,
+        "isRecommended": false,
+        "location": {
+         "location": [
+          "małopolskie",
+          "wielicki",
+          "Biskupice",
+          "Sławkowice"
+         ],
+         "street": null
+        },
+        "numberOfRooms": null,
+        "photos": [],
+        "photosNumber": 22,
+        "promotionPoints": 0,
+        "has3dView": false,
+        "hasVideo": false,
+        "plans": [],
+        "price": {
+         "amount": "690000.00",
+         "currency": "PLN"
+        },
+        "priceFormatted": "690 000 zł",
+        "priceM2": {
+         "amount": "136.04",
+         "currency": "PLN"
+        },
+        "priceM2Formatted": "136 zł/m²",
+        "title": "działka lub grunt na sprzedaż",
+        "url": "/nieruchomosci/dzialka-wielicki-biskupice/ob/49159777",
+        "servicePromocenaIsActive": false,
+        "omnibusPreviousSalePrice": null,
+        "omnibusPreviousLowestPrice": null
+       },
+       {
+        "addedAt": "2026-09-01",
+        "refreshedAt": "2026-10-02 10:46:20",
+        "advertisementText": "Działka w malowniczej miejscowości",
+        "area": "2 000",
+        "contact": {
+         "company": {
+          "address": [
+           "Cieszyńska 9/LU4",
+           "30-015 Kraków"
+          ],
+          "faxes": [],
+          "name": "MB ESTATES BEATA CHWASTEK",
+          "id": 392439,
+          "logo": {
+           "alt": "MB ESTATES BEATA CHWASTEK",
+           "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1wbG9nby9iZS8yMi8zOTI0MzlfMTYwMzc2NDY3OS5qcGc=",
+           "name": "mb-estates-beata-chwastek"
+          },
+          "phones": [
+           "665 858 585"
+          ],
+          "type": "AGENCY"
+         },
+         "person": {
+          "faxes": [],
+          "name": "Oleksandra Korliakova",
+          "phones": [
+           "+48 726 858 585"
+          ],
+          "photo": {
+           "alt": "Oleksandra Korliakova",
+           "id": "aHR0cHM6Ly9pbWcyLnN0YXRpY21vcml6b24uY29tLnBsL3RodW1ibmFpbC9hSFIwY0RvdkwyMWxaR2xoTG1SdmJYa3VjR3d2YVcxbkwzVjZlWFJyYjNkdWFXTjUvMjAwLzIwMC8yL3RodW1ibmFpbC5qcGc=",
+           "name": "oleksandra-korliakova"
+          },
+          "type": "AGENT",
+          "url": "/posrednik/oleksandra-korliakova-48320491"
+         }
+        },
+        "development": null,
+        "description": "DZIAŁKA BUDOWLANA 20 ARÓW | GOLKOWICE | BLISKO KRAKOWA Na sprzedaż atrakcyjna działka budowlana o powierzchni 20 arów , położona w spokojnej i zielonej części G",
+        "floorFormatted": null,
+        "highlightText": "",
+        "id": 1542930669,
+        "idOnFrontend": "48812327",
+        "isTopPromoted": false,
+        "isHighlighted": false,
+        "isRecommended": false,
+        "location": {
+         "location": [
+          "małopolskie",
+          "wielicki",
+          "Wieliczka",
+          "Golkowice"
+         ],
+         "street": null
+        },
+        "numberOfRooms": null,
+        "photos": [],
+        "photosNumber": 14,
+        "promotionPoints": 0,
+        "has3dView": false,
+        "hasVideo": false,
+        "plans": [],
+        "price": {
+         "amount": "400000.00",
+         "currency": "PLN"
+        },
+        "priceFormatted": "400 000 zł",
+        "priceM2": {
+         "amount": "200.00",
+         "currency": "PLN"
+        },
+        "priceM2Formatted": "200 zł/m²",
+        "title": "działka lub grunt na sprzedaż",
+        "url": "/nieruchomosci/dzialka-wielicki-wieliczka/ob/48812327",
+        "servicePromocenaIsActive": false,
+        "omnibusPreviousSalePrice": null,
+        "omnibusPreviousLowestPrice": null
+       },
+       {
+        "addedAt": "2026-08-07",
+        "refreshedAt": "2026-10-01 11:15:01",
+        "advertisementText": "Działka na sprzedaż, 1009 m², Gdów Winiary",
+        "area": "1 009",
+        "contact": {
+         "company": {
+          "address": [
+           "Grodzka 41",
+           "31-001 Kraków"
+          ],
+          "faxes": [],
+          "name": "SZEMBEK EWA Biuro Nieruchomości",
+          "id": 41597,
+          "logo": {
+           "alt": "SZEMBEK EWA Biuro Nieruchomości",
+           "id": "aHR0cHM6Ly9kLWdyLmNkbmdyLnBsL2thZHJ5L2svci9nci1wbG9nby80Ni82Ny80MTU5N18xNjAyNjM4NzE3LmpwZw==",
+           "name": "szembek-ewa-biuro-nieruchomosci"
+          },
+          "phones": [
+           "12 432 43 90"
+          ],
+          "type": "AGENCY"
+         },
+         "person": {
+          "faxes": [],
+          "name": "Robert Jałocha",
+          "phones": [
+           "503652582",
+           "183311257"
+          ],
+          "photo": {
+           "alt": "Robert Jałocha",
+           "id": "aHR0cHM6Ly9pbWcyLnN0YXRpY21vcml6b24uY29tLnBsL3RodW1ibmFpbC9hSFIwY0RvdkwyMWxaR2xoTG1SdmJYa3VjR3d2YVcxbkwzVjZlWFJyYjNkdWFXTjVMek5pWVRCa04yTTBOR016WVdJNU9EazNOV1EzWmpka1ptSm1PRFkzTkRFMExuQnVadz09LzIwMC8yMDAvMi90aHVtYm5haWwuanBn",
+           "name": "robert-jalocha"
+          },
+          "type": "AGENT",
+          "url": "/posrednik/robert-jalocha-48593551"
+         }
+        },
+        "development": null,
+        "description": "Na sprzedaż dwie wyjątkowe działki w miejscowości Winiary, gmina Gdów Marzysz o miejscu, gdzie poranki budzi śpiew ptaków, a dzień upływa w otoczeniu zieleni i ",
+        "floorFormatted": null,
+        "highlightText": "",
+        "id": 1542832635,
+        "idOnFrontend": "48540711",
+        "isTopPromoted": false,
+        "isHighlighted": false,
+        "isRecommended": false,
+        "location": {
+         "location": [
+          "małopolskie",
+          "wielicki",
+          "Gdów",
+          "Winiary"
+         ],
+         "street": null
+        },
+        "numberOfRooms": null,
+        "photos": [],
+        "photosNumber": 11,
+        "promotionPoints": 0,
+        "has3dView": false,
+        "hasVideo": false,
+        "plans": [],
+        "price": {
+         "amount": "95855.00",
+         "currency": "PLN"
+        },
+        "priceFormatted": "95 855 zł",
+        "priceM2": {
+         "amount": "95.00",
+         "currency": "PLN"
+        },
+        "priceM2Formatted": "95 zł/m²",
+        "title": "działka lub grunt na sprzedaż",
+        "url": "/nieruchomosci/dzialka-wielicki-gdow/ob/48540711",
+        "servicePromocenaIsActive": false,
+        "omnibusPreviousSalePrice": null,
+        "omnibusPreviousLowestPrice": null
+       }
+      ],
+      "totalCount": 416
+     }
+    }
+   }
+  }
+ }
+}

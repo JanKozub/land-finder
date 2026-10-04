@@ -1,0 +1,104 @@
+{
+ "data": {
+  "property-details-/nieruchomosci/dzialka-wielicki-wieliczka/ob/49041155-false": {
+   "data": {
+    "propertyData": {
+     "id": 1543027761,
+     "idOnFrontend": "49041155",
+     "url": "/nieruchomosci/dzialka-wielicki-wieliczka/ob/49041155",
+     "title": "Działka na sprzedaż, 1005 m², Wieliczka Wieliczka",
+     "advertisementText": "Działka na sprzedaż, 1005 m², Wieliczka Wieliczka",
+     "area": "1 005",
+     "price": {
+      "amount": "250000.00",
+      "currency": "PLN"
+     },
+     "priceM2": {
+      "amount": "248.76",
+      "currency": "PLN"
+     },
+     "location": {
+      "countryCode": "PL",
+      "location": [
+       "małopolskie",
+       "wielicki",
+       "Wieliczka",
+       "Wieliczka"
+      ],
+      "map": {
+       "center": {
+        "latitude": 49.9823773,
+        "longitude": 20.0602114
+       },
+       "zoom": 13
+      },
+      "number": null,
+      "street": null,
+      "county": "wielicki",
+      "commune": "Wieliczka"
+     },
+     "detailedInformation": [
+      {
+       "label": "Typ działki",
+       "value": "Budowlana",
+       "url": null
+      },
+      {
+       "label": "Pow. działki",
+       "value": "1 005 m²",
+       "url": null
+      },
+      {
+       "label": "Długość działki",
+       "value": "35 m",
+       "url": null
+      },
+      {
+       "label": "Szerokość działki",
+       "value": "29 m",
+       "url": null
+      },
+      {
+       "label": "Rynek",
+       "value": "Wtórny",
+       "url": null
+      }
+     ],
+     "buildingDetailedInformation": [],
+     "offerDetailedInformation": [
+      {
+       "label": "Data dodania",
+       "value": "22.09.2026"
+      },
+      {
+       "label": "Aktualizacja",
+       "value": "22.09.2026"
+      },
+      {
+       "label": "Numer ogłoszenia",
+       "value": "gratka-572775"
+      },
+      {
+       "label": "Liczba odsłon",
+       "value": "123"
+      }
+     ],
+     "presentationType": "ACTIVE",
+     "archiveCategoryRedirectUrl": null,
+     "reference": "572775",
+     "types": {
+      "primaryType": "PLOT",
+      "primaryTypeRoot": "PLOT",
+      "mainType": "PLOT",
+      "mainTypeRoot": "PLOT"
+     },
+     "transaction": "SALE",
+     "marketType": "Rynek wtórny",
+     "refreshedAt": null,
+     "lastModified": "Tue, 22 Sep 2026 08:21:24 GMT",
+     "description": "<p>Bardzo atrakcyjna działka budowlana o powierzchni 10.05 ar (1005 m2), oznaczona jako C10MN - tereny zabudowany mieszkaniowej jednorodzinnej - wg miejscowego planu zagospodarowania przestrzennego. <"
+    }
+   }
+  }
+ }
+}

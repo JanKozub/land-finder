@@ -4,9 +4,11 @@ import { createTestDb } from "../../tests/helpers/pglite-db";
 import type { DbHandle } from "../db/client";
 import type { FetchClient } from "../http/fetch-client";
 import { silentLogger } from "../logger";
+import { eq } from "drizzle-orm";
 import { makeListing } from "../../tests/helpers/factories";
-import { assignProperty } from "../dedup/match";
+import { assignProperty, createPropertyFromListing } from "../dedup/match";
 import { upsertListings } from "../db/queries/listings";
+import { listings } from "../db/schema";
 import { createApp } from "./app";
 
 let handle: DbHandle;
@@ -28,13 +30,21 @@ describe("API", () => {
     expect(settings.center).toEqual(DEFAULT_SETTINGS.center);
     const bad = await app.request("/api/settings", json({ ...DEFAULT_SETTINGS, radiusKm: 0 }, "PUT"));
     expect(bad.status).toBe(400);
-    const ok = await app.request("/api/settings", json({ ...DEFAULT_SETTINGS, radiusKm: 20 }, "PUT"));
+    // Centre and radius are derived from the rectangle, whatever the client sent for them.
+    const ok = await app.request("/api/settings", json({ ...DEFAULT_SETTINGS, radiusKm: 20, area: { south: 49.9, west: 20.0, north: 50.0, east: 20.2 } }, "PUT"));
     expect(ok.status).toBe(200);
-    expect((await ok.json()).radiusKm).toBe(20);
-    // Portal radii are free integers (Otodom honours most values; the UI offers a check), bounded to 0–100.
-    const otodom20 = await app.request("/api/settings", json({ ...DEFAULT_SETTINGS, otodom: { ...DEFAULT_SETTINGS.otodom, radiusKm: 20 } }, "PUT"));
-    expect(otodom20.status).toBe(200);
-    expect((await otodom20.json()).otodom.radiusKm).toBe(20);
+    const okBody = await ok.json();
+    expect(okBody.radiusKm).toBe(10);
+    expect(okBody.center).toEqual({ lat: 49.95, lon: 20.1 });
+    // Every portal's query follows the rectangle (OLX keeps its id: the lookup fails with the stub client).
+    expect(okBody.otodom).toMatchObject({ locationPath: "malopolskie/wielicki/wieliczka", radiusKm: 10 });
+    expect(okBody.olx).toMatchObject({ cityId: DEFAULT_SETTINGS.olx.cityId, cityName: "Wieliczka", distanceKm: 10 });
+    expect(okBody.domiporta.location).toBe("malopolskie/wieliczka");
+    expect(okBody.nieruchomosci_online.location).toBe("Wieliczka");
+    expect(okBody.gratka.location.split(", ")).toContain("gmina-wieliczka");
+    expect(okBody.morizon.location.split(", ")).toContain("wielicki/gmina-wieliczka");
+    expect((await app.request("/api/settings", json(DEFAULT_SETTINGS, "PUT"))).status).toBe(200);
+    // Portal radii are validated as integers 0–100 even though they are derived from the area on save.
     const otodomTooFar = await app.request("/api/settings", json({ ...DEFAULT_SETTINGS, otodom: { ...DEFAULT_SETTINGS.otodom, radiusKm: 101 } }, "PUT"));
     expect(otodomTooFar.status).toBe(400);
     const props = await (await app.request("/api/properties?kinds=plot&priceMax=300000")).json();
@@ -101,6 +111,90 @@ describe("API", () => {
     const invalid = await (await app.request("/api/listings?sort=nope&pageSize=99999&source=otodom")).json();
     expect(invalid.pageSize).toBe(100);
     expect(invalid.rows.map((r: { sourceId: string }) => r.sourceId)).toEqual(["T4"]); // valid fields survive
+  });
+
+  it("filters the table by numeric ranges and ignores or restores every match in bulk", async () => {
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "" });
+    const now = new Date("2026-10-04T09:00:00Z");
+    const seeded = await upsertListings(
+      handle.db,
+      [
+        makeListing({ source: "olx", sourceId: "BULK1", title: "Bulk mała działka", areaM2: 500, lat: 49.93, lon: 20.3 }),
+        makeListing({ source: "olx", sourceId: "BULK2", title: "Bulk średnia działka", areaM2: 790, lat: 49.94, lon: 20.31 }),
+        makeListing({ source: "olx", sourceId: "BULK3", title: "Bulk duża działka", areaM2: 1500, price: 400_000, lat: 49.95, lon: 20.32 }),
+      ],
+      now,
+    );
+    const propertyIds: number[] = [];
+    for (const row of seeded) propertyIds.push((await assignProperty(handle.db, row.id, { now })).propertyId!);
+    const ids = (page: { rows: { sourceId: string }[] }) => page.rows.map((r) => r.sourceId).sort();
+
+    expect(ids(await (await app.request("/api/listings?q=Bulk&areaMax=800")).json())).toEqual(["BULK1", "BULK2"]);
+    expect(ids(await (await app.request("/api/listings?q=Bulk&areaMin=1000&priceMin=300000")).json())).toEqual(["BULK3"]);
+    expect(ids(await (await app.request("/api/listings?q=Bulk&priceMax=250000&areaMin=600")).json())).toEqual(["BULK2"]);
+    expect((await (await app.request("/api/listings?q=Bulk&areaMax=abc")).json()).total).toBe(3); // an invalid bound is dropped, not the whole query
+
+    // "do 8 arów" → every matching listing, across all pages, in one call.
+    const ignored = await (await app.request("/api/listings/bulk-ignore?q=Bulk&areaMax=800", json({ ignored: true }))).json();
+    expect(ignored).toEqual({ updated: 2, properties: 2 });
+    expect(await (await app.request("/api/listings/bulk-ignore?q=Bulk&areaMax=800", json({ ignored: true }))).json()).toEqual({ updated: 0, properties: 0 });
+    expect(ids(await (await app.request("/api/listings?q=Bulk&ignored=only")).json())).toEqual(["BULK1", "BULK2"]);
+    const mapDefault = await (await app.request("/api/properties?kinds=plot")).json();
+    const shownIds = mapDefault.items.map((p: { id: number }) => p.id);
+    expect(shownIds).not.toContain(propertyIds[0]);
+    expect(shownIds).not.toContain(propertyIds[1]);
+    expect(shownIds).toContain(propertyIds[2]);
+
+    const restored = await (await app.request("/api/listings/bulk-ignore?q=Bulk&ignored=only", json({ ignored: false }))).json();
+    expect(restored).toEqual({ updated: 2, properties: 2 });
+    expect((await (await app.request("/api/listings?q=Bulk&ignored=only")).json()).total).toBe(0);
+    expect((await (await app.request("/api/properties?kinds=plot")).json()).items.map((p: { id: number }) => p.id)).toContain(propertyIds[0]);
+  });
+
+  it("counts and prunes listings outside the search area", async () => {
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "" });
+    const now = new Date("2026-10-04T12:00:00Z");
+    // Default area is a 30 km square around Wieliczka; Zakopane is far outside it.
+    const [far] = await upsertListings(handle.db, [makeListing({ source: "olx", sourceId: "FAR1", lat: 49.29, lon: 19.95, city: "Zakopane", title: "Działka Zakopane" })], now);
+    await assignProperty(handle.db, far!.id, { now });
+    const before = await (await app.request("/api/area/outside")).json();
+    expect(before.count).toBeGreaterThanOrEqual(1);
+    const pruned = await (await app.request("/api/area/prune", { method: "POST" })).json();
+    expect(pruned.deleted).toBe(before.count);
+    expect((await (await app.request("/api/area/outside")).json()).count).toBe(0);
+    const rows = await handle.db.select().from(listings).where(eq(listings.id, far!.id));
+    expect(rows).toHaveLength(0);
+  });
+
+  it("re-matches listings in resumable batches", async () => {
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "" });
+    const now = new Date("2026-10-04T11:00:00Z");
+    // Two copies of one plot that were assigned separately (e.g. before a rules change).
+    const [a] = await upsertListings(handle.db, [makeListing({ source: "olx", sourceId: "RM1", lat: 49.91, lon: 20.31, areaM2: 900, price: 180_000, title: "Działka Grabie 9 ar" })], now);
+    const [b] = await upsertListings(handle.db, [makeListing({ source: "domiporta", sourceId: "RM2", lat: 49.9101, lon: 20.3101, areaM2: 900, price: 180_000, title: "Grabie działka 900 m2" })], now);
+    const first = await assignProperty(handle.db, a!.id, { now });
+    await handle.db.update(listings).set({ propertyId: null }).where(eq(listings.id, b!.id));
+    const pb = await createPropertyFromListing(handle.db, (await handle.db.select().from(listings).where(eq(listings.id, b!.id)))[0]!, { now });
+    expect(pb).not.toBe(first.propertyId);
+
+    let afterId = 0;
+    let moved = 0;
+    let calls = 0;
+    for (;;) {
+      const res = await (await app.request(`/api/dedup/reassign?afterId=${afterId}`, { method: "POST" })).json();
+      calls += 1;
+      moved += res.moved;
+      if (res.nextAfterId === null) break;
+      afterId = res.nextAfterId;
+      expect(calls).toBeLessThan(100);
+    }
+    expect(moved).toBeGreaterThanOrEqual(1);
+    // Both copies end up in one property (whichever won); the emptied one is gone.
+    const [rowA] = await handle.db.select().from(listings).where(eq(listings.id, a!.id));
+    const [rowB] = await handle.db.select().from(listings).where(eq(listings.id, b!.id));
+    expect(rowA!.propertyId).toBe(rowB!.propertyId);
+    const emptied = rowA!.propertyId === first.propertyId ? pb : first.propertyId!;
+    expect((await app.request(`/api/properties/${emptied}`)).status).toBe(404);
   });
 
   it("ignores a listing: the property disappears from the map until 'show ignored' is on", async () => {

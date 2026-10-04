@@ -1,7 +1,8 @@
 import type { Kind } from "../../../shared/constants";
-import { MAX_INCREMENTAL_PAGES, OLX_CATEGORY, OLX_OFFSET_CAP, OLX_PAGE_SIZE, OLX_PRICE_BUCKETS } from "../../../shared/constants";
+import { OLX_CATEGORY, OLX_OFFSET_CAP, OLX_PAGE_SIZE, OLX_PRICE_BUCKETS } from "../../../shared/constants";
 import type { ScrapeMode, Settings } from "../../../shared/schemas";
 import { HttpError } from "../../http/errors";
+import { incrementalStep } from "../paging";
 import type { Cursor, ListPage, SourceAdapter, SourceContext } from "../types";
 import { OLX_JSON_HEADERS, buildOlxOffersUrl } from "./client";
 import { parseOlxOffersResponse } from "./parse";
@@ -41,6 +42,10 @@ export const olxAdapter: SourceAdapter = {
   label: "OLX",
   rate: { minIntervalMs: 2000, maxPer10Min: 20, maxPerSlice: 6 },
   estimatedPageCostMs: 2500,
+
+  probe(settings: Settings) {
+    return { url: buildOlxOffersUrl({ categoryId: OLX_CATEGORY.plot, cityId: settings.olx.cityId, distanceKm: settings.olx.distanceKm, offset: 0, limit: 1 }), headers: OLX_JSON_HEADERS };
+  },
 
   initialCursor(kind: Kind, mode: ScrapeMode): OlxCursor {
     if (mode === "incremental") return { kind, mode, page: 0 };
@@ -85,8 +90,9 @@ export const olxAdapter: SourceAdapter = {
   nextCursor(cursor: Cursor, page: ListPage, info: { newCount: number }): Cursor | null {
     const c = cursor as OlxCursor;
     if (c.mode === "incremental") {
-      if (info.newCount === 0 || !page.hasMore || c.page + 1 >= MAX_INCREMENTAL_PAGES) return null;
-      return { ...c, page: c.page + 1 };
+      const step = incrementalStep(c, page, info, c.page + 1);
+      if (step.stop) return null;
+      return { ...c, page: c.page + 1, emptyStreak: step.emptyStreak };
     }
     const buckets = c.buckets ?? initialBuckets(c.kind);
     const idx = c.bucketIdx ?? 0;
