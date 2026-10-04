@@ -1,4 +1,5 @@
 import { existsSync } from "node:fs";
+import { deriveMigrationsUrl } from "./db/urls";
 
 // Load .env for local CLI/dev runs. Netlify injects env vars itself; vitest sets its own.
 if (!process.env.NETLIFY && !process.env.VITEST && existsSync(".env")) {
@@ -18,7 +19,7 @@ const csv = (v: string | undefined): string[] | null =>
 
 export const env = {
   databaseUrl: process.env.DATABASE_URL || "pglite://.data/dev",
-  databaseUrlMigrations: process.env.DATABASE_URL_MIGRATIONS || process.env.DATABASE_URL || "pglite://.data/dev",
+  databaseUrlMigrations: process.env.DATABASE_URL_MIGRATIONS || deriveMigrationsUrl(process.env.DATABASE_URL || "") || "pglite://.data/dev",
   telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || "",
   telegramChatId: process.env.TELEGRAM_CHAT_ID || "",
   appBaseUrl: (process.env.APP_BASE_URL || process.env.URL || "").replace(/\/$/, ""),

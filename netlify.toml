@@ -1,5 +1,7 @@
 [build]
-  command = "pnpm build"
+  # Migrations run against DATABASE_URL (direct host derived from the pooled one) before every build,
+  # so the schema never lags behind the deployed code.
+  command = "pnpm db:migrate && pnpm build"
   publish = "dist"
 
 [build.environment]
