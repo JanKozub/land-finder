@@ -1,8 +1,8 @@
 import { zValidator } from "@hono/zod-validator";
 import type { Hono } from "hono";
-import { IgnoreSchema, parseListingsQuery, type ListingsPageDto } from "../../../shared/schemas";
-import { listListingsTable } from "../../db/queries/listings";
-import { listingToDto, propertyToDto, setListingIgnored } from "../../db/queries/properties";
+import { IgnoreSchema, parseListingsQuery, type BulkIgnoreResultDto, type ListingsPageDto } from "../../../shared/schemas";
+import { bulkSetListingsIgnored, listListingsTable } from "../../db/queries/listings";
+import { listingToDto, propertyToDto, recomputeProperties, setListingIgnored } from "../../db/queries/properties";
 import type { RouteContext } from "../context";
 import { ApiError, parseId } from "../errors";
 
@@ -16,6 +16,17 @@ export function registerListingRoutes(app: Hono, ctx: RouteContext): void {
       page: query.page,
       pageSize: query.pageSize,
     };
+    return c.json(body);
+  });
+
+  /** Ignores (or restores) every listing matching the same filter as GET /api/listings, across all pages. */
+  app.post("/api/listings/bulk-ignore", zValidator("json", IgnoreSchema), async (c) => {
+    const query = parseListingsQuery(c.req.query());
+    const { ignored } = c.req.valid("json");
+    const now = ctx.now();
+    const { listingIds, propertyIds } = await bulkSetListingsIgnored(ctx.db, query, ignored, now);
+    await recomputeProperties(ctx.db, propertyIds, now);
+    const body: BulkIgnoreResultDto = { updated: listingIds.length, properties: propertyIds.length };
     return c.json(body);
   });
 

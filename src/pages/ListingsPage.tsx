@@ -3,12 +3,17 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { KINDS, SOURCES, type Kind, type Source } from "@shared/constants";
 import { listingsQueryToParams, parseListingsQuery, type ListingSortKey, type ListingTableRowDto, type ListingsQuery } from "@shared/schemas";
-import { useIgnoreListing, useListingsTable } from "@/api/hooks";
+import { useBulkIgnoreListings, useIgnoreListing, useListingsTable } from "@/api/hooks";
+import { NumberInput } from "@/components/filters/NumberInput";
 import { KindBadge } from "@/components/listings/PropertyCard";
 import { Badge, Button, ErrorText, Input, Select } from "@/components/ui";
 import { cn } from "@/components/ui/cn";
 import { KIND_LABEL, KIND_LABEL_PLURAL, SOURCE_LABEL } from "@/i18n/pl";
-import { formatArea, formatDate, formatDateTime, formatPln, formatPricePerM2, formatRelative } from "@/lib/format";
+import { formatArea, formatDate, formatDateTime, formatPln, formatPricePerM2, formatRelative, pluralPl } from "@/lib/format";
+
+const LISTING_FORMS: [string, string, string] = ["ogłoszenie", "ogłoszenia", "ogłoszeń"];
+const PROPERTY_FORMS: [string, string, string] = ["nieruchomość", "nieruchomości", "nieruchomości"];
+type BulkMode = "ignore" | "restore";
 
 interface Column {
   key: string;
@@ -85,6 +90,21 @@ export function ListingsPage() {
   useEffect(() => setSearch(query.q), [query.q]);
   const data = useListingsTable(query);
   const ignore = useIgnoreListing();
+  const bulk = useBulkIgnoreListings();
+  // Mass ignore/restore of everything matching the current filter: ask once, then report what changed.
+  const [confirm, setConfirm] = useState<BulkMode | null>(null);
+  const [bulkResult, setBulkResult] = useState<{ mode: BulkMode; updated: number; properties: number } | null>(null);
+  useEffect(() => setConfirm(null), [query]);
+  const runBulk = (mode: BulkMode) =>
+    bulk.mutate(
+      { query, ignored: mode === "ignore" },
+      {
+        onSuccess: (res) => {
+          setBulkResult({ mode, ...res });
+          setConfirm(null);
+        },
+      },
+    );
 
   const update = (patch: Partial<ListingsQuery>) => {
     const next = { ...query, ...patch };
@@ -99,6 +119,7 @@ export function ListingsPage() {
   const rows = data.data?.rows ?? [];
   const total = data.data?.total ?? 0;
   const pages = Math.max(1, Math.ceil(total / query.pageSize));
+  const restoreMode = query.ignored === "only";
 
   return (
     <div className="flex h-full flex-col">
@@ -141,14 +162,71 @@ export function ListingsPage() {
           <option value="only">Tylko ignorowane</option>
         </Select>
         <span className="ml-auto text-slate-600">
-          {data.isLoading ? "Ładowanie…" : `${total} ogłoszeń`}
+          {data.isLoading ? "Ładowanie…" : pluralPl(total, LISTING_FORMS)}
           {data.isFetching && !data.isLoading && <span className="ml-2 animate-pulse text-slate-400">odświeżanie…</span>}
         </span>
         <Button size="sm" onClick={() => exportCsv(rows)} disabled={rows.length === 0} title="Eksportuje bieżącą stronę tabeli">
           <Download className="h-3.5 w-3.5" /> CSV
         </Button>
       </div>
-      <ErrorText error={data.error} />
+      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-4 py-2 text-sm">
+        <div className="w-32">
+          <NumberInput value={query.priceMin ?? null} onCommit={(v) => update({ priceMin: v ?? undefined })} placeholder="Cena od" suffix="zł" min={0} />
+        </div>
+        <div className="w-32">
+          <NumberInput value={query.priceMax ?? null} onCommit={(v) => update({ priceMax: v ?? undefined })} placeholder="Cena do" suffix="zł" min={0} />
+        </div>
+        <div className="w-32">
+          <NumberInput value={query.areaMin ?? null} onCommit={(v) => update({ areaMin: v ?? undefined })} placeholder="Pow. od" suffix="m²" min={0} />
+        </div>
+        <div className="w-32">
+          <NumberInput value={query.areaMax ?? null} onCommit={(v) => update({ areaMax: v ?? undefined })} placeholder="Pow. do" suffix="m²" min={0} />
+        </div>
+        <div className="w-36">
+          <NumberInput value={query.pricePerM2Max ?? null} onCommit={(v) => update({ pricePerM2Max: v ?? undefined })} placeholder="Max zł/m²" suffix="zł/m²" min={0} />
+        </div>
+        <span className="text-xs text-slate-500">1 a = 100 m² (np. „do 8 arów” = Pow. do 800)</span>
+        {confirm === null ? (
+          <Button
+            size="sm"
+            className="ml-auto"
+            disabled={total === 0 || data.isLoading}
+            onClick={() => setConfirm(restoreMode ? "restore" : "ignore")}
+            title={
+              restoreMode
+                ? "Przywraca wszystkie ogłoszenia z bieżącego filtra (ze wszystkich stron)"
+                : "Ignoruje wszystkie ogłoszenia z bieżącego filtra (ze wszystkich stron); ich nieruchomości znikają z mapy"
+            }
+          >
+            {restoreMode ? <RotateCcw className="h-3.5 w-3.5" /> : <Ban className="h-3.5 w-3.5" />}
+            {restoreMode ? "Przywróć wszystkie" : "Ignoruj wszystkie"} ({total})
+          </Button>
+        ) : (
+          <span className="ml-auto inline-flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-amber-700">
+              Na pewno? Dotyczy {pluralPl(total, LISTING_FORMS)} z bieżącego filtra, ze wszystkich stron.
+            </span>
+            <Button size="sm" variant="danger" loading={bulk.isPending} onClick={() => runBulk(confirm)}>
+              Tak, {confirm === "ignore" ? "ignoruj" : "przywróć"}
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => setConfirm(null)} disabled={bulk.isPending}>
+              Anuluj
+            </Button>
+          </span>
+        )}
+      </div>
+      {bulkResult && (
+        <div className="flex items-center gap-2 border-b border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-800">
+          <span>
+            {bulkResult.mode === "ignore" ? "Zignorowano" : "Przywrócono"} {pluralPl(bulkResult.updated, LISTING_FORMS)}
+            {bulkResult.properties > 0 && ` (przeliczono ${pluralPl(bulkResult.properties, PROPERTY_FORMS)})`}.
+          </span>
+          <Button size="sm" variant="ghost" className="ml-auto" onClick={() => setBulkResult(null)}>
+            OK
+          </Button>
+        </div>
+      )}
+      <ErrorText error={data.error ?? bulk.error} />
 
       <div className="min-h-0 flex-1 overflow-auto">
         <table className="w-full border-collapse text-xs">

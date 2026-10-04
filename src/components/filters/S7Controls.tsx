@@ -54,10 +54,6 @@ export function S7Controls({ variants, setVariants, filter, setFilter, loading, 
         ))}
       </Select>
       {error && <p className="text-[11px] text-rose-600">{error.message}</p>}
-      <p className="text-[11px] leading-snug text-slate-500">
-        Gruba linia = oś S7, kreskowana = tunel, cienka = BDI (Beskidzka Droga Integracyjna). Kliknij kółko na trasie, aby zobaczyć nazwę węzła.
-        Estakady, tunele, węzły i zakres robót od zoomu 13. Odległości liczone do osi najbliższego włączonego wariantu. Dane: GDDKiA, STEŚ 2025.
-      </p>
     </div>
   );
 }

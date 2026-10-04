@@ -31,6 +31,13 @@ export function formatKm(km: number): string {
   return `${dec1.format(km)} km`;
 }
 
+/** Polish plural: pluralPl(3, ["ogłoszenie", "ogłoszenia", "ogłoszeń"]) → "3 ogłoszenia". */
+export function pluralPl(n: number, forms: [string, string, string]): string {
+  const abs = Math.abs(n);
+  const few = abs % 10 >= 2 && abs % 10 <= 4 && (abs % 100 < 12 || abs % 100 > 14);
+  return `${pln.format(n)} ${abs === 1 ? forms[0] : few ? forms[1] : forms[2]}`;
+}
+
 export function formatMeters(m: number): string {
   return m < 1000 ? `${pln.format(Math.round(m))} m` : formatKm(m / 1000);
 }
