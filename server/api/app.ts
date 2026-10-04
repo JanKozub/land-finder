@@ -12,6 +12,7 @@ import { defaultNotifiers } from "../notify";
 import type { Notifier } from "../notify/types";
 import type { RouteContext } from "./context";
 import { ApiError } from "./errors";
+import { registerAreaRoutes } from "./routes/area";
 import { registerListingRoutes } from "./routes/listings";
 import { registerNotifyRoutes } from "./routes/notify";
 import { registerPropertyRoutes } from "./routes/properties";
@@ -98,5 +99,6 @@ export function createApp(deps: AppDeps): Hono {
   registerScrapeRoutes(app, ctx);
   registerSourceRoutes(app, ctx);
   registerNotifyRoutes(app, ctx);
+  registerAreaRoutes(app, ctx);
   return app;
 }

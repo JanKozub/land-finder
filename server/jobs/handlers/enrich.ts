@@ -1,6 +1,7 @@
+import { areaContains } from "../../../shared/area";
 import { assignProperty } from "../../dedup/match";
 import { recomputeProperty } from "../../dedup/recompute";
-import { MAX_ENRICH_ATTEMPTS, applyEnrichment, listingsNeedingEnrichment } from "../../db/queries/listings";
+import { MAX_ENRICH_ATTEMPTS, applyEnrichment, deleteListing, listingsNeedingEnrichment } from "../../db/queries/listings";
 import { BudgetExceededError, RateLimitedError, SourceBlockedError } from "../../http/errors";
 import { classifyError } from "../classify";
 import { emptyStats, type HandlerDeps, type HandlerResult } from "../types";
@@ -23,6 +24,15 @@ export async function handleEnrichJob(deps: HandlerDeps): Promise<HandlerResult>
       const t = now();
       try {
         const result = await adapter.enrich(listing, ctx);
+        const lat = result.patch?.lat ?? null;
+        const lon = result.patch?.lon ?? null;
+        if (lat !== null && lon !== null && !areaContains(ctx.settings.area, lat, lon, Math.max(1, result.patch?.locationRadiusKm ?? 0))) {
+          // The ad page placed it outside the search area: not an offer for this user.
+          await deleteListing(db, listing.id, t);
+          stats.outsideArea = (stats.outsideArea ?? 0) + 1;
+          stats.enriched = (stats.enriched ?? 0) + 1;
+          continue;
+        }
         const updated = await applyEnrichment(db, listing.id, result.patch ?? {}, t, result.status !== "skip");
         stats.enriched = (stats.enriched ?? 0) + 1;
         if (result.status === "gone") {

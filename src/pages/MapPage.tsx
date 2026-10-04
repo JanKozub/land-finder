@@ -35,7 +35,7 @@ export function MapPage() {
 
   const items = query.data?.items ?? EMPTY_ITEMS;
   const center = query.data?.center ?? settings.data?.center ?? { lat: 49.9873, lon: 20.0646 };
-  const radiusKm = query.data?.radiusKm ?? settings.data?.radiusKm ?? 15;
+  const area = settings.data?.area ?? { south: 49.8525, west: 19.8551, north: 50.1221, east: 20.2741 };
 
   // Planned S7 route variants: static GeoJSON, distances computed client-side.
   const s7Params = useS7Params();
@@ -140,7 +140,7 @@ export function MapPage() {
         <MapView
           items={filtered}
           center={center}
-          radiusKm={radiusKm}
+          area={area}
           focusId={focusId}
           onFocus={setFocus}
           onDetails={openDetails}

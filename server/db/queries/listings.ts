@@ -1,8 +1,9 @@
-import { and, desc, eq, ilike, inArray, isNull, lt, or, sql, type SQL } from "drizzle-orm";
+import { and, desc, eq, gte, ilike, inArray, isNotNull, isNull, lt, lte, or, sql, type SQL } from "drizzle-orm";
+import { areaContains } from "../../../shared/area";
 import type { Kind, Source } from "../../../shared/constants";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import type { ListingSortKey, ListingsQuery } from "../../../shared/schemas";
-import { normalizeTitle } from "../../dedup/normalize";
+import { normalizeTitle, withDedupKeys } from "../../dedup/normalize";
 import type { NormalizedListing } from "../../sources/types";
 import type { Db } from "../client";
 import { listings, priceHistory, properties, type ListingRow, type NewListingRow } from "../schema";
@@ -44,7 +45,7 @@ function toInsertRow(item: NormalizedListing, now: Date): NewListingRow {
     isPrivate: item.isPrivate,
     advertiserName: item.advertiserName,
     advertiserId: item.advertiserId,
-    attributes: item.attributes,
+    attributes: withDedupKeys(item.attributes),
     descriptionExcerpt: item.descriptionExcerpt,
     sourceCreatedAt: item.sourceCreatedAt,
     sourceRefreshedAt: item.sourceRefreshedAt,
@@ -119,7 +120,7 @@ export async function upsertListings(db: Db, items: NormalizedListing[], now: Da
         isPrivate: item.isPrivate ?? row.isPrivate,
         advertiserName: item.advertiserName ?? row.advertiserName,
         advertiserId: item.advertiserId ?? row.advertiserId,
-        attributes: { ...row.attributes, ...item.attributes },
+        attributes: withDedupKeys({ ...row.attributes, ...item.attributes }),
         descriptionExcerpt: item.descriptionExcerpt ?? row.descriptionExcerpt,
         sourceRefreshedAt: item.sourceRefreshedAt ?? row.sourceRefreshedAt,
         validTo: item.validTo ?? row.validTo,
@@ -226,13 +227,44 @@ export async function applyEnrichment(
   if (patch.plotAreaM2 !== undefined) set.plotAreaM2 = patch.plotAreaM2;
   if (patch.plotType !== undefined) set.plotType = patch.plotType;
   if (patch.city !== undefined) set.city = patch.city;
-  if (patch.attributes !== undefined) set.attributes = patch.attributes;
+  if (patch.attributes !== undefined) set.attributes = withDedupKeys(patch.attributes);
   if (patch.isActive === false) {
     set.isActive = false;
     set.deactivatedAt = now;
   }
   const [row] = await db.update(listings).set(set).where(eq(listings.id, id)).returning();
   return row ?? null;
+}
+
+/** Removes a listing for good (its property is recomputed or dropped by the caller via recomputeProperties). */
+export async function deleteListing(db: Db, id: number, now: Date): Promise<number | null> {
+  const [row] = await db.delete(listings).where(eq(listings.id, id)).returning({ propertyId: listings.propertyId });
+  if (!row) return null;
+  if (row.propertyId !== null) {
+    const { recomputeProperty } = await import("../../dedup/recompute");
+    await recomputeProperty(db, row.propertyId, now);
+  }
+  return row.propertyId;
+}
+
+/** Ids of located listings whose coordinates fall outside the rectangle (with the same slack the ingestion uses). */
+export async function listingIdsOutsideArea(db: Db, area: { south: number; west: number; north: number; east: number }): Promise<number[]> {
+  const rows = await db
+    .select({ id: listings.id, lat: listings.lat, lon: listings.lon, radius: listings.locationRadiusKm })
+    .from(listings)
+    .where(and(isNotNull(listings.lat), isNotNull(listings.lon)));
+  return rows.filter((r) => !areaContains(area, r.lat!, r.lon!, Math.max(1, r.radius ?? 0))).map((r) => r.id);
+}
+
+export async function listingsBySourceKind(db: Db): Promise<Record<string, Partial<Record<Kind, number>>>> {
+  const rows = await db
+    .select({ source: listings.source, kind: listings.kind, n: sql<number>`count(*)::int` })
+    .from(listings)
+    .where(eq(listings.isActive, true))
+    .groupBy(listings.source, listings.kind);
+  const out: Record<string, Partial<Record<Kind, number>>> = {};
+  for (const r of rows) (out[r.source] ??= {})[r.kind] = r.n;
+  return out;
 }
 
 export async function countListings(db: Db): Promise<{ total: number; active: number }> {
@@ -261,8 +293,8 @@ const SORT_COLUMNS: Record<ListingSortKey, AnyPgColumn> = {
 
 export type ListingTableRow = ListingRow & { propertyHidden: boolean };
 
-/** Paginated, sortable view of every listing in the database (the "all offers" table). */
-export async function listListingsTable(db: Db, query: ListingsQuery): Promise<{ rows: ListingTableRow[]; total: number }> {
+/** WHERE clause of the offers table filter (shared by the paginated view and bulk actions). */
+export function listingsTableWhere(query: ListingsQuery): SQL | undefined {
   const conds: SQL[] = [];
   if (query.q) {
     const like = `%${query.q.replace(/[%_]/g, (m) => `\\${m}`)}%`;
@@ -274,7 +306,17 @@ export async function listListingsTable(db: Db, query: ListingsQuery): Promise<{
   if (query.status === "inactive") conds.push(eq(listings.isActive, false));
   if (query.ignored === "hide") conds.push(eq(listings.ignored, false));
   if (query.ignored === "only") conds.push(eq(listings.ignored, true));
-  const where = conds.length ? and(...conds) : undefined;
+  if (query.priceMin !== undefined) conds.push(gte(listings.price, query.priceMin));
+  if (query.priceMax !== undefined) conds.push(lte(listings.price, query.priceMax));
+  if (query.areaMin !== undefined) conds.push(gte(listings.areaM2, query.areaMin));
+  if (query.areaMax !== undefined) conds.push(lte(listings.areaM2, query.areaMax));
+  if (query.pricePerM2Max !== undefined) conds.push(lte(listings.pricePerM2, query.pricePerM2Max));
+  return conds.length ? and(...conds) : undefined;
+}
+
+/** Paginated, sortable view of every listing in the database (the "all offers" table). */
+export async function listListingsTable(db: Db, query: ListingsQuery): Promise<{ rows: ListingTableRow[]; total: number }> {
+  const where = listingsTableWhere(query);
 
   const column = SORT_COLUMNS[query.sort];
   const order = query.dir === "asc" ? sql`${column} asc nulls last` : sql`${column} desc nulls last`;
@@ -288,4 +330,23 @@ export async function listListingsTable(db: Db, query: ListingsQuery): Promise<{
     .limit(query.pageSize)
     .offset((query.page - 1) * query.pageSize);
   return { rows: rows.map((r) => ({ ...r.listing, propertyHidden: r.propertyHidden ?? false })), total: countRow?.n ?? 0 };
+}
+
+/**
+ * Flags every listing matching the table filter as ignored (or restores it). Only rows whose flag changes are
+ * touched; the caller recomputes the returned properties so the map reflects the change.
+ */
+export async function bulkSetListingsIgnored(
+  db: Db,
+  query: ListingsQuery,
+  ignored: boolean,
+  now: Date,
+): Promise<{ listingIds: number[]; propertyIds: number[] }> {
+  const rows = await db
+    .update(listings)
+    .set({ ignored, ignoredAt: ignored ? now : null, updatedAt: now })
+    .where(and(listingsTableWhere(query), eq(listings.ignored, !ignored)))
+    .returning({ id: listings.id, propertyId: listings.propertyId });
+  const propertyIds = [...new Set(rows.map((r) => r.propertyId).filter((id): id is number => id !== null))];
+  return { listingIds: rows.map((r) => r.id), propertyIds };
 }

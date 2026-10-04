@@ -1,18 +1,39 @@
 import { z } from "zod";
-import { KINDS, SOURCES } from "./constants";
+import { AreaSchema, areaCenter, areaCoveringRadiusKm, areaFromCenter, type Area } from "./area";
+import { KINDS, SOURCES, type Kind } from "./constants";
+
+const DEFAULT_AREA: Area = areaFromCenter(49.9873, 20.0646, 15);
 
 export const KindSchema = z.enum(KINDS);
 export const SourceSchema = z.enum(SOURCES);
 export const ScrapeModeSchema = z.enum(["incremental", "backfill", "sweep"]);
 export type ScrapeMode = z.infer<typeof ScrapeModeSchema>;
 
+/** Settings shared by the smaller portals: a portal-specific location token plus a radius where supported. */
+export const PortalSettingsSchema = z.object({
+  enabled: z.boolean(),
+  /** Location slug(s) in the portal's own URL scheme, comma-separated (the area card fills gmina lists in here). */
+  location: z.string().trim().min(1).max(4000),
+  /** Search radius in km for portals that support it; 0 = the location only. */
+  radiusKm: z.number().int().min(0).max(100),
+});
+export type PortalSettings = z.infer<typeof PortalSettingsSchema>;
+
+const portalDefault = (location: string, radiusKm = 15): PortalSettings => ({ enabled: true, location, radiusKm });
+
 export const SettingsSchema = z.object({
+  /** The search rectangle; `center` and `radiusKm` are derived from it (kept for filters, the map and notifications). */
+  area: AreaSchema.default(DEFAULT_AREA),
+  /** TERYT codes of gminas inside the area the user does not want to search on the portals without radius search. */
+  excludedGminy: z.array(z.string().regex(/^\d{7}$/)).default([]),
   center: z.object({ lat: z.number().min(-90).max(90), lon: z.number().min(-180).max(180) }),
   radiusKm: z.number().min(1).max(100),
   kinds: z.array(KindSchema).min(1),
   olx: z.object({
     enabled: z.boolean(),
+    /** Resolved on save from the gmina at the centre of the area (OLX has no coordinate search). */
     cityId: z.number().int().positive(),
+    cityName: z.string().default(""),
     distanceKm: z.number().int().min(0).max(100),
   }),
   otodom: z.object({
@@ -25,6 +46,12 @@ export const SettingsSchema = z.object({
     /** Any integer; Otodom honours most values but ignores some (see OTODOM_RADII), so the UI offers a check. */
     radiusKm: z.number().int().min(0).max(100),
   }),
+  // Defaults keep settings saved before a portal existed loadable.
+  nieruchomosci_online: PortalSettingsSchema.default(portalDefault("Wieliczka:32080")),
+  morizon: PortalSettingsSchema.default({ ...portalDefault("wielicki", 0), enabled: false }),
+  gratka: PortalSettingsSchema.default(portalDefault("powiat-wielicki", 0)),
+  domiporta: PortalSettingsSchema.default(portalDefault("malopolskie/wieliczka")),
+  adresowo: PortalSettingsSchema.default(portalDefault("powiat-wielicki", 0)),
   autoScrape: z.object({
     enabled: z.boolean(),
     intervalMin: z.number().int().min(15).max(1440),
@@ -42,12 +69,34 @@ export const SettingsSchema = z.object({
 });
 export type Settings = z.infer<typeof SettingsSchema>;
 
+/** Keeps the derived centre/radius in step with the rectangle. */
+export function normalizeSettings(s: Settings): Settings {
+  return { ...s, center: areaCenter(s.area), radiusKm: Math.min(100, areaCoveringRadiusKm(s.area)) };
+}
+
+/** Settings rows saved before the rectangle existed get one around their centre and radius. */
+export function upgradeSettingsInput(raw: unknown): unknown {
+  const rec = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : null;
+  if (!rec || rec.area) return raw;
+  const center = rec.center as { lat?: number; lon?: number } | undefined;
+  const radius = typeof rec.radiusKm === "number" ? rec.radiusKm : 15;
+  if (typeof center?.lat !== "number" || typeof center?.lon !== "number") return raw;
+  return { ...rec, area: areaFromCenter(center.lat, center.lon, radius) };
+}
+
 export const DEFAULT_SETTINGS: Settings = {
-  center: { lat: 49.9873, lon: 20.0646 },
-  radiusKm: 15,
+  area: DEFAULT_AREA,
+  excludedGminy: [],
+  center: areaCenter(DEFAULT_AREA),
+  radiusKm: areaCoveringRadiusKm(DEFAULT_AREA),
   kinds: ["plot", "house"],
-  olx: { enabled: true, cityId: 128097, distanceKm: 15 },
+  olx: { enabled: true, cityId: 128097, cityName: "Wieliczka", distanceKm: 15 },
   otodom: { enabled: true, locationPath: "malopolskie/wielicki/wieliczka", radiusKm: 15 },
+  nieruchomosci_online: portalDefault("Wieliczka:32080"),
+  morizon: { ...portalDefault("wielicki", 0), enabled: false },
+  gratka: portalDefault("powiat-wielicki", 0),
+  domiporta: portalDefault("malopolskie/wieliczka"),
+  adresowo: portalDefault("powiat-wielicki", 0),
   autoScrape: { enabled: false, intervalMin: 60, activeHours: { from: 6, to: 23 }, sweepEveryDays: 1 },
   alert: { enabled: true, kinds: ["plot", "house"], maxPrice: null, minArea: null, maxPricePerM2: null, privateOnly: false },
 };
@@ -200,6 +249,8 @@ export interface RunStats {
   newProperties?: number;
   deactivated?: number;
   enriched?: number;
+  /** Listings skipped or removed because their coordinates fall outside the search area. */
+  outsideArea?: number;
   errors?: string[];
 }
 
@@ -244,7 +295,20 @@ export interface ScrapeStatusDto {
   jobs: JobDto[];
   sources: SourceStateDto[];
   lease: { holder: string; lockedUntil: string } | null;
-  counts: { listings: number; activeListings: number; properties: number; activeProperties: number; hidden: number };
+  counts: {
+    listings: number;
+    activeListings: number;
+    properties: number;
+    activeProperties: number;
+    hidden: number;
+    /** Active listings per portal and kind, to compare with the totals the portals report (`SourceStateDto.meta.totals`). */
+    bySource: Record<string, Partial<Record<Kind, number>>>;
+  };
+}
+
+/** Portal-reported result totals, recorded from the first list page of every run: meta.totals[kind][location]. */
+export interface SourceTotals {
+  [kind: string]: Record<string, { total: number; at: string }>;
 }
 
 export const LISTING_SORT_KEYS = [
@@ -269,6 +333,12 @@ export const ListingsQuerySchema = z.object({
   kind: KindSchema.optional(),
   status: z.enum(["all", "active", "inactive"]).default("all"),
   ignored: z.enum(["all", "hide", "only"]).default("all"),
+  /** Numeric ranges (PLN, m²); rows without the value never match a bound. */
+  priceMin: z.coerce.number().min(0).optional(),
+  priceMax: z.coerce.number().min(0).optional(),
+  areaMin: z.coerce.number().min(0).optional(),
+  areaMax: z.coerce.number().min(0).optional(),
+  pricePerM2Max: z.coerce.number().min(0).optional(),
   sort: z.enum(LISTING_SORT_KEYS).default("firstSeenAt"),
   dir: z.enum(["asc", "desc"]).default("desc"),
   page: z.coerce.number().int().min(1).default(1),
@@ -301,6 +371,14 @@ export interface ListingsPageDto {
   total: number;
   page: number;
   pageSize: number;
+}
+
+/** Result of ignoring/restoring every listing that matches a table filter. */
+export interface BulkIgnoreResultDto {
+  /** Listings whose flag actually changed. */
+  updated: number;
+  /** Distinct properties recomputed afterwards. */
+  properties: number;
 }
 
 export const ScrapeStartSchema = z.object({

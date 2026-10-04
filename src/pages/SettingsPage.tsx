@@ -1,13 +1,15 @@
 import { useMutation } from "@tanstack/react-query";
 import { Save, Send } from "lucide-react";
 import { useEffect, useState } from "react";
-import { KINDS, OLX_DISTANCES, OTODOM_RADII } from "@shared/constants";
+import { areaCenter, areaCoveringRadiusKm, areaSizeKm, deriveSettingsFromArea, gminasInArea, type Area } from "@shared/area";
+import { KINDS, SOURCES } from "@shared/constants";
 import { SettingsSchema, type Settings } from "@shared/schemas";
 import { api } from "@/api/client";
-import { useSaveSettings, useSettings } from "@/api/hooks";
-import { CenterPicker } from "@/components/settings/CenterPicker";
+import { useAreaOutside, useAreaPrune, useSaveSettings, useSettings } from "@/api/hooks";
+import { AreaPicker } from "@/components/settings/AreaPicker";
+import { useGminy } from "@/hooks/useGminy";
 import { Button, Card, ErrorText, Field, Input, Spinner, Switch } from "@/components/ui";
-import { KIND_LABEL_PLURAL } from "@/i18n/pl";
+import { KIND_LABEL_PLURAL, PORTAL_NOTES, SOURCE_LABEL } from "@/i18n/pl";
 
 function toggle<T>(list: T[], v: T): T[] {
   return list.includes(v) ? list.filter((x) => x !== v) : [...list, v];
@@ -23,13 +25,13 @@ export function SettingsPage() {
   const save = useSaveSettings();
   const [form, setForm] = useState<Settings | null>(null);
   const [issues, setIssues] = useState<string[]>([]);
-  const [town, setTown] = useState("");
-  const [otodomUrl, setOtodomUrl] = useState("");
   useEffect(() => {
     if (query.data && !form) setForm(structuredClone(query.data));
   }, [query.data, form]);
 
-  const olxLookup = useMutation({ mutationFn: (q: string) => api.olxCities(q) });
+  const gminy = useGminy();
+  const outside = useAreaOutside();
+  const prune = useAreaPrune();
   const otodomCheck = useMutation({ mutationFn: (url: string) => api.validateOtodom(url) });
   const notifyTest = useMutation({ mutationFn: api.notifyTest });
 
@@ -42,6 +44,20 @@ export function SettingsPage() {
       return next;
     });
   const dirty = JSON.stringify(form) !== JSON.stringify(query.data);
+  const inArea = gminy.data ? gminasInArea(gminy.data.gminy, f.area) : [];
+  const chosen = inArea.filter((g) => !f.excludedGminy.includes(g.terc));
+  const size = areaSizeKm(f.area);
+  /** Preview of what the server will derive for each portal when the form is saved. */
+  const derived = gminy.data ? deriveSettingsFromArea(f, gminy.data.gminy) : null;
+  const setArea = (area: Area) => set((s) => {
+    s.area = area;
+    s.center = areaCenter(area);
+    s.radiusKm = Math.min(100, areaCoveringRadiusKm(area));
+  });
+  const setBound = (key: keyof Area, value: number) => {
+    if (!Number.isFinite(value)) return;
+    setArea({ ...f.area, [key]: value });
+  };
 
   const onSave = () => {
     const parsed = SettingsSchema.safeParse(form);
@@ -55,15 +71,23 @@ export function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-4 overflow-y-auto p-4" style={{ maxHeight: "100%" }}>
-      <Card title="Obszar poszukiwań" >
+      <Card title="Obszar poszukiwań">
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-3">
-            <p className="text-sm text-slate-600">Kliknij na mapie, aby ustawić centrum. Promień służy do filtrów i okręgu na mapie; portale mają własne ustawienia poniżej.</p>
-            <div className="grid grid-cols-3 gap-2">
-              <Field label="Szerokość"><Input value={f.center.lat} onChange={(e) => set((s) => (s.center.lat = Number(e.target.value)))} /></Field>
-              <Field label="Długość"><Input value={f.center.lon} onChange={(e) => set((s) => (s.center.lon = Number(e.target.value)))} /></Field>
-              <Field label="Promień (km)"><Input type="number" min={1} max={100} value={f.radiusKm} onChange={(e) => set((s) => (s.radiusKm = Number(e.target.value)))} /></Field>
+            <p className="text-sm text-slate-600">
+              Prostokąt na mapie wyznacza, co trafia do bazy: portale z promieniem dostają okrąg obejmujący prostokąt, portale bez promienia
+              (Gratka, Morizon, Adresowo) listę gmin, które prostokąt obejmuje, a ogłoszenia ze współrzędnymi spoza prostokąta są odrzucane.
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <Field label="Południe (szer.)"><Input value={f.area.south} onChange={(e) => setBound("south", Number(e.target.value))} inputMode="decimal" /></Field>
+              <Field label="Północ (szer.)"><Input value={f.area.north} onChange={(e) => setBound("north", Number(e.target.value))} inputMode="decimal" /></Field>
+              <Field label="Zachód (dł.)"><Input value={f.area.west} onChange={(e) => setBound("west", Number(e.target.value))} inputMode="decimal" /></Field>
+              <Field label="Wschód (dł.)"><Input value={f.area.east} onChange={(e) => setBound("east", Number(e.target.value))} inputMode="decimal" /></Field>
             </div>
+            <p className="text-xs text-slate-500">
+              {size.widthKm.toFixed(1)} × {size.heightKm.toFixed(1)} km, środek {f.center.lat.toFixed(4)}, {f.center.lon.toFixed(4)}; okrąg obejmujący: {f.radiusKm} km
+              (tyle dostają OLX, Otodom, Nieruchomosci-online i Domiporta).
+            </p>
             <div className="flex gap-4 text-sm">
               {KINDS.map((k) => (
                 <label key={k} className="inline-flex items-center gap-1.5">
@@ -72,92 +96,90 @@ export function SettingsPage() {
                 </label>
               ))}
             </div>
-          </div>
-          <CenterPicker center={f.center} radiusKm={f.radiusKm} onPick={(lat, lon) => set((s) => (s.center = { lat, lon }))} />
-        </div>
-      </Card>
-
-      <Card title="OLX" actions={<Switch checked={f.olx.enabled} onChange={(v) => set((s) => (s.olx.enabled = v))} label="włączone" />}>
-        <div className="grid gap-3 md:grid-cols-3">
-          <Field label="ID miasta (city_id)" hint="Wieliczka = 128097, Kraków = 8959, Niepołomice = 121091, Skawina = 94873">
-            <Input type="number" value={f.olx.cityId} onChange={(e) => set((s) => (s.olx.cityId = Number(e.target.value)))} />
-          </Field>
-          <Field label="Odległość (km)" hint="Dowolna liczba całkowita 0–100 (OLX przyjmuje każdą); 0 = tylko miasto.">
-            <Input
-              type="number"
-              min={0}
-              max={100}
-              step={1}
-              list="olx-distances"
-              value={f.olx.distanceKm}
-              onChange={(e) => set((s) => (s.olx.distanceKm = Number(e.target.value)))}
-            />
-            <datalist id="olx-distances">
-              {OLX_DISTANCES.map((d) => (
-                <option key={d} value={d} label={d === 0 ? "tylko miasto" : `${d} km`} />
-              ))}
-            </datalist>
-          </Field>
-          <Field label="Znajdź ID po nazwie" hint="Szuka w ogłoszeniach OLX; nie zawsze się uda — wtedy wpisz ID ręcznie.">
-            <div className="flex gap-2">
-              <Input value={town} onChange={(e) => setTown(e.target.value)} placeholder="np. Niepołomice" />
-              <Button onClick={() => olxLookup.mutate(town)} loading={olxLookup.isPending} disabled={town.trim().length < 2}>Znajdź</Button>
-            </div>
-          </Field>
-        </div>
-        <ErrorText error={olxLookup.error} />
-        {olxLookup.data && (
-          <ul className="mt-2 flex flex-wrap gap-2 text-sm">
-            {olxLookup.data.candidates.length === 0 && <li className="text-slate-500">Nie znaleziono — wpisz ID ręcznie.</li>}
-            {olxLookup.data.candidates.map((c) => (
-              <li key={c.id}>
-                <Button size="sm" onClick={() => set((s) => (s.olx.cityId = c.id))}>
-                  {c.name} {c.region ? `(${c.region})` : ""} → {c.id}
+            <div className="flex flex-wrap items-center gap-2 text-sm">
+              {outside.data && outside.data.count > 0 && (
+                <Button size="sm" variant="danger" onClick={() => prune.mutate()} loading={prune.isPending} title="Usuwa z bazy ogłoszenia, których współrzędne leżą poza zapisanym prostokątem">
+                  Usuń {outside.data.count} ogłoszeń spoza obszaru
                 </Button>
-              </li>
+              )}
+              {prune.data && <span className="text-xs text-emerald-700">Usunięto {prune.data.deleted}.</span>}
+            </div>
+          </div>
+          <AreaPicker area={f.area} onChange={setArea} />
+        </div>
+        <div className="mt-4">
+          <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Gminy w obszarze {gminy.isLoading ? "(wczytywanie…)" : `(${chosen.length} z ${inArea.length})`}
+          </h4>
+          <ErrorText error={gminy.error} />
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+            {inArea.map((g) => (
+              <label key={g.terc} className="inline-flex items-center gap-1.5">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 accent-slate-900"
+                  checked={!f.excludedGminy.includes(g.terc)}
+                  onChange={() => set((s) => (s.excludedGminy = toggle(s.excludedGminy, g.terc)))}
+                />
+                {g.name}
+                <span className="text-xs text-slate-400">{g.type === 1 ? "miasto" : `pow. ${g.powiat}`}</span>
+              </label>
             ))}
-          </ul>
-        )}
+          </div>
+          <p className="mt-1 text-xs text-slate-500">
+            Odznaczone gminy nie są przeszukiwane na Gratce, Morizonie i Adresowo. Granice gmin: © OpenStreetMap.
+          </p>
+        </div>
       </Card>
 
-      <Card title="Otodom" actions={<Switch checked={f.otodom.enabled} onChange={(v) => set((s) => (s.otodom.enabled = v))} label="włączone" />}>
-        <div className="grid gap-3 md:grid-cols-2">
-          <Field label="Ścieżka lokalizacji" hint="Z adresu wyszukiwania, np. malopolskie/wielicki/wieliczka (poziom gminy działa poprawnie z promieniem).">
-            <Input value={f.otodom.locationPath} onChange={(e) => set((s) => (s.otodom.locationPath = e.target.value.trim()))} />
-          </Field>
-          <Field label="Promień (km)" hint="Dowolna liczba całkowita 0–100; 0 = bez promienia. Otodom bywa kapryśny i czasem zwraca wynik jak bez promienia — sprawdź przyciskiem.">
-            <div className="flex gap-2">
-              <Input
-                type="number"
-                min={0}
-                max={100}
-                step={1}
-                list="otodom-radii"
-                value={f.otodom.radiusKm}
-                onChange={(e) => set((s) => (s.otodom.radiusKm = Number(e.target.value)))}
-              />
-              <datalist id="otodom-radii">
-                {OTODOM_RADII.map((r) => (
-                  <option key={r} value={r} label={r === 0 ? "bez promienia" : `${r} km`} />
-                ))}
-              </datalist>
-              <Button
-                onClick={() => otodomCheck.mutate(`https://www.otodom.pl/pl/wyniki/sprzedaz/dzialka/${f.otodom.locationPath}?distanceRadius=${f.otodom.radiusKm}`)}
-                loading={otodomCheck.isPending}
-                disabled={!f.otodom.locationPath || f.otodom.radiusKm <= 0}
-                title="Porównuje liczbę ofert z promieniem i bez niego"
-              >
-                Sprawdź promień
-              </Button>
-            </div>
-          </Field>
-        </div>
-        <Field label="Sprawdź adres wyszukiwania Otodom" hint="Wklej URL z otodom.pl po ustawieniu miejscowości i promienia; sprawdzimy, czy portal respektuje promień." className="mt-3">
-          <div className="flex gap-2">
-            <Input value={otodomUrl} onChange={(e) => setOtodomUrl(e.target.value)} placeholder="https://www.otodom.pl/pl/wyniki/sprzedaz/dzialka/..." />
-            <Button onClick={() => otodomCheck.mutate(otodomUrl)} loading={otodomCheck.isPending} disabled={!otodomUrl.startsWith("http")}>Sprawdź</Button>
-          </div>
-        </Field>
+      <Card title="Portale">
+        <p className="mb-3 text-sm text-slate-600">
+          Ustawienia wyszukiwania każdego portalu wynikają z prostokąta i są przeliczane przy zapisie: portale z promieniem dostają okrąg
+          obejmujący prostokąt wokół gminy w jego środku, pozostałe listę zaznaczonych gmin. Tu tylko włączasz lub wyłączasz portale.
+        </p>
+        <ul className="divide-y divide-slate-200">
+          {SOURCES.map((source) => {
+            const cfg = f[source];
+            const d = derived?.[source];
+            const summary =
+              source === "olx"
+                ? `${f.olx.cityName || "miasto w środku obszaru"}${f.olx.cityId ? ` (id ${f.olx.cityId})` : ""}, ${d ? (d as { distanceKm: number }).distanceKm : f.olx.distanceKm} km`
+                : source === "otodom"
+                  ? `${d ? (d as { locationPath: string }).locationPath : f.otodom.locationPath}, ${d ? (d as { radiusKm: number }).radiusKm : f.otodom.radiusKm} km`
+                  : (() => {
+                      const pc = (d ?? cfg) as { location: string; radiusKm: number };
+                      const parts = pc.location.split(",").map((x) => x.trim()).filter(Boolean);
+                      return pc.radiusKm > 0 ? `${parts[0]}, ${pc.radiusKm} km` : parts.length > 3 ? `${parts.length} gmin (${parts.slice(0, 3).join(", ")}…)` : parts.join(", ");
+                    })();
+            return (
+              <li key={source} className="flex flex-wrap items-center gap-x-4 gap-y-1 py-2.5">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold">{SOURCE_LABEL[source]}</span>
+                    <span className="truncate text-sm text-slate-600" title={source === "olx" ? undefined : ((d ?? cfg) as { location?: string; locationPath?: string }).location ?? ((d ?? cfg) as { locationPath?: string }).locationPath}>
+                      {summary}
+                    </span>
+                  </div>
+                  {PORTAL_NOTES[source] && <p className="text-xs text-slate-500">{PORTAL_NOTES[source]}</p>}
+                </div>
+                {source === "otodom" && (
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      const oto = derived?.otodom ?? f.otodom;
+                      otodomCheck.mutate(`https://www.otodom.pl/pl/wyniki/sprzedaz/dzialka/${oto.locationPath}?distanceRadius=${oto.radiusKm}`);
+                    }}
+                    loading={otodomCheck.isPending}
+                    title="Porównuje liczbę ofert z promieniem i bez niego"
+                  >
+                    Sprawdź promień
+                  </Button>
+                )}
+                <Switch checked={cfg.enabled} onChange={(v) => set((s) => (s[source].enabled = v))} label="włączone" />
+              </li>
+            );
+          })}
+        </ul>
         <ErrorText error={otodomCheck.error} />
         {otodomCheck.data && (
           <div className="mt-2 space-y-1 rounded-md bg-slate-50 p-3 text-sm">
@@ -166,20 +188,10 @@ export function SettingsPage() {
               {otodomCheck.data.totalWithoutRadius !== null && ` (bez promienia: ${otodomCheck.data.totalWithoutRadius})`}.
             </p>
             {otodomCheck.data.radiusIgnored ? (
-              <p className="text-amber-700">
-                Otodom zignorował promień {otodomCheck.data.radiusKm} km dla tej ścieżki — wynik jest taki sam jak bez promienia. Sprawdź ponownie za chwilę
-                albo spróbuj sąsiedniej wartości (np. 18, 20 lub 22).{" "}
-                {otodomCheck.data.suggestedPath && `Proponowana ścieżka gminy: ${otodomCheck.data.suggestedPath} (${otodomCheck.data.suggestedTotal ?? "?"} ofert).`}
-              </p>
+              <p className="text-amber-700">Otodom zignorował ten promień — sprawdź ponownie za chwilę albo lekko zmień prostokąt, by zmienić promień.</p>
             ) : (
               otodomCheck.data.radiusKm > 0 && <p className="text-emerald-700">Otodom respektuje ten promień.</p>
             )}
-            <div className="flex gap-2">
-              <Button size="sm" onClick={() => set((s) => { s.otodom.locationPath = otodomCheck.data!.locationPath; s.otodom.radiusKm = otodomCheck.data!.radiusKm; })}>Użyj tej ścieżki</Button>
-              {otodomCheck.data.suggestedPath && (
-                <Button size="sm" variant="primary" onClick={() => set((s) => { s.otodom.locationPath = otodomCheck.data!.suggestedPath!; s.otodom.radiusKm = otodomCheck.data!.radiusKm; })}>Użyj ścieżki gminy</Button>
-              )}
-            </div>
           </div>
         )}
       </Card>

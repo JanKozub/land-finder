@@ -1,3 +1,5 @@
+import { areaContains } from "../../../shared/area";
+import type { SourceTotals } from "../../../shared/schemas";
 import { assignProperty } from "../../dedup/match";
 import { addPriceHistory, deactivateUnseen, upsertListings } from "../../db/queries/listings";
 import { recomputeProperties } from "../../db/queries/properties";
@@ -26,8 +28,14 @@ export async function handleListJob(deps: HandlerDeps): Promise<HandlerResult> {
     stats.pages = (stats.pages ?? 0) + 1;
     if (page.parseErrors > 0) stats.errors!.push(`${label} p${cursor.page}: ${page.parseErrors} unparsable items`);
 
+    // Portal searches are circles or whole gminas; only what lies in the configured rectangle is kept.
+    const area = ctx.settings.area;
+    const inside = page.items.filter((i) => i.lat === null || i.lon === null || areaContains(area, i.lat, i.lon, Math.max(1, i.locationRadiusKm ?? 0)));
+    stats.outsideArea = (stats.outsideArea ?? 0) + (page.items.length - inside.length);
+    if (page.total !== null && isFirstPage(cursor)) await recordTotal(ctx, kind, cursor, page.total, now());
+
     const t = now();
-    const results = await upsertListings(db, page.items, t);
+    const results = await upsertListings(db, inside, t);
     const newCount = results.filter((r) => r.inserted).length;
     stats.newListings = (stats.newListings ?? 0) + newCount;
     stats.updatedListings = (stats.updatedListings ?? 0) + results.filter((r) => !r.inserted && r.changed).length;
@@ -39,7 +47,7 @@ export async function handleListJob(deps: HandlerDeps): Promise<HandlerResult> {
     );
     for (const r of results) {
       if (!(r.inserted || r.changed)) continue;
-      if (!r.hasCoords && r.propertyId === null) continue; // waits for enrichment
+      if (!r.hasCoords && r.propertyId === null && adapter.enrich) continue; // waits for enrichment
       const a = await assignProperty(db, r.id, { suppressNotifications: deps.suppressNotifications, now: t });
       if (a.created) stats.newProperties = (stats.newProperties ?? 0) + 1;
     }
@@ -57,4 +65,22 @@ export async function handleListJob(deps: HandlerDeps): Promise<HandlerResult> {
     stats.deactivated = (stats.deactivated ?? 0) + gone.length;
   }
   return { status: "done", stats };
+}
+
+function isFirstPage(cursor: Cursor): boolean {
+  const first = cursor.page === 1 || (cursor.page === 0 && !("bucketIdx" in cursor && cursor.bucketIdx)); // OLX pages are 0-based
+  return first && (cursor.priceFrom === undefined || cursor.priceFrom === null || cursor.priceFrom === 0);
+}
+
+/** Remembers what the portal says it has for this query, so the UI can show coverage. */
+async function recordTotal(ctx: HandlerDeps["ctx"], kind: string, cursor: Cursor, total: number, at: Date): Promise<void> {
+  const locations = Array.isArray(cursor.locations) ? (cursor.locations as string[]) : null;
+  const locKey = locations ? (locations[typeof cursor.locIdx === "number" ? cursor.locIdx : 0] ?? "0") : "0";
+  const totals: SourceTotals = { ...((ctx.meta.totals as SourceTotals | undefined) ?? {}) };
+  const current = { ...(totals[kind] ?? {}) };
+  // Locations no longer configured drop out so the sum does not keep stale numbers.
+  for (const key of Object.keys(current)) if (locations && !locations.includes(key)) delete current[key];
+  current[locKey] = { total, at: at.toISOString() };
+  totals[kind] = current;
+  await ctx.setMeta({ totals });
 }

@@ -1,7 +1,8 @@
 import { Ban, Heart, RotateCcw } from "lucide-react";
 import type { LatLngBounds } from "leaflet";
 import { memo, useEffect, useMemo, useRef } from "react";
-import { Circle, CircleMarker, MapContainer, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
+import { CircleMarker, MapContainer, Popup, Rectangle, TileLayer, useMap, useMapEvents } from "react-leaflet";
+import type { Area } from "@shared/area";
 import type { PropertyDto } from "@shared/schemas";
 import type { S7Proximity, S7Variant } from "@shared/s7";
 import type { S7Collections } from "@/hooks/useS7";
@@ -16,7 +17,7 @@ import { S7Overlay } from "./S7Overlay";
 export interface MapViewProps {
   items: PropertyDto[];
   center: { lat: number; lon: number };
-  radiusKm: number;
+  area: Area;
   focusId: number | null;
   onFocus: (id: number | null) => void;
   onDetails: (id: number) => void;
@@ -159,7 +160,7 @@ function PopupContent({
 export function MapView({
   items,
   center,
-  radiusKm,
+  area,
   focusId,
   onFocus,
   onDetails,
@@ -196,7 +197,14 @@ export function MapView({
   return (
     <MapContainer center={[center.lat, center.lon]} zoom={11} preferCanvas className="h-full w-full" zoomControl>
       <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-      <Circle center={[center.lat, center.lon]} radius={radiusKm * 1000} pathOptions={{ color: "#334155", weight: 1, dashArray: "6 6", fill: false }} interactive={false} />
+      <Rectangle
+        bounds={[
+          [area.south, area.west],
+          [area.north, area.east],
+        ]}
+        pathOptions={{ color: "#334155", weight: 1, dashArray: "6 6", fill: false }}
+        interactive={false}
+      />
       <ViewportSync onBoundsChange={onBoundsChange} />
       <FocusController focusId={focusId} lat={focused?.lat ?? null} lon={focused?.lon ?? null} />
       <S7Overlay collections={s7Collections} variants={s7Variants} />
