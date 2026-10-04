@@ -76,6 +76,11 @@ export function formatDigest(items: PropertyRow[], opts: DigestOptions): string 
   return [header, ...items.map((p) => formatPropertyLine(p, opts))].join("\n\n");
 }
 
+export function formatSummary(count: number, appBaseUrl: string): string {
+  const link = appBaseUrl ? `\n<a href="${escapeHtml(`${appBaseUrl}/?addedWithinDays=1`)}">Pokaż nowe na mapie</a>` : "";
+  return `📦 Duża partia: ${count} nowych ofert naraz (bez szczegółów, żeby nie zalewać czatu).${link}`;
+}
+
 export function formatTestMessage(): string {
   return "✅ Land Finder: powiadomienia działają.";
 }

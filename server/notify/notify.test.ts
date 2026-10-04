@@ -86,4 +86,17 @@ describe("notifications", () => {
     expect(log[0]!.status).toBe("failed");
     expect(log[0]!.error).toBe("boom");
   });
+
+  it("collapses a large batch into one summary message", async () => {
+    const { db } = handle;
+    const many = Array.from({ length: 45 }, (_, i) => makeProperty({ title: `Partia ${i}`, primaryUrl: `https://www.otodom.pl/pl/oferta/batch-${i}`, lat: 49.9 + i * 0.001 }));
+    await db.insert(properties).values(many);
+    const sent: string[] = [];
+    const notifier: Notifier = { id: "fake", isConfigured: () => true, send: async (t) => void sent.push(t) };
+    const res = await notifyNewProperties(db, { settings: DEFAULT_SETTINGS, notifiers: [notifier], appBaseUrl: "https://app.example", runId: null, now, log: silentLogger });
+    expect(res.messages).toBe(1);
+    expect(res.notified).toBeGreaterThanOrEqual(45);
+    expect(sent[0]).toContain("Duża partia");
+    expect(sent[0]).toContain("addedWithinDays=1");
+  });
 });

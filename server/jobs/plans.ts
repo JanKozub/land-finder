@@ -2,6 +2,7 @@ import { SOURCES, type Source } from "../../shared/constants";
 import type { ScrapeMode, Settings } from "../../shared/schemas";
 import type { Db } from "../db/client";
 import { createRun, currentRun, insertJobs, openJobsExist, type NewJob } from "../db/queries/jobs";
+import { countProperties } from "../db/queries/properties";
 import type { ScrapeJobRow, ScrapeRunRow } from "../db/schema";
 import { adapters as defaultAdapters } from "../sources";
 import type { SourceAdapter } from "../sources/types";
@@ -33,7 +34,9 @@ export async function startRun(
   if (chosen.length === 0) return { ok: false, reason: "no_sources", run: null };
 
   const run = await createRun(db, { mode: input.mode, trigger: input.trigger, now: input.now });
-  const suppress = input.mode === "backfill";
+  // Backfills and the very first fill of an empty database would announce hundreds of "new" offers.
+  const initialFill = (await countProperties(db)).total === 0;
+  const suppress = input.mode === "backfill" || initialFill;
   const jobs: NewJob[] = [];
   for (const source of chosen) {
     const adapter = adapters[source];

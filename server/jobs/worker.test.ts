@@ -69,6 +69,7 @@ describe("worker", () => {
     expect(started.ok).toBe(true);
     if (!started.ok) return;
     expect(started.jobs).toHaveLength(4); // 2 olx list + 2 otodom list (fake adapters have no enrich step)
+    expect(started.jobs.every((j) => j.suppressNotifications)).toBe(true); // empty database = initial fill
 
     // Budget allows exactly one page: 3000 ms budget, page cost estimate 2000, each fetch advances the clock 1500 ms.
     const first = await runWorker({ db, budgetMs: 3000, holder: "t1", now, sleep: async () => {}, log: silentLogger, adapters, notifiers: [], sources: ["olx", "otodom"] });
@@ -100,6 +101,7 @@ describe("worker", () => {
     const second = await startRun(db, { mode: "incremental", trigger: "manual", settings, now: now(), adapters });
     expect(second.ok).toBe(true);
     if (!second.ok) return;
+    expect(second.jobs.every((j) => !j.suppressNotifications)).toBe(true); // regular run announces new offers
     await runWorker({ db, budgetMs: 60_000, holder: "t3", now, sleep: async () => {}, log: silentLogger, adapters, notifiers: [], sources: ["olx", "otodom"] });
     const run2 = (await getRun(db, second.run.id))!;
     expect(run2.status).toBe("done");
