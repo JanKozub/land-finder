@@ -33,6 +33,19 @@ export interface AppDeps {
   appBaseUrl?: string;
 }
 
+/** Drivers and ORMs wrap the real error (e.g. drizzle's "Failed query"); surface the chain of causes. */
+export function describeCause(err: unknown): string | null {
+  const parts: string[] = [];
+  let current: unknown = err instanceof Error ? err.cause : null;
+  for (let depth = 0; current && depth < 4; depth += 1) {
+    const e = current as { message?: unknown; code?: unknown; cause?: unknown };
+    const message = typeof e.message === "string" ? e.message : String(current);
+    parts.push(typeof e.code === "string" ? `${e.code}: ${message}` : message);
+    current = e.cause;
+  }
+  return parts.length ? parts.join(" ← ") : null;
+}
+
 export function createApp(deps: AppDeps): Hono {
   const app = new Hono();
   const log = deps.log ?? createLogger({ mod: "api" });
@@ -60,8 +73,9 @@ export function createApp(deps: AppDeps): Hono {
   app.onError((err, c) => {
     if (err instanceof ApiError) return c.json({ error: err.message, ...err.extra }, err.status as ContentfulStatusCode);
     if (err instanceof HTTPException) return err.getResponse();
-    log.error("unhandled api error", { path: c.req.path, err: err.stack ?? err.message });
-    return c.json({ error: "internal_error", message: err.message }, 500);
+    const cause = describeCause(err);
+    log.error("unhandled api error", { path: c.req.path, err: err.stack ?? err.message, cause });
+    return c.json({ error: "internal_error", message: cause ? `${err.message} — ${cause}` : err.message }, 500);
   });
   app.notFound((c) => c.json({ error: "not_found", path: c.req.path }, 404));
 

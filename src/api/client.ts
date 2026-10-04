@@ -2,12 +2,21 @@ import type { Source } from "@shared/constants";
 import type { Filters, ListingDto, ListingsPageDto, ListingsQuery, PropertyDetailDto, PropertyDto, RunDto, ScrapeMode, ScrapeStatusDto, Settings } from "@shared/schemas";
 import { filtersToQuery, listingsQueryToParams } from "@shared/schemas";
 
+function describeError(status: number, body: unknown): string {
+  if (body && typeof body === "object") {
+    const b = body as { error?: unknown; message?: unknown; hint?: unknown };
+    const parts = [b.error, b.message, b.hint].filter((v): v is string => typeof v === "string" && v.length > 0);
+    if (parts.length) return parts.join(": ");
+  }
+  return `HTTP ${status}`;
+}
+
 export class ApiClientError extends Error {
   constructor(
     public readonly status: number,
     public readonly body: unknown,
   ) {
-    super(typeof body === "object" && body && "error" in body ? String((body as { error: unknown }).error) : `HTTP ${status}`);
+    super(describeError(status, body));
   }
 }
 

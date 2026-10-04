@@ -13,6 +13,7 @@ export function classifyError(err: unknown, cursor: Record<string, unknown> | nu
   if (err instanceof BudgetExceededError) {
     return { status: "paused", cursor, notBefore: now, stats };
   }
-  const message = err instanceof HttpError ? err.message : err instanceof Error ? `${err.name}: ${err.message}` : String(err);
-  return { status: "failed", cursor, stats, error: message };
+  const base = err instanceof HttpError ? err.message : err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+  const cause = err instanceof Error && err.cause instanceof Error ? ` — ${err.cause.message}` : "";
+  return { status: "failed", cursor, stats, error: `${base}${cause}` };
 }
