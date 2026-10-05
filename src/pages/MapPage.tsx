@@ -82,9 +82,14 @@ export function MapPage() {
     },
     [setFocus],
   );
-  const toggleHidden = useCallback((item: PropertyDto) => hide.mutate({ id: item.id, hidden: !item.hidden }), [hide]);
-  const toggleFavorite = useCallback((item: PropertyDto) => favorite.mutate({ id: item.id, favorite: !item.favorite }), [favorite]);
-  const toggleIgnored = useCallback((item: PropertyDto) => ignoreProperty.mutate({ id: item.id, ignored: !item.ignored }), [ignoreProperty]);
+  // `mutate` is stable while the mutation result object is not; depending on it keeps the map and list memoized
+  // across the re-render every pan triggers (bounds change), instead of reconciling thousands of markers each time.
+  const hideMutate = hide.mutate;
+  const favoriteMutate = favorite.mutate;
+  const ignoreMutate = ignoreProperty.mutate;
+  const toggleHidden = useCallback((item: PropertyDto) => hideMutate({ id: item.id, hidden: !item.hidden }), [hideMutate]);
+  const toggleFavorite = useCallback((item: PropertyDto) => favoriteMutate({ id: item.id, favorite: !item.favorite }), [favoriteMutate]);
+  const toggleIgnored = useCallback((item: PropertyDto) => ignoreMutate({ id: item.id, ignored: !item.ignored }), [ignoreMutate]);
 
   return (
     <div className="relative flex h-full">

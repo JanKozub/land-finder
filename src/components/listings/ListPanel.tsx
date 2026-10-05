@@ -26,7 +26,8 @@ export function sortItems(items: PropertyDto[], sort: SortKey, distance: (p: Pro
     case "distance":
       return sorted.sort((a, b) => nullsLast(distance(a), distance(b), 1));
     default:
-      return sorted.sort((a, b) => b.firstSeenAt.localeCompare(a.firstSeenAt));
+      // ISO timestamps compare correctly as plain strings; localeCompare was the slowest part of every pan.
+      return sorted.sort((a, b) => (a.firstSeenAt < b.firstSeenAt ? 1 : a.firstSeenAt > b.firstSeenAt ? -1 : 0));
   }
 }
 

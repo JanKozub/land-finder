@@ -15,9 +15,13 @@ const AREA_KINDS: readonly S7Kind[] = ["bridge", "tunnel", "interchange"];
 const EXTENT_KINDS: readonly S7Kind[] = ["extent"];
 const POINT_KINDS: readonly S7Kind[] = ["interchangeName"];
 
-/** Zoom levels from which the denser layers become readable (zoom 13 ≈ 12 m/px around Kraków). */
-const ZOOM_AREAS = 13;
-const ZOOM_EXTENT = 13;
+/** Zoom level from which the denser layers become readable (zoom 13 ≈ 12 m/px around Kraków). */
+const ZOOM_DETAILS = 13;
+/**
+ * Once shown, the details stay until the map is zoomed out this far: mounting the ~600 bridge, tunnel, interchange and
+ * work-extent layers costs about 100 ms, and users flip between zoom 12 and 13 all the time.
+ */
+const ZOOM_DETAILS_HIDE = 11;
 const HOVER_KINDS: readonly S7Kind[] = [...LINE_KINDS, "bridge", "tunnel", "interchange"];
 // Kilometre posts ("km") are in the data but not drawn yet.
 
@@ -90,11 +94,17 @@ function onEachFeature(feature: S7Feature, layer: L.Layer) {
   paintTooltip(layer, S7_COLORS[variant]);
 }
 
-function useZoom(): number {
+/** Whether the detail layers are shown, with hysteresis between ZOOM_DETAILS_HIDE and ZOOM_DETAILS. */
+function useShowDetails(): boolean {
   const map = useMap();
-  const [zoom, setZoom] = useState(() => map.getZoom());
-  useMapEvents({ zoomend: () => setZoom(map.getZoom()) });
-  return zoom;
+  const [show, setShow] = useState(() => map.getZoom() >= ZOOM_DETAILS);
+  useMapEvents({
+    zoomend: () => {
+      const zoom = map.getZoom();
+      setShow((current) => (current ? zoom > ZOOM_DETAILS_HIDE : zoom >= ZOOM_DETAILS));
+    },
+  });
+  return show;
 }
 
 /**
@@ -144,9 +154,7 @@ export interface S7OverlayProps {
  * clickable above the axis lines, and the areas/extent belong underneath everything.
  */
 export function S7Overlay({ collections, variants }: S7OverlayProps) {
-  const zoom = useZoom();
-  const showAreas = zoom >= ZOOM_AREAS;
-  const showExtent = zoom >= ZOOM_EXTENT;
+  const showDetails = useShowDetails();
   return (
     <>
       {variants.map((variant) => {
@@ -157,8 +165,8 @@ export function S7Overlay({ collections, variants }: S7OverlayProps) {
           <Fragment key={variant}>
             {groups.points.features.length > 0 && <S7Group data={groups.points} />}
             <S7Group data={groups.lines} />
-            {showAreas && groups.areas.features.length > 0 && <S7Group data={groups.areas} />}
-            {showExtent && groups.extent.features.length > 0 && <S7Group data={groups.extent} />}
+            {showDetails && groups.areas.features.length > 0 && <S7Group data={groups.areas} />}
+            {showDetails && groups.extent.features.length > 0 && <S7Group data={groups.extent} />}
           </Fragment>
         );
       })}

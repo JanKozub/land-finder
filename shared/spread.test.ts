@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { spreadOffset, spreadOverlapping, type PixelProjector } from "./spread";
+import { splitOverlapping, spreadOffset, spreadOverlapping, type PixelProjector } from "./spread";
 
 /** 1 px = 0.001° in both axes; good enough to check the geometry. */
 const projector: PixelProjector = {
@@ -29,6 +29,19 @@ describe("spreading overlapping dots", () => {
     }
     const [a, b] = [spread.positions.get(1)!, spread.positions.get(2)!];
     expect(Math.hypot((a[1] - b[1]) * 1000, (a[0] - b[0]) * 1000)).toBeGreaterThan(12);
+  });
+
+  it("separates lone dots from the ones that share a spot", () => {
+    const items = [
+      { id: 1, lat: 49.99, lon: 20.06 },
+      { id: 2, lat: 49.99004, lon: 20.06003 },
+      { id: 3, lat: 49.95, lon: 20.1 },
+      { id: 4, lat: null, lon: null },
+    ];
+    const { solo, grouped } = splitOverlapping(items);
+    expect(solo.map((i) => i.id)).toEqual([3]);
+    expect(grouped.map((i) => i.id).sort()).toEqual([1, 2]);
+    expect(spreadOverlapping(projector, grouped).positions.size).toBe(2);
   });
 
   it("switches to a sunflower for big groups and keeps neighbours apart", () => {
