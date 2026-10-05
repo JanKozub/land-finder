@@ -80,13 +80,15 @@ export async function createPropertyFromListing(db: Db, row: ListingRow, opts: A
 }
 
 async function findCandidates(db: Db, L: ListingRow, now: Date): Promise<CandidateRow[]> {
-  const conds = [
+  /** Guards every candidate query shares: assigned, same kind, active or recently deactivated, not split by the user. */
+  const baseConds = [
     ne(listings.id, L.id),
     eq(listings.kind, L.kind),
     isNotNull(listings.propertyId),
     or(eq(listings.isActive, true), gt(listings.deactivatedAt, new Date(now.getTime() - INACTIVE_GRACE_DAYS * 86_400_000)))!,
     sql`NOT EXISTS (SELECT 1 FROM dedup_exclusions e WHERE e.listing_id_a = LEAST(${L.id}::bigint, ${listings.id}) AND e.listing_id_b = GREATEST(${L.id}::bigint, ${listings.id}))`,
   ];
+  const conds = [...baseConds];
   if (L.lat !== null && L.lon !== null) {
     const box = bboxAround(L.lat, L.lon, CANDIDATE_BBOX_KM);
     const sameCity = L.city ? sql`lower(${listings.city}) = lower(${L.city})` : sql`false`;
@@ -108,12 +110,13 @@ async function findCandidates(db: Db, L: ListingRow, now: Date): Promise<Candida
   const rows: CandidateRow[] = await db.select(candidateColumns).from(listings).where(and(...conds)).limit(CANDIDATE_LIMIT);
 
   // Listings sharing an identity key (same platform id, same agency reference) regardless of location/area.
+  // The same guards as above apply: a pair the user split by hand stays apart whatever keys it shares.
   const keys = dedupKeysFor(L.attributes);
   if (keys.length) {
     const byKey = await db
       .select(candidateColumns)
       .from(listings)
-      .where(and(ne(listings.id, L.id), isNotNull(listings.propertyId), sql`${listings.attributes}->'dedupKeys' ?| array[${sql.join(keys.map((k) => sql`${k}`), sql`, `)}]`))
+      .where(and(...baseConds, sql`${listings.attributes}->'dedupKeys' ?| array[${sql.join(keys.map((k) => sql`${k}`), sql`, `)}]`))
       .limit(50);
     const seen = new Set(rows.map((r) => r.id));
     for (const r of byKey) if (!seen.has(r.id)) rows.push(r);

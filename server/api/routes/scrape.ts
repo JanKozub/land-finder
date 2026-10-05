@@ -54,6 +54,8 @@ export function registerScrapeRoutes(app: Hono, ctx: RouteContext): void {
       sources: ctx.workerSources,
       log: ctx.log.child({ mod: "worker" }),
       fetchClient: ctx.fetchClient,
+      olxFetchClient: ctx.olxFetchClient,
+      sleep: ctx.sleep,
       notifiers: ctx.notifiers,
       appBaseUrl: ctx.appBaseUrl,
       now: ctx.now,

@@ -14,7 +14,28 @@ import type {
 } from "@shared/schemas";
 import { filtersToQuery, listingsQueryToParams } from "@shared/schemas";
 
+const SECRET_KEY = "landfinder.appSecret";
+
+/** The write secret (server `APP_SECRET`) lives in this browser only; it is asked for once and kept in localStorage. */
+function storedSecret(): string | null {
+  try {
+    return localStorage.getItem(SECRET_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function storeSecret(value: string | null): void {
+  try {
+    if (value) localStorage.setItem(SECRET_KEY, value);
+    else localStorage.removeItem(SECRET_KEY);
+  } catch {
+    // private mode or storage disabled: the secret is asked for again next time
+  }
+}
+
 function describeError(status: number, body: unknown): string {
+  if (status === 401) return "Brak lub błędne hasło zapisu (APP_SECRET)";
   if (body && typeof body === "object") {
     const b = body as { error?: unknown; message?: unknown; hint?: unknown };
     const parts = [b.error, b.message, b.hint].filter((v): v is string => typeof v === "string" && v.length > 0);
@@ -32,14 +53,20 @@ export class ApiClientError extends Error {
   }
 }
 
-async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
-  const res = await fetch(path, {
-    method,
-    headers: body === undefined ? {} : { "content-type": "application/json" },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+async function request<T>(method: string, path: string, body?: unknown, retried = false): Promise<T> {
+  const headers: Record<string, string> = {};
+  if (body !== undefined) headers["content-type"] = "application/json";
+  const secret = method !== "GET" ? storedSecret() : null;
+  if (secret) headers["x-app-secret"] = secret;
+  const res = await fetch(path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
   const text = await res.text();
   const json = text ? (JSON.parse(text) as unknown) : null;
+  if (res.status === 401 && method !== "GET" && !retried && typeof window !== "undefined") {
+    // Writes are protected on this server: ask once, remember, and repeat the call.
+    const entered = window.prompt("Ten serwer wymaga hasła zapisu (APP_SECRET). Podaj je, aby kontynuować:", "")?.trim();
+    storeSecret(entered || null);
+    if (entered) return request<T>(method, path, body, true);
+  }
   if (!res.ok) throw new ApiClientError(res.status, json);
   return json as T;
 }

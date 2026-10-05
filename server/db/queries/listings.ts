@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, ilike, inArray, isNotNull, isNull, lt, lte, or, sql, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, gte, ilike, inArray, isNotNull, isNull, lt, lte, or, sql, type SQL } from "drizzle-orm";
 import { areaContains } from "../../../shared/area";
 import type { Kind, Source } from "../../../shared/constants";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
@@ -107,7 +107,8 @@ export async function upsertListings(db: Db, items: NormalizedListing[], now: Da
       priceChanged ||
       !row.isActive ||
       row.title !== item.title ||
-      (row.areaM2 ?? null) !== (item.areaM2 ?? null) ||
+      // Only an area the portal states counts; a list page without it keeps the stored (often enriched) value.
+      (item.areaM2 !== null && item.areaM2 !== row.areaM2) ||
       newCoords ||
       (item.advertiserId !== null && item.advertiserId !== row.advertiserId);
     // A bump (newer refresh time) refreshes the stored fields but is no reason to run dedup again.
@@ -177,13 +178,14 @@ export async function addPriceHistory(db: Db, entries: { listingId: number; pric
   await db.insert(priceHistory).values(entries);
 }
 
+/** Oldest first, so a joined "a → b → c" reads chronologically. */
 export async function priceHistoryForListings(db: Db, listingIds: number[]) {
   if (listingIds.length === 0) return [];
   return db
     .select()
     .from(priceHistory)
     .where(inArray(priceHistory.listingId, listingIds))
-    .orderBy(desc(priceHistory.observedAt));
+    .orderBy(asc(priceHistory.observedAt), asc(priceHistory.id));
 }
 
 export async function getListingById(db: Db, id: number): Promise<ListingRow | null> {

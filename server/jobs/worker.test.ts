@@ -8,6 +8,7 @@ import type { DbHandle } from "../db/client";
 import { acquireLeaseQuery, cancelOpenJobs, getRun, jobCounts, listJobs } from "../db/queries/jobs";
 import { saveSettings } from "../db/queries/settings";
 import { listings, properties, scrapeJobs } from "../db/schema";
+import { RetryLaterError } from "../http/errors";
 import { silentLogger } from "../logger";
 import type { NormalizedListing, SourceAdapter } from "../sources/types";
 import { startRun } from "./plans";
@@ -205,6 +206,58 @@ describe("worker", () => {
     const jobs = await listJobs(db, started.run.id);
     expect(jobs.every((j) => j.status === "done")).toBe(true);
     expect(jobs.every((j) => j.attempts === 1)).toBe(true); // the interrupted claim was not counted
+  });
+
+  it("keeps the enrich job open until the list jobs of its source are finished", async () => {
+    const { db } = handle;
+    await cancelOpenJobs(db, now());
+    const settings = await saveSettings(db, { ...DEFAULT_SETTINGS, kinds: ["plot"] });
+    const calls: string[] = [];
+    let pausedOnce = false;
+    const otodom: SourceAdapter = {
+      id: "otodom",
+      label: "otodom",
+      rate: { minIntervalMs: 0, maxPer10Min: 10_000, maxPerSlice: 10_000 },
+      estimatedPageCostMs: 1,
+      estimatedEnrichCostMs: 1,
+      initialCursor: (kind, mode) => ({ kind, mode, page: 1 }),
+      async fetchListPage(cursor) {
+        calls.push(`list p${cursor.page}`);
+        if (!pausedOnce) {
+          pausedOnce = true;
+          throw new RetryLaterError("otodom", new Date(clock.t + 30_000), "different result set");
+        }
+        const item = makeListing({ source: "otodom", sourceId: "WAIT1", lat: null, lon: null, locationPrecision: "unknown", locationRadiusKm: null });
+        return { items: [item], total: 1, totalPages: 1, hasMore: false, parseErrors: 0 };
+      },
+      nextCursor: () => null,
+      async enrich(listing) {
+        calls.push(`enrich ${listing.sourceId}`);
+        return { status: "ok", patch: { lat: 49.99, lon: 20.06, locationPrecision: "exact", locationRadiusKm: 0 } };
+      },
+    };
+    const adapters = { otodom };
+    const started = await startRun(db, { mode: "incremental", trigger: "manual", settings, now: now(), adapters });
+    expect(started.ok).toBe(true);
+    if (!started.ok) return;
+
+    // Slice 1: the list job pauses for 30 s, so the worker takes the enrich job, which has nothing yet. It must wait, not finish.
+    await runWorker({ db, budgetMs: 60_000, holder: "e1", now, sleep: async () => {}, log: silentLogger, adapters, notifiers: [], sources: ["otodom"] });
+    const afterFirst = await listJobs(db, started.run.id);
+    const enrichJob = afterFirst.find((j) => j.type === "enrich")!;
+    expect(enrichJob.status).toBe("queued");
+    expect(enrichJob.notBefore.getTime()).toBe(clock.t + 30_000);
+    expect(enrichJob.lastError).toMatch(/waiting for the list jobs/);
+    expect((await getRun(db, started.run.id))!.status).toBe("running");
+
+    // Slice 2 (after the pause): the list job inserts a coordinate-less listing, then the enrich job places it.
+    clock.t += 31_000;
+    await runWorker({ db, budgetMs: 60_000, holder: "e2", now, sleep: async () => {}, log: silentLogger, adapters, notifiers: [], sources: ["otodom"] });
+    expect((await getRun(db, started.run.id))!.status).toBe("done");
+    expect(calls).toEqual(["list p1", "list p1", "enrich WAIT1"]);
+    const [row] = await db.select().from(listings).where(eq(listings.sourceId, "WAIT1"));
+    expect(row!.lat).toBe(49.99);
+    expect(row!.propertyId).not.toBeNull();
   });
 
   it("binds lease timestamps through columns (postgres.js would reject raw Date params)", async () => {

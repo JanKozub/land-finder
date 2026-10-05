@@ -77,7 +77,7 @@ export async function claimNextJob(
 
 export function mergeStats(a: RunStats, b: RunStats): RunStats {
   const out: RunStats = { ...a };
-  const keys = ["requests", "pages", "newListings", "updatedListings", "newProperties", "deactivated", "enriched"] as const;
+  const keys = ["requests", "pages", "newListings", "updatedListings", "newProperties", "deactivated", "enriched", "outsideArea"] as const;
   for (const k of keys) {
     const sum = (a[k] ?? 0) + (b[k] ?? 0);
     if (sum) out[k] = sum;
@@ -139,6 +139,24 @@ export async function requeueRunningJobs(db: Db, now: Date): Promise<number> {
     .where(eq(scrapeJobs.status, "running"))
     .returning({ id: scrapeJobs.id });
   return rows.length;
+}
+
+/** Earliest `notBefore` among the open list/sweep jobs of one source in a run; null when none are left. */
+export async function earliestOpenListJob(db: Db, runId: number, source: Source): Promise<Date | null> {
+  const [row] = await db
+    .select({ notBefore: scrapeJobs.notBefore })
+    .from(scrapeJobs)
+    .where(
+      and(
+        eq(scrapeJobs.runId, runId),
+        eq(scrapeJobs.source, source),
+        inArray(scrapeJobs.type, ["list", "sweep"]),
+        inArray(scrapeJobs.status, ["queued", "running"]),
+      ),
+    )
+    .orderBy(asc(scrapeJobs.notBefore))
+    .limit(1);
+  return row?.notBefore ?? null;
 }
 
 export async function cancelOpenJobs(db: Db, now: Date, runId?: number): Promise<number> {

@@ -1,8 +1,10 @@
 import { z } from "zod";
 import { AreaSchema, areaCenter, areaCoveringRadiusKm, areaFromCenter, type Area } from "./area";
-import { KINDS, SOURCES, type Kind } from "./constants";
+import { KINDS, SOURCES, snapOtodomRadius, type Kind } from "./constants";
 
 const DEFAULT_AREA: Area = areaFromCenter(49.9873, 20.0646, 15);
+/** Covering circle of the default rectangle; the default portal radii follow it, as deriveSettingsFromArea does on save. */
+const DEFAULT_RADIUS_KM = areaCoveringRadiusKm(DEFAULT_AREA);
 
 export const KindSchema = z.enum(KINDS);
 export const SourceSchema = z.enum(SOURCES);
@@ -19,7 +21,7 @@ export const PortalSettingsSchema = z.object({
 });
 export type PortalSettings = z.infer<typeof PortalSettingsSchema>;
 
-const portalDefault = (location: string, radiusKm = 15): PortalSettings => ({ enabled: true, location, radiusKm });
+const portalDefault = (location: string, radiusKm = DEFAULT_RADIUS_KM): PortalSettings => ({ enabled: true, location, radiusKm });
 
 export const SettingsSchema = z.object({
   /** The search rectangle; `center` and `radiusKm` are derived from it (kept for filters, the map and notifications). */
@@ -88,10 +90,10 @@ export const DEFAULT_SETTINGS: Settings = {
   area: DEFAULT_AREA,
   excludedGminy: [],
   center: areaCenter(DEFAULT_AREA),
-  radiusKm: areaCoveringRadiusKm(DEFAULT_AREA),
+  radiusKm: DEFAULT_RADIUS_KM,
   kinds: ["plot", "house"],
-  olx: { enabled: true, cityId: 128097, cityName: "Wieliczka", distanceKm: 15 },
-  otodom: { enabled: true, locationPath: "malopolskie/wielicki/wieliczka", radiusKm: 15 },
+  olx: { enabled: true, cityId: 128097, cityName: "Wieliczka", distanceKm: DEFAULT_RADIUS_KM },
+  otodom: { enabled: true, locationPath: "malopolskie/wielicki/wieliczka", radiusKm: snapOtodomRadius(DEFAULT_RADIUS_KM) },
   nieruchomosci_online: portalDefault("Wieliczka:32080"),
   morizon: { ...portalDefault("wielicki", 0), enabled: false },
   gratka: portalDefault("powiat-wielicki", 0),

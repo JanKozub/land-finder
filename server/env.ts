@@ -27,7 +27,8 @@ export const env = {
     process.env.SCRAPE_USER_AGENT ||
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
   stepBudgetMs: int(process.env.SCRAPE_STEP_BUDGET_MS, 8000),
-  tickBudgetMs: int(process.env.SCRAPE_TICK_BUDGET_MS, 20000),
+  /** Scheduled functions share the synchronous function limit (10 s on Free), so the tick defaults to the step budget. */
+  tickBudgetMs: int(process.env.SCRAPE_TICK_BUDGET_MS, int(process.env.SCRAPE_STEP_BUDGET_MS, 8000)),
   workerSources: csv(process.env.WORKER_SOURCES),
   olxProxyUrl: process.env.OLX_PROXY_URL || "",
   /** "browser" (default) sends OLX requests with a browser-like TLS/header fingerprint; "fetch" uses plain Node fetch. */

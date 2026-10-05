@@ -43,7 +43,7 @@ function ListingRow({
         <span className="text-slate-500"> · {formatArea(listing.areaM2, listing.kind)}</span>
         {listing.plotAreaM2 !== null && <span className="text-slate-500"> · działka {formatArea(listing.plotAreaM2, "plot")}</span>}
       </p>
-      {listing.priceHistory.length > 0 && (
+      {listing.priceHistory.length > 1 && (
         <p className="text-xs text-slate-500">
           Historia cen: {listing.priceHistory.map((h) => `${formatPln(h.price)} (${formatDateTime(h.observedAt)})`).join(" → ")}
         </p>

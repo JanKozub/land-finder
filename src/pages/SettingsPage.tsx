@@ -66,7 +66,8 @@ export function SettingsPage() {
       return;
     }
     setIssues([]);
-    save.mutate(parsed.data);
+    // The server derives the portal queries from the rectangle; the form takes those over so it is clean after saving.
+    save.mutate(parsed.data, { onSuccess: (saved) => setForm(structuredClone(saved)) });
   };
 
   return (

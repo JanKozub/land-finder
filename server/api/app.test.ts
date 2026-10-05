@@ -13,6 +13,7 @@ import { createApp } from "./app";
 
 let handle: DbHandle;
 const fetchClient: FetchClient = { get: async () => ({ status: 500, headers: new Headers(), text: "" }) };
+const noSleep = async () => {};
 
 beforeAll(async () => {
   handle = await createTestDb();
@@ -23,7 +24,7 @@ const json = (body: unknown, method = "POST") => ({ method, headers: { "content-
 
 describe("API", () => {
   it("serves health, settings and an empty property list", async () => {
-    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "" });
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, sleep: noSleep, appSecret: "" });
     const health = await (await app.request("/api/health")).json();
     expect(health).toMatchObject({ ok: true, db: "pglite", schemaReady: true });
     const settings = await (await app.request("/api/settings")).json();
@@ -54,7 +55,7 @@ describe("API", () => {
   });
 
   it("starts, reports and cancels scrape runs", async () => {
-    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "" });
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, sleep: noSleep, appSecret: "" });
     const started = await app.request("/api/scrape", json({ mode: "incremental" }));
     expect(started.status).toBe(201);
     const again = await app.request("/api/scrape", json({ mode: "incremental" }));
@@ -69,7 +70,7 @@ describe("API", () => {
   });
 
   it("requires the shared secret for writes when configured", async () => {
-    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "s3cret" });
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, sleep: noSleep, appSecret: "s3cret" });
     expect((await app.request("/api/settings")).status).toBe(200);
     expect((await app.request("/api/scrape/cancel", { method: "POST" })).status).toBe(401);
     expect((await app.request("/api/scrape/cancel", { method: "POST", headers: { "x-app-secret": "s3cret" } })).status).toBe(200);
@@ -77,7 +78,7 @@ describe("API", () => {
   });
 
   it("lists all listings as a sortable, searchable, paginated table", async () => {
-    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "" });
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, sleep: noSleep, appSecret: "" });
     const now = new Date("2026-10-03T12:00:00Z");
     await upsertListings(
       handle.db,
@@ -114,7 +115,7 @@ describe("API", () => {
   });
 
   it("filters the table by numeric ranges and ignores or restores every match in bulk", async () => {
-    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "" });
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, sleep: noSleep, appSecret: "" });
     const now = new Date("2026-10-04T09:00:00Z");
     const seeded = await upsertListings(
       handle.db,
@@ -152,7 +153,7 @@ describe("API", () => {
   });
 
   it("counts and prunes listings outside the search area", async () => {
-    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "" });
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, sleep: noSleep, appSecret: "" });
     const now = new Date("2026-10-04T12:00:00Z");
     // Default area is a 30 km square around Wieliczka; Zakopane is far outside it.
     const [far] = await upsertListings(handle.db, [makeListing({ source: "olx", sourceId: "FAR1", lat: 49.29, lon: 19.95, city: "Zakopane", title: "Działka Zakopane" })], now);
@@ -167,7 +168,7 @@ describe("API", () => {
   });
 
   it("re-matches listings in resumable batches", async () => {
-    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "" });
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, sleep: noSleep, appSecret: "" });
     const now = new Date("2026-10-04T11:00:00Z");
     // Two copies of one plot that were assigned separately (e.g. before a rules change).
     const [a] = await upsertListings(handle.db, [makeListing({ source: "olx", sourceId: "RM1", lat: 49.91, lon: 20.31, areaM2: 900, price: 180_000, title: "Działka Grabie 9 ar" })], now);
@@ -198,7 +199,7 @@ describe("API", () => {
   });
 
   it("ignores a listing: the property disappears from the map until 'show ignored' is on", async () => {
-    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "" });
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, sleep: noSleep, appSecret: "" });
     const now = new Date("2026-10-04T08:00:00Z");
     const [a] = await upsertListings(handle.db, [makeListing({ source: "olx", sourceId: "IGN1", title: "Ignorowana działka", lat: 49.95, lon: 20.2 })], now);
     const [b] = await upsertListings(handle.db, [makeListing({ source: "otodom", sourceId: "IGN2", title: "Ignorowana działka", lat: 49.9501, lon: 20.2001 })], now);
@@ -240,7 +241,7 @@ describe("API", () => {
   });
 
   it("marks favorites and ignores whole properties from the map popup", async () => {
-    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "" });
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, sleep: noSleep, appSecret: "" });
     const now = new Date("2026-10-04T09:00:00Z");
     const [a] = await upsertListings(handle.db, [makeListing({ source: "olx", sourceId: "FAV1", title: "Ulubiona działka", lat: 49.93, lon: 20.25 })], now);
     const [b] = await upsertListings(handle.db, [makeListing({ source: "otodom", sourceId: "FAV2", title: "Ulubiona działka", lat: 49.9301, lon: 20.2501 })], now);
@@ -270,8 +271,37 @@ describe("API", () => {
     expect((await app.request("/api/properties/999999/favorite", json({ favorite: true }))).status).toBe(404);
   });
 
+  it("resolves the OLX city for the area centre only within the home voivodeship, through the rate limiter", async () => {
+    // Full-text fallback only (the town page answers 404); the candidate's region decides whether the id is adopted.
+    const olxStub = (region: string, log: string[]): FetchClient => ({
+      get: async (url) => {
+        log.push(url);
+        if (url.includes("/nieruchomosci/")) return { status: 404, headers: new Headers(), text: "" };
+        const data = [{ location: { city: { id: 777, name: "Wieliczka", normalized_name: "wieliczka" }, region: { name: region } } }];
+        return { status: 200, headers: new Headers(), text: JSON.stringify({ data }) };
+      },
+    });
+    const reset = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, sleep: noSleep, appSecret: "" });
+    await reset.request("/api/sources/olx/reset", { method: "POST" }); // earlier saves used up part of the 10-minute window
+
+    const farLog: string[] = [];
+    const far = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: olxStub("Mazowieckie", farLog), sleep: noSleep, appSecret: "" });
+    const kept = await (await far.request("/api/settings", json(DEFAULT_SETTINGS, "PUT"))).json();
+    expect(kept.olx).toMatchObject({ cityId: DEFAULT_SETTINGS.olx.cityId, cityName: "Wieliczka" });
+    expect(farLog.length).toBeGreaterThan(0);
+
+    const near = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: olxStub("Małopolskie", []), sleep: noSleep, appSecret: "" });
+    const adopted = await (await near.request("/api/settings", json(DEFAULT_SETTINGS, "PUT"))).json();
+    expect(adopted.olx.cityId).toBe(777);
+
+    // The lookups count against OLX's window like every other request to the portal.
+    const status = await (await near.request("/api/scrape/status")).json();
+    expect(status.sources.find((x: { source: string }) => x.source === "olx").requestsLast10Min).toBeGreaterThan(0);
+    await near.request("/api/settings", json(DEFAULT_SETTINGS, "PUT")); // restore the default id for the tests below
+  });
+
   it("probes a source and resets its app-side block", async () => {
-    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, appSecret: "" });
+    const app = createApp({ db: handle.db, dbKind: "pglite", log: silentLogger, notifiers: [], fetchClient, olxFetchClient: fetchClient, sleep: noSleep, appSecret: "" });
     const probe = await (await app.request("/api/sources/olx/probe")).json();
     expect(probe.ok).toBe(false);
     expect(probe.status).toBe(500);

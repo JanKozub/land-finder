@@ -28,6 +28,7 @@ export interface AppDeps {
   fetchClient?: FetchClient;
   olxFetchClient?: FetchClient;
   notifiers?: Notifier[];
+  sleep?: (ms: number) => Promise<void>;
   appSecret?: string;
   stepBudgetMs?: number;
   workerSources?: Source[] | null;
@@ -58,6 +59,7 @@ export function createApp(deps: AppDeps): Hono {
     fetchClient: deps.fetchClient ?? createFetchClient(),
     olxFetchClient: deps.olxFetchClient ?? clientForSource("olx", deps.fetchClient ?? createFetchClient()),
     notifiers: deps.notifiers ?? defaultNotifiers(),
+    sleep: deps.sleep ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms))),
     stepBudgetMs: deps.stepBudgetMs ?? env.stepBudgetMs,
     workerSources: deps.workerSources === undefined ? (env.workerSources as Source[] | null) : deps.workerSources,
     appBaseUrl: deps.appBaseUrl ?? env.appBaseUrl,

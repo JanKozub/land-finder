@@ -140,7 +140,8 @@ export function ScrapePage() {
         )}
         <p className="mb-3 text-sm text-slate-600">
           „{MODE_LABEL.incremental}” przegląda najnowsze strony każdego portalu, aż trafi na znane ogłoszenia. Praca dzieje się w krótkich
-          porcjach, więc możesz zostawić tę kartę otwartą albo zamknąć — niedokończone zadania dokończy harmonogram lub kolejne kliknięcie.
+          porcjach, więc możesz zostawić tę kartę otwartą albo zamknąć — niedokończone zadania dokończy kolejne kliknięcie, a przy włączonym
+          automatycznym pobieraniu także harmonogram.
         </p>
         <ErrorText error={loop.error ?? status.error} />
         {s && (
@@ -163,7 +164,7 @@ export function ScrapePage() {
             <p className="mt-1 text-slate-700">
               żądania {run.stats.requests ?? 0} · strony {run.stats.pages ?? 0} · nowe ogłoszenia {run.stats.newListings ?? 0} · zaktualizowane{" "}
               {run.stats.updatedListings ?? 0} · nowe nieruchomości {run.stats.newProperties ?? 0} · uzupełnione współrzędne {run.stats.enriched ?? 0} · wygasłe{" "}
-              {run.stats.deactivated ?? 0}
+              {run.stats.deactivated ?? 0} · poza obszarem {run.stats.outsideArea ?? 0}
             </p>
             {run.stats.errors && run.stats.errors.length > 0 && (
               <details className="mt-1 text-xs text-rose-700">

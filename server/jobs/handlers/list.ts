@@ -39,10 +39,11 @@ export async function handleListJob(deps: HandlerDeps): Promise<HandlerResult> {
     const newCount = results.filter((r) => r.inserted).length;
     stats.newListings = (stats.newListings ?? 0) + newCount;
     stats.updatedListings = (stats.updatedListings ?? 0) + results.filter((r) => !r.inserted && r.changed).length;
+    // The first observed price starts the history, so a later change shows where it came from.
     await addPriceHistory(
       db,
       results
-        .filter((r) => r.priceChanged && r.price !== null)
+        .filter((r) => (r.inserted || r.priceChanged) && r.price !== null)
         .map((r) => ({ listingId: r.id, price: r.price!, observedAt: t })),
     );
     for (const r of results) {

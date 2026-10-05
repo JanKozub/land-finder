@@ -1,6 +1,7 @@
 import { areaContains } from "../../../shared/area";
 import { assignProperty } from "../../dedup/match";
 import { recomputeProperty } from "../../dedup/recompute";
+import { earliestOpenListJob } from "../../db/queries/jobs";
 import { MAX_ENRICH_ATTEMPTS, applyEnrichment, deleteListing, listingsNeedingEnrichment } from "../../db/queries/listings";
 import type { ListingRow } from "../../db/schema";
 import { BudgetExceededError, RateLimitedError, SourceBlockedError } from "../../http/errors";
@@ -13,7 +14,8 @@ const LOG_EVERY = 10;
 /**
  * Fetches ad pages for listings that still lack coordinates, then runs dedup for them. Pages are fetched a few at a
  * time (`enrichConcurrency`), but property assignment stays sequential: two listings of one property assigned at
- * the same moment would each miss the other and end up as two properties.
+ * the same moment would each miss the other and end up as two properties. The job only completes once every list
+ * job of its source in the run is finished; until then an empty backlog means a pause, not the end.
  */
 export async function handleEnrichJob(deps: HandlerDeps): Promise<HandlerResult> {
   const { db, adapter, ctx, now, remainingMs } = deps;
@@ -99,5 +101,13 @@ export async function handleEnrichJob(deps: HandlerDeps): Promise<HandlerResult>
     }
   }
   if (processed % LOG_EVERY !== 0) progress();
+  // Nothing left to enrich right now, but a list job of this source is still queued (paused for a retry, a rate
+  // window or a backoff) and may add more coordinate-less listings. Completing here would leave them without a
+  // property until the next run, so wait for the list jobs instead.
+  const pendingList = await earliestOpenListJob(db, deps.job.runId, adapter.id);
+  if (pendingList) {
+    const at = now();
+    return { status: "paused", cursor, notBefore: pendingList > at ? pendingList : at, stats, error: "waiting for the list jobs of this source" };
+  }
   return { status: "done", stats };
 }

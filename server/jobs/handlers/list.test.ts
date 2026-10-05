@@ -5,6 +5,7 @@ import { makeListing } from "../../../tests/helpers/factories";
 import type { DbHandle } from "../../db/client";
 import { createRun, insertJobs } from "../../db/queries/jobs";
 import { saveSettings } from "../../db/queries/settings";
+import { priceHistory } from "../../db/schema";
 import { silentLogger } from "../../logger";
 import type { Cursor, ListPage, SourceAdapter, SourceContext } from "../../sources/types";
 import { handleListJob } from "./list";
@@ -49,6 +50,9 @@ describe("list job and the search area", () => {
     expect(result.stats.outsideArea).toBe(1);
     const totals = meta.totals as Record<string, Record<string, { total: number }>>;
     expect(totals.plot?.["0"]?.total).toBe(123);
+    // The first observed price opens the history of every listing that has one.
+    const history = await db.select().from(priceHistory);
+    expect(history.map((h) => h.price)).toEqual([200_000, 200_000]);
     const cursor: Cursor = { kind: "plot", mode: "incremental", page: 0 };
     expect(cursor.page).toBe(0);
   });

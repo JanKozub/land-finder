@@ -59,6 +59,26 @@ describe("assignProperty", () => {
     expect(remaining.map((r) => r.id).sort()).toEqual([first.propertyId!, third.propertyId!].sort());
   });
 
+  it("never re-merges a pair the user split, even when the listings share an identity key", async () => {
+    const { db } = handle;
+    const now = new Date("2026-10-05T10:00:00Z");
+    const shared = { lat: null, lon: null, locationPrecision: "unknown" as const, locationRadiusKm: null, areaM2: 2345, price: 333_000, city: "Zakrzów", title: "Działka widokowa Zakrzów 23 ary", attributes: { internalId: 999000111 } };
+    const [gratka] = await upsertListings(db, [makeListing({ source: "gratka", sourceId: "SPLIT-G", ...shared })], now);
+    const [morizon] = await upsertListings(db, [makeListing({ source: "morizon", sourceId: "SPLIT-M", ...shared })], now);
+    const g = await assignProperty(db, gratka!.id, { now });
+    expect((await assignProperty(db, morizon!.id, { now })).propertyId).toBe(g.propertyId);
+
+    // "To nie ta sama oferta" on the Morizon copy: it gets its own property and an exclusion against its sibling.
+    const detached = (await detachListing(db, morizon!.id, now))!;
+    expect(detached.propertyId).not.toBe(g.propertyId);
+
+    // The Gratka copy is not pinned; a price change sends it through dedup again. The shared platform id must not win.
+    await db.update(listings).set({ price: 240_000 }).where(eq(listings.id, gratka!.id));
+    const again = await assignProperty(db, gratka!.id, { now });
+    expect(again.propertyId).toBe(g.propertyId);
+    expect(again.reason).toBe("solo");
+  });
+
   it("merges the same advertisement across portals by identity key, seller name and agency reference", async () => {
     const { db } = handle;
     const now = new Date("2026-10-04T10:00:00Z");

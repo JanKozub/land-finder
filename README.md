@@ -43,7 +43,9 @@ pnpm worker --mode backfill
    Jeśli 403: ustaw `OLX_PROXY_URL` **albo** `WORKER_SOURCES=otodom` na Netlify i pobieraj OLX lokalnie
    (`WORKER_SOURCES=olx pnpm worker --mode incremental`) na tę samą bazę.
 6. Harmonogram: funkcja `scrape-tick` budzi się co 30 min (`netlify.toml`); faktyczne pobieranie włączasz w
-   *Ustawienia → Automatyczne pobieranie* (interwał, godziny aktywne). Lokalnie: `npx netlify-cli functions:invoke scrape-tick`.
+   *Ustawienia → Automatyczne pobieranie* (interwał, godziny aktywne). Przy wyłączonym automacie tick nic nie robi —
+   zakolejkowane zadania dokańcza kolejne kliknięcie w aplikacji albo `pnpm worker`. Lokalnie:
+   `npx netlify-cli functions:invoke scrape-tick`.
 
 ## Jak to działa
 
@@ -137,5 +139,6 @@ pnpm worker --mode backfill
 
 Patrz `.env.example`. Najważniejsze: `DATABASE_URL`, `DATABASE_URL_MIGRATIONS`, `TELEGRAM_BOT_TOKEN`,
 `TELEGRAM_CHAT_ID`, `APP_BASE_URL`, opcjonalnie `OLX_PROXY_URL`, `WORKER_SOURCES`, `APP_SECRET`
-(nagłówek `X-App-Secret` wymagany dla operacji zapisu), `SCRAPE_STEP_BUDGET_MS` (8000; na planie kredytowym
-Netlify można 20000).
+(nagłówek `X-App-Secret` wymagany dla operacji zapisu; aplikacja pyta o nie przy pierwszym zapisie i zapamiętuje w
+przeglądarce), `SCRAPE_STEP_BUDGET_MS` (8000; na planie kredytowym Netlify można 20000) i `SCRAPE_TICK_BUDGET_MS`
+(budżet ticku harmonogramu, domyślnie tyle samo co krok — funkcje cykliczne mają ten sam limit czasu co zwykłe).
