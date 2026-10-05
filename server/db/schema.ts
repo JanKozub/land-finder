@@ -146,6 +146,8 @@ export const listings = pgTable(
     index("listings_needs_enrich_idx")
       .on(t.source, t.firstSeenAt)
       .where(sql`${t.lat} IS NULL AND ${t.isActive}`),
+    // Identity-key lookup in dedup (`attributes->'dedupKeys' ?| array[...]`); without it every assignment scanned the table.
+    index("listings_dedup_keys_idx").using("gin", sql`(${t.attributes}->'dedupKeys')`),
   ],
 );
 

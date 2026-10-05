@@ -25,12 +25,18 @@ export const OLX_CATEGORY: Record<Kind, number> = { plot: 24, house: 18 };
 export const OTODOM_ESTATE: Record<Kind, string> = { plot: "dzialka", house: "dom" };
 
 /**
- * Radius suggestions for Otodom (km). The site accepts any integer, but it intermittently answers with the
- * no-radius result set for some (location, radius) pairs (seen 2026-10-04 for wielicki/wieliczka: 25 km returned the
- * radius-0 count twice, then the real count minutes later), so the settings page offers a check that compares result
- * counts with and without the radius.
+ * Radii Otodom's own search form offers (km). Any integer is honoured on the first pages, but for other values every
+ * page past the page count of the radius-less query redirects into that smaller result set (verified 2026-10-04 for
+ * wielicki/wieliczka: 19 km and 20 km broke on page 6 every time, 25 km did not), so every search uses the next value
+ * from this list. Even these values intermittently get the radius-less answer; the adapter re-asks per page.
  */
-export const OTODOM_RADII = [0, 5, 10, 15, 20, 25, 50, 75] as const;
+export const OTODOM_RADII = [0, 5, 10, 15, 25, 50, 75] as const;
+
+/** Smallest radius Otodom supports that still covers `km`. */
+export function snapOtodomRadius(km: number): number {
+  for (const r of OTODOM_RADII) if (r >= km) return r;
+  return OTODOM_RADII[OTODOM_RADII.length - 1]!;
+}
 
 /** Commonly used OLX distance values (km); the API accepts any integer. */
 export const OLX_DISTANCES = [0, 2, 5, 10, 15, 20, 25, 30, 50, 75, 100] as const;

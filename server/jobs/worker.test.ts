@@ -7,7 +7,7 @@ import { makeListing } from "../../tests/helpers/factories";
 import type { DbHandle } from "../db/client";
 import { acquireLeaseQuery, cancelOpenJobs, getRun, jobCounts, listJobs } from "../db/queries/jobs";
 import { saveSettings } from "../db/queries/settings";
-import { listings, properties } from "../db/schema";
+import { listings, properties, scrapeJobs } from "../db/schema";
 import { silentLogger } from "../logger";
 import type { NormalizedListing, SourceAdapter } from "../sources/types";
 import { startRun } from "./plans";
@@ -126,6 +126,85 @@ describe("worker", () => {
     if (!b.ok) expect(b.reason).toBe("already_running");
     expect(await cancelOpenJobs(db, now())).toBeGreaterThan(0);
     expect((await jobCounts(db)).queued).toBe(0);
+  });
+
+  it("retries a failed page from the failing cursor, not from the start", async () => {
+    const { db } = handle;
+    await cancelOpenJobs(db, now());
+    const settings = await saveSettings(db, { ...DEFAULT_SETTINGS, kinds: ["plot"] });
+    const fetches: string[] = [];
+    const inner = fakeAdapter("olx", { plot: [[plot("A", 1)], [plot("B", 2)], [plot("C", 3)]], house: [[]] }, fetches);
+    let failOnce = true;
+    const flaky: SourceAdapter = {
+      ...inner,
+      async fetchListPage(cursor, ctx) {
+        if (cursor.page === 1 && failOnce) {
+          failOnce = false;
+          fetches.push("olx/plot/1!");
+          throw new Error("Otodom redirected page 1 (different result set)");
+        }
+        return inner.fetchListPage(cursor, ctx);
+      },
+    };
+    const adapters = { olx: flaky, otodom: fakeAdapter("otodom", { plot: [[]], house: [[]] }, fetches) };
+    const started = await startRun(db, { mode: "backfill", trigger: "cli", settings, now: now(), adapters });
+    expect(started.ok).toBe(true);
+    if (!started.ok) return;
+
+    const first = await runWorker({ db, budgetMs: 60_000, holder: "f1", now, sleep: async () => {}, log: silentLogger, adapters, notifiers: [], sources: ["olx", "otodom"] });
+    expect(first.failed).toBe(0); // first attempt is a retry, not a final failure
+    const job = (await listJobs(db, started.run.id)).find((j) => j.source === "olx" && j.kind === "plot")!;
+    expect(job.status).toBe("queued");
+    expect(job.attempts).toBe(1);
+    expect(job.lastError).toMatch(/different result set/);
+    expect(job.cursor).toMatchObject({ page: 1 });
+
+    clock.t += 2 * 60_000; // past the 1-minute backoff
+    await runWorker({ db, budgetMs: 60_000, holder: "f2", now, sleep: async () => {}, log: silentLogger, adapters, notifiers: [], sources: ["olx", "otodom"] });
+    expect((await getRun(db, started.run.id))!.status).toBe("done");
+    expect(fetches.filter((f) => f.startsWith("olx/plot"))).toEqual(["olx/plot/0", "olx/plot/1!", "olx/plot/1", "olx/plot/2"]);
+    expect(await db.select().from(listings).then((rows) => rows.filter((r) => r.source === "olx" && ["A", "B", "C"].includes(r.sourceId)).length)).toBe(3);
+  });
+
+  it("lets a source-limited request join the active run of the same mode", async () => {
+    const { db } = handle;
+    await cancelOpenJobs(db, now());
+    const settings = await saveSettings(db, { ...DEFAULT_SETTINGS, kinds: ["plot"] });
+    const fetches: string[] = [];
+    const adapters = { olx: fakeAdapter("olx", { plot: [[plot("J1", 1)]], house: [[]] }, fetches), otodom: fakeAdapter("otodom", { plot: [[plot("J2", 2, "otodom")]], house: [[]] }, fetches) };
+    const first = await startRun(db, { mode: "backfill", trigger: "cli", sources: ["olx"], settings, now: now(), adapters });
+    expect(first.ok && !first.joined).toBe(true);
+    if (!first.ok) return;
+    const sameSource = await startRun(db, { mode: "backfill", trigger: "cli", sources: ["olx"], settings, now: now(), adapters });
+    expect(sameSource.ok).toBe(false); // olx still has an open job
+    const otherMode = await startRun(db, { mode: "incremental", trigger: "cli", sources: ["otodom"], settings, now: now(), adapters });
+    expect(otherMode.ok).toBe(false);
+    const joined = await startRun(db, { mode: "backfill", trigger: "cli", sources: ["otodom"], settings, now: now(), adapters });
+    expect(joined.ok && joined.joined && joined.run.id === first.run.id).toBe(true);
+    expect((await jobCounts(db, first.run.id)).queued).toBe(2);
+    await runWorker({ db, budgetMs: 60_000, holder: "j1", now, sleep: async () => {}, log: silentLogger, adapters, notifiers: [], sources: ["olx", "otodom"] });
+    expect((await getRun(db, first.run.id))!.status).toBe("done");
+    expect(fetches.sort()).toEqual(["olx/plot/0", "otodom/plot/0"]);
+  });
+
+  it("picks up jobs a killed worker left in the running state", async () => {
+    const { db } = handle;
+    await cancelOpenJobs(db, now());
+    const settings = await saveSettings(db, { ...DEFAULT_SETTINGS, kinds: ["plot"] });
+    const fetches: string[] = [];
+    const adapters = { olx: fakeAdapter("olx", { plot: [[plot("R", 1)]], house: [[]] }, fetches), otodom: fakeAdapter("otodom", { plot: [[]], house: [[]] }, fetches) };
+    const started = await startRun(db, { mode: "backfill", trigger: "cli", settings, now: now(), adapters });
+    expect(started.ok).toBe(true);
+    if (!started.ok) return;
+    // Simulate a worker that claimed everything and died mid-slice (its lease has expired).
+    await db.update(scrapeJobs).set({ status: "running", attempts: 1 }).where(eq(scrapeJobs.runId, started.run.id));
+    expect((await jobCounts(db, started.run.id)).queued).toBe(0);
+
+    await runWorker({ db, budgetMs: 60_000, holder: "k1", now, sleep: async () => {}, log: silentLogger, adapters, notifiers: [], sources: ["olx", "otodom"] });
+    expect((await getRun(db, started.run.id))!.status).toBe("done");
+    const jobs = await listJobs(db, started.run.id);
+    expect(jobs.every((j) => j.status === "done")).toBe(true);
+    expect(jobs.every((j) => j.attempts === 1)).toBe(true); // the interrupted claim was not counted
   });
 
   it("binds lease timestamps through columns (postgres.js would reject raw Date params)", async () => {

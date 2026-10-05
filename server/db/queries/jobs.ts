@@ -38,11 +38,13 @@ export async function jobCounts(db: Db, runId?: number): Promise<JobCounts> {
   return out;
 }
 
-export async function openJobsExist(db: Db): Promise<boolean> {
+export async function openJobsExist(db: Db, sources?: readonly Source[]): Promise<boolean> {
+  const conds = [inArray(scrapeJobs.status, ["queued", "running"])];
+  if (sources) conds.push(inArray(scrapeJobs.source, [...sources]));
   const [row] = await db
     .select({ id: scrapeJobs.id })
     .from(scrapeJobs)
-    .where(inArray(scrapeJobs.status, ["queued", "running"]))
+    .where(and(...conds))
     .limit(1);
   return Boolean(row);
 }
@@ -109,7 +111,8 @@ export async function pauseJob(db: Db, id: number, cursor: Record<string, unknow
     .where(eq(scrapeJobs.id, id));
 }
 
-export async function failJob(db: Db, id: number, error: string, stats: RunStats, now: Date): Promise<"retry" | "failed"> {
+/** Retries with exponential backoff; `cursor` (the page that failed) lets the retry resume there instead of at the start. */
+export async function failJob(db: Db, id: number, error: string, stats: RunStats, now: Date, cursor?: Record<string, unknown> | null): Promise<"retry" | "failed"> {
   const [job] = await db.select().from(scrapeJobs).where(eq(scrapeJobs.id, id)).limit(1);
   if (!job) return "failed";
   const merged = mergeStats(job.stats, stats);
@@ -117,12 +120,25 @@ export async function failJob(db: Db, id: number, error: string, stats: RunStats
     const delayMs = 60_000 * 2 ** Math.max(0, job.attempts - 1);
     await db
       .update(scrapeJobs)
-      .set({ status: "queued", notBefore: new Date(now.getTime() + delayMs), lastError: error, stats: merged })
+      .set({ status: "queued", notBefore: new Date(now.getTime() + delayMs), lastError: error, stats: merged, ...(cursor ? { cursor } : {}) })
       .where(eq(scrapeJobs.id, id));
     return "retry";
   }
   await db.update(scrapeJobs).set({ status: "failed", finishedAt: now, lastError: error, stats: merged }).where(eq(scrapeJobs.id, id));
   return "failed";
+}
+
+/**
+ * Jobs a dead worker left in "running" (killed mid-slice, crashed). Safe only for the lease holder: nobody else can
+ * be executing them. The interrupted claim does not count as an attempt; the cursor saved at the last pause stays.
+ */
+export async function requeueRunningJobs(db: Db, now: Date): Promise<number> {
+  const rows = await db
+    .update(scrapeJobs)
+    .set({ status: "queued", notBefore: now, attempts: sql`greatest(${scrapeJobs.attempts} - 1, 0)` })
+    .where(eq(scrapeJobs.status, "running"))
+    .returning({ id: scrapeJobs.id });
+  return rows.length;
 }
 
 export async function cancelOpenJobs(db: Db, now: Date, runId?: number): Promise<number> {

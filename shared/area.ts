@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { snapOtodomRadius } from "./constants";
 import { haversineKm } from "./geo";
 import type { Settings } from "./schemas";
 
@@ -225,7 +226,7 @@ export function deriveSettingsFromArea(settings: Settings, gminas: readonly Gmin
     center,
     radiusKm: radius,
     olx: { ...settings.olx, cityName: home.name, distanceKm: radius },
-    otodom: { ...settings.otodom, locationPath: otodomPathFor(home), radiusKm: radius },
+    otodom: { ...settings.otodom, locationPath: otodomPathFor(home), radiusKm: snapOtodomRadius(radius) },
     nieruchomosci_online: { ...settings.nieruchomosci_online, location: noLocationFor(home), radiusKm: radius },
     domiporta: { ...settings.domiporta, location: domiportaLocationFor(home), radiusKm: radius },
     gratka: { ...settings.gratka, location: lists.gratka, radiusKm: 0 },

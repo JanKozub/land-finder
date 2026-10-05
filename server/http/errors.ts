@@ -40,3 +40,17 @@ export class BudgetExceededError extends Error {
     this.name = "BudgetExceededError";
   }
 }
+
+/** The portal answered something transient (e.g. a different result set); pause the job and ask again at `retryAt`. */
+export class RetryLaterError extends Error {
+  constructor(
+    public readonly source: Source,
+    public readonly retryAt: Date,
+    message: string,
+    /** Merged into the job cursor when pausing (e.g. a retry counter). */
+    public readonly cursorPatch: Record<string, unknown> = {},
+  ) {
+    super(message);
+    this.name = "RetryLaterError";
+  }
+}

@@ -2,7 +2,7 @@ import { parseArgs } from "node:util";
 import { SOURCES, type Source } from "../shared/constants";
 import { ScrapeModeSchema } from "../shared/schemas";
 import { createDb } from "../server/db/client";
-import { jobCounts, listJobs, currentRun } from "../server/db/queries/jobs";
+import { currentRun, getLease, jobCounts, listJobs, releaseLease, requeueRunningJobs } from "../server/db/queries/jobs";
 import { ensureSettings } from "../server/db/queries/settings";
 import { env } from "../server/env";
 import { startRun } from "../server/jobs/plans";
@@ -11,7 +11,8 @@ import { createLogger } from "../server/logger";
 
 /**
  * Local worker: `pnpm worker --mode backfill [--sources olx,otodom] [--max-minutes 180]`.
- * Without --mode it only drains whatever is already queued.
+ * Without --mode it only drains whatever is already queued. `--sources` picks the portals that get new jobs; the
+ * worker itself drains the whole queue (set WORKER_SOURCES to restrict what this machine fetches).
  */
 async function main() {
   const { values } = parseArgs({
@@ -38,6 +39,8 @@ async function main() {
       console.error(`Cannot start run: ${result.reason}` + (result.run ? ` (run #${result.run.id} is active)` : ""));
       if (result.reason === "already_running") console.error("Draining the existing queue instead …");
       else process.exit(1);
+    } else if (result.joined) {
+      console.log(`Added ${result.jobs.length} jobs to the active run #${result.run.id} (${mode}).`);
     } else {
       console.log(`Run #${result.run.id} (${mode}) started with ${result.jobs.length} jobs.`);
     }
@@ -45,8 +48,32 @@ async function main() {
 
   const sliceMs = Number(values["slice-ms"]) || 60_000;
   const deadline = Date.now() + (Number(values["max-minutes"]) || 240) * 60_000;
+  const holder = `cli-${process.pid}`;
+  let stopping = false;
+  process.on("SIGINT", () => {
+    if (stopping) process.exit(130);
+    stopping = true;
+    console.log("\nStopping: handing running jobs back to the queue (progress is saved per page and per offer) …");
+    void (async () => {
+      try {
+        const t = new Date();
+        await requeueRunningJobs(db, t);
+        await releaseLease(db, holder, t);
+        await handle.close();
+      } finally {
+        process.exit(0);
+      }
+    })();
+  });
+  const initial = await jobCounts(db);
+  const active = await currentRun(db);
+  console.log(
+    `Queue: queued=${initial.queued} running=${initial.running}` +
+      (active ? ` (run #${active.id}, ${active.mode})` : "") +
+      `; working in slices of ${Math.round(sliceMs / 1000)} s, a summary line follows each one.`,
+  );
   for (;;) {
-    const summary = await runWorker({ db, budgetMs: sliceMs, holder: "cli", sources, log });
+    const summary = await runWorker({ db, budgetMs: sliceMs, holder, sources: null, log });
     const counts = await jobCounts(db);
     const run = await currentRun(db);
     console.log(
@@ -55,8 +82,12 @@ async function main() {
         (run ? ` run#${run.id} stats=${JSON.stringify(run.stats)}` : ""),
     );
     if (summary.skipped === "locked") {
-      console.log("Another worker holds the lease; waiting 15 s …");
-      await new Promise((r) => setTimeout(r, 15_000));
+      // A worker that was killed without Ctrl+C leaves its lease behind for up to two minutes.
+      const lease = await getLease(db, new Date());
+      const leftMs = lease ? Math.max(0, lease.lockedUntil.getTime() - Date.now()) : 0;
+      const waitMs = Math.min(15_000, Math.max(2000, leftMs + 1000));
+      console.log(`Another worker (${lease?.holder ?? "?"}) holds the lease for ${Math.ceil(leftMs / 1000)} s more; waiting ${Math.round(waitMs / 1000)} s …`);
+      await new Promise((r) => setTimeout(r, waitMs));
       continue;
     }
     if (counts.queued === 0 && counts.running === 0) break;

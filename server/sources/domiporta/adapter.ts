@@ -14,6 +14,7 @@ export const domiportaAdapter: SourceAdapter = {
   rate: { minIntervalMs: 1500, maxPer10Min: 250, maxPerSlice: 20 },
   estimatedPageCostMs: 2500,
   estimatedEnrichCostMs: 1800,
+  enrichConcurrency: 2,
 
   probe(settings: Settings) {
     return { url: buildDomiportaListUrl({ kind: "plot", location: settings.domiporta.location, radiusKm: settings.domiporta.radiusKm, page: 1 }), headers: DOMIPORTA_HEADERS };

@@ -36,4 +36,6 @@ export const env = {
   storeRaw: process.env.STORE_RAW === "1",
   logLevel: (process.env.LOG_LEVEL || "info") as "debug" | "info" | "warn" | "error",
   isNetlify: Boolean(process.env.NETLIFY),
+  /** Postgres connections per process: one inside a function, several for the CLI so parallel portal jobs do not queue behind one round trip. */
+  dbPoolMax: int(process.env.DB_POOL_MAX, process.env.NETLIFY ? 1 : 6),
 };

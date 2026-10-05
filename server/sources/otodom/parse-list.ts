@@ -44,6 +44,18 @@ export function pagePropsOf(data: unknown): Record<string, unknown> | null {
   return asRecord(props?.pageProps) ?? asRecord(root.pageProps);
 }
 
+/** The `searchAds` node of a list payload, or null when the payload is not a search result. */
+export function searchAdsOf(data: unknown): Record<string, unknown> | null {
+  const pageProps = pagePropsOf(data);
+  return asRecord(asRecord(pageProps?.data)?.searchAds);
+}
+
+/** Target of a Next.js redirect stub (`_next/data` answers redirects with `__N_REDIRECT` instead of a 3xx). */
+export function redirectOf(data: unknown): string | null {
+  const pageProps = pagePropsOf(data);
+  return pageProps ? asString(pageProps.__N_REDIRECT) : null;
+}
+
 export function buildIdOf(data: unknown): string | null {
   const root = asRecord(data);
   return root ? asString(root.buildId) : null;
@@ -148,9 +160,7 @@ export interface OtodomSearchPage {
 }
 
 export function parseOtodomSearch(data: unknown, kind: Kind): OtodomSearchPage {
-  const pageProps = pagePropsOf(data);
-  const dataNode = asRecord(pageProps?.data);
-  const searchAds = asRecord(dataNode?.searchAds);
+  const searchAds = searchAdsOf(data);
   if (!searchAds) throw new Error("Otodom payload has no searchAds");
   const rawItems = Array.isArray(searchAds.items) ? searchAds.items : [];
   const items: NormalizedListing[] = [];

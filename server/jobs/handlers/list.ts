@@ -46,7 +46,7 @@ export async function handleListJob(deps: HandlerDeps): Promise<HandlerResult> {
         .map((r) => ({ listingId: r.id, price: r.price!, observedAt: t })),
     );
     for (const r of results) {
-      if (!(r.inserted || r.changed)) continue;
+      if (!r.needsAssignment) continue;
       if (!r.hasCoords && r.propertyId === null && adapter.enrich) continue; // waits for enrichment
       const a = await assignProperty(db, r.id, { suppressNotifications: deps.suppressNotifications, now: t });
       if (a.created) stats.newProperties = (stats.newProperties ?? 0) + 1;
@@ -67,9 +67,10 @@ export async function handleListJob(deps: HandlerDeps): Promise<HandlerResult> {
   return { status: "done", stats };
 }
 
-function isFirstPage(cursor: Cursor): boolean {
-  const first = cursor.page === 1 || (cursor.page === 0 && !("bucketIdx" in cursor && cursor.bucketIdx)); // OLX pages are 0-based
-  return first && (cursor.priceFrom === undefined || cursor.priceFrom === null || cursor.priceFrom === 0);
+/** The first page of an unsplit query: OLX backfills walk price buckets, whose totals are partial. */
+export function isFirstPage(cursor: Cursor): boolean {
+  if ("buckets" in cursor && cursor.buckets) return false;
+  return cursor.page === 1 || cursor.page === 0; // OLX pages are 0-based
 }
 
 /** Remembers what the portal says it has for this query, so the UI can show coverage. */

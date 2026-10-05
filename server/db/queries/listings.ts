@@ -13,6 +13,8 @@ export interface UpsertResult {
   sourceId: string;
   inserted: boolean;
   changed: boolean;
+  /** Something dedup looks at changed (price, title, area, coordinates, advertiser, reactivation), or it was never assigned. */
+  needsAssignment: boolean;
   priceChanged: boolean;
   previousPrice: number | null;
   price: number | null;
@@ -58,6 +60,8 @@ function toInsertRow(item: NormalizedListing, now: Date): NewListingRow {
   };
 }
 
+const UPDATE_CONCURRENCY = 6;
+
 /** Inserts new listings and refreshes known ones (by source + source id). Reports what changed. */
 export async function upsertListings(db: Db, items: NormalizedListing[], now: Date): Promise<UpsertResult[]> {
   if (items.length === 0) return [];
@@ -82,6 +86,7 @@ export async function upsertListings(db: Db, items: NormalizedListing[], now: Da
         sourceId: row.sourceId,
         inserted: true,
         changed: true,
+        needsAssignment: true,
         priceChanged: false,
         previousPrice: null,
         price: row.price,
@@ -91,12 +96,22 @@ export async function upsertListings(db: Db, items: NormalizedListing[], now: Da
     }
   }
 
+  const updates: Array<() => Promise<void>> = [];
   for (const item of items) {
     const row = existing.get(item.sourceId);
     if (!row) continue;
     const priceChanged = (row.price ?? null) !== (item.price ?? null);
     const refreshed = (item.sourceRefreshedAt?.getTime() ?? 0) > (row.sourceRefreshedAt?.getTime() ?? 0);
-    const changed = priceChanged || refreshed || !row.isActive || row.title !== item.title || (row.areaM2 ?? null) !== (item.areaM2 ?? null);
+    const newCoords = item.lat !== null && item.lon !== null && (item.lat !== row.lat || item.lon !== row.lon);
+    const relevant =
+      priceChanged ||
+      !row.isActive ||
+      row.title !== item.title ||
+      (row.areaM2 ?? null) !== (item.areaM2 ?? null) ||
+      newCoords ||
+      (item.advertiserId !== null && item.advertiserId !== row.advertiserId);
+    // A bump (newer refresh time) refreshes the stored fields but is no reason to run dedup again.
+    const changed = relevant || refreshed;
     const patch: Partial<NewListingRow> = {
       lastSeenAt: now,
       isActive: true,
@@ -134,18 +149,25 @@ export async function upsertListings(db: Db, items: NormalizedListing[], now: Da
         });
       }
     }
-    await db.update(listings).set(patch).where(eq(listings.id, row.id));
+    updates.push(async () => {
+      await db.update(listings).set(patch).where(eq(listings.id, row.id));
+    });
     results.push({
       id: row.id,
       sourceId: row.sourceId,
       inserted: false,
       changed,
+      needsAssignment: relevant || row.propertyId === null,
       priceChanged,
       previousPrice: row.price,
       price: item.price,
       hasCoords: (item.lat !== null && item.lon !== null) || (row.lat !== null && row.lon !== null),
       propertyId: row.propertyId,
     });
+  }
+  // Distinct rows; a few at a time keeps a remote database from being paid one round trip per listing in sequence.
+  for (let i = 0; i < updates.length; i += UPDATE_CONCURRENCY) {
+    await Promise.all(updates.slice(i, i + UPDATE_CONCURRENCY).map((fn) => fn()));
   }
   return results;
 }

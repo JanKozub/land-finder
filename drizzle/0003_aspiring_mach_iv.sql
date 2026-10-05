@@ -1,0 +1,1 @@
+CREATE INDEX "listings_dedup_keys_idx" ON "listings" USING gin (("attributes"->'dedupKeys'));

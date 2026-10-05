@@ -126,8 +126,8 @@ pnpm worker --mode backfill
 |---|---|
 | `pnpm dev` | Vite + emulacja Netlify Functions |
 | `pnpm build` / `pnpm typecheck` / `pnpm test` | build SPA, TypeScript, vitest (PGlite w pamięci) |
-| `pnpm db:generate` / `pnpm db:migrate` / `pnpm db:studio` | migracje Drizzle |
-| `pnpm worker --mode incremental\|backfill\|sweep [--sources olx,otodom]` | lokalny worker |
+| `pnpm db:generate` / `pnpm db:migrate [--database-url …]` / `pnpm db:studio` | migracje Drizzle (bez flagi: `DATABASE_URL_MIGRATIONS`, potem `DATABASE_URL`) |
+| `pnpm worker [--mode incremental\|backfill\|sweep] [--sources olx,otodom] [--database-url …]` | lokalny worker; bez `--mode` tylko dokańcza zakolejkowane zadania; `--sources` wybiera portale, które dostają nowe zadania (przy trwającym przebiegu tego samego trybu dołącza je do niego), a kolejka jest zawsze opróżniana w całości |
 | `pnpm fixtures:record [olx,otodom,domiporta,adresowo,gratka,morizon,nieruchomosci_online]` | nagrywa i przycina prawdziwe odpowiedzi portali jako fixture'y testów |
 | `pnpm s7:fetch` | pobiera warianty planowanej S7 z map GDDKiA do `public/data/s7/*.geojson` |
 | `pnpm gminy:fetch` | pobiera granice gmin wokół Wieliczki z OpenStreetMap do `shared/data/gminy.json` |

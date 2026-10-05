@@ -45,6 +45,7 @@ export function createMgAdapter(spec: MgAdapterSpec): SourceAdapter {
     rate: { minIntervalMs: 2000, maxPer10Min: 150, maxPerSlice: 12 },
     estimatedPageCostMs: 3000,
     estimatedEnrichCostMs: 3000,
+    enrichConcurrency: 2,
 
     probe(settings: Settings) {
       const location = splitLocations(spec.settingsOf(settings).location)[0]!;

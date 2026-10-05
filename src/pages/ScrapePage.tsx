@@ -18,9 +18,17 @@ function Coverage({ have, totals }: { have: Partial<Record<Kind, number>> | unde
     if (reported === null && ours === 0) return null;
     const pct = reported ? Math.min(100, Math.round((ours / reported) * 100)) : null;
     return (
-      <span key={kind} className={pct !== null && pct < 70 ? "text-amber-700" : "text-slate-600"} title={reported === null ? "Portal nie podał liczby wyników" : "Nasze aktywne ogłoszenia / wyniki zgłaszane przez portal dla tego zapytania"}>
+      <span
+        key={kind}
+        className={pct !== null && pct < 50 ? "text-amber-700" : "text-slate-600"}
+        title={
+          reported === null
+            ? "Portal nie podał liczby wyników"
+            : "W bazie / wyniki zgłaszane przez portal dla naszego zapytania. Portal liczy okrąg lub całe gminy, a zostają tylko oferty z prostokąta (kwadrat w okręgu to ok. 64 % jego pola), więc 100 % nie jest celem; dużo niższy udział oznacza, że pełne pobranie jeszcze nie przeszło."
+        }
+      >
         {KIND_LABEL_PLURAL[kind].toLowerCase()}: {ours}
-        {reported !== null && ` z ${reported}${pct !== null ? ` (${pct}%)` : ""}`}
+        {reported !== null && ` / portal ${reported}${pct !== null ? ` (${pct}%)` : ""}`}
       </span>
     );
   }).filter(Boolean);
@@ -205,6 +213,10 @@ export function ScrapePage() {
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card title="Źródła">
+          <p className="mb-2 text-xs text-slate-500">
+            „w bazie / portal” porównuje nasze aktywne ogłoszenia z liczbą wyników zgłaszaną przez portal dla naszego zapytania. Portal liczy okrąg
+            albo całe gminy, a zostają tylko oferty z prostokąta, więc ok. 60–70 % to komplet; wyraźnie mniej = brakuje pełnego pobrania.
+          </p>
           {s?.sources.length ? (
             <ul className="space-y-2 text-sm">
               {s.sources.map((src) => (

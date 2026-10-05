@@ -22,6 +22,7 @@ export const adresowoAdapter: SourceAdapter = {
   rate: { minIntervalMs: 2000, maxPer10Min: 200, maxPerSlice: 15 },
   estimatedPageCostMs: 2500,
   estimatedEnrichCostMs: 2500,
+  enrichConcurrency: 2,
 
   probe(settings: Settings) {
     const location = splitLocations(settings.adresowo.location)[0]!;

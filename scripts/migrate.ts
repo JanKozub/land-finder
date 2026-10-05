@@ -1,9 +1,12 @@
+import { parseArgs } from "node:util";
 import { env } from "../server/env";
 import { createDb } from "../server/db/client";
 import { ensureSettings } from "../server/db/queries/settings";
 
+/** `pnpm db:migrate [--database-url <url>]`; without the flag `DATABASE_URL_MIGRATIONS` (then `DATABASE_URL`) is used. */
 async function main() {
-  const url = env.databaseUrlMigrations;
+  const { values } = parseArgs({ options: { "database-url": { type: "string" } } });
+  const url = values["database-url"] ?? env.databaseUrlMigrations;
   const handle = await createDb(url);
   console.log(`Applying migrations (${handle.kind}) …`);
   if (handle.kind === "pglite") {

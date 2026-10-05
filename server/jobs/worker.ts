@@ -11,13 +11,14 @@ import {
   heartbeatLease,
   mergeRunStats,
   pauseJob,
+  requeueRunningJobs,
   releaseLease,
 } from "../db/queries/jobs";
 import { expireByValidTo } from "../db/queries/listings";
 import { recomputeProperties } from "../db/queries/properties";
 import { ensureSettings } from "../db/queries/settings";
 import { getSourceState, listSourceStates, patchSourceMeta } from "../db/queries/source-state";
-import { scrapeJobs } from "../db/schema";
+import { scrapeJobs, type ScrapeJobRow } from "../db/schema";
 import { env } from "../env";
 import { clientForSource } from "../http/clients";
 import { createFetchClient, type FetchClient } from "../http/fetch-client";
@@ -63,6 +64,8 @@ export interface WorkerSummary {
 }
 
 const MIN_LOOP_MS = 2000;
+/** Jobs run concurrently per invocation, at most one per portal. */
+const MAX_PARALLEL_JOBS = 7;
 
 /**
  * Processes queued jobs until the time budget runs out. Safe to call from a 10 s function,
@@ -96,6 +99,9 @@ export async function runWorker(opts: WorkerOptions): Promise<WorkerSummary> {
     summary.skipped = "locked";
     return summary;
   }
+  // Holding the lease means no other worker is executing anything, so jobs still marked "running" were abandoned.
+  const orphaned = await requeueRunningJobs(opts.db, now());
+  if (orphaned) log.warn("requeued jobs left running by an interrupted worker", { count: orphaned });
   const defaultClient = opts.fetchClient ?? createFetchClient();
   const olxClient = opts.olxFetchClient ?? clientForSource("olx", defaultClient);
   const clientFor = (source: Source): FetchClient => (source === "olx" ? olxClient : defaultClient);
@@ -105,29 +111,37 @@ export async function runWorker(opts: WorkerOptions): Promise<WorkerSummary> {
     const expired = await expireByValidTo(opts.db, now());
     if (expired.length) await recomputeProperties(opts.db, expired.map((e) => e.propertyId), now());
 
-    while (remainingMs() > MIN_LOOP_MS) {
+    // Run stats and the lease are shared rows; concurrent jobs update them one at a time.
+    let chain: Promise<unknown> = Promise.resolve();
+    const serialized = <T>(fn: () => Promise<T>): Promise<T> => {
+      const next = chain.then(fn, fn);
+      chain = next.catch(() => undefined);
+      return next;
+    };
+
+    /** Runs one claimed job to completion, pause or failure and records the outcome. */
+    const runJob = async (job: ScrapeJobRow): Promise<HandlerResult | null> => {
       const t = now();
-      const states = await listSourceStates(opts.db);
-      const blocked = states.filter((s) => s.blockedUntil && s.blockedUntil > t).map((s) => s.source);
-      const job = await claimNextJob(opts.db, { sources: allowed, excludeSources: blocked, now: t });
-      if (!job) break;
       const run = await getRun(opts.db, job.runId);
       if (!run || run.status !== "running") {
         await opts.db.update(scrapeJobs).set({ status: "cancelled", finishedAt: t }).where(eq(scrapeJobs.id, job.id));
-        continue;
+        return null;
       }
       const adapter = adapters[job.source];
       if (!adapter) {
         // A job for a source without an adapter (disabled build, test registry) cannot run; fail it instead of looping.
         await opts.db.update(scrapeJobs).set({ status: "failed", finishedAt: t, lastError: `no adapter for ${job.source}` }).where(eq(scrapeJobs.id, job.id));
-        continue;
+        return null;
       }
       const state = await getSourceState(opts.db, job.source);
       const jobLog = log.child({ job: job.id, source: job.source, type: job.type, kind: job.kind });
+      // The per-invocation cap is sized for short function slices; a long CLI slice would otherwise sit idle after
+      // a few dozen requests while the 10-minute window still has room. The minimum interval and the window stay.
+      const maxPerSlice = Math.max(adapter.rate.maxPerSlice, Math.floor(opts.budgetMs / Math.max(1, adapter.rate.minIntervalMs)));
       const http = createSourceHttp({
         db: opts.db,
         source: job.source,
-        rate: adapter.rate,
+        rate: { ...adapter.rate, maxPerSlice },
         client: clientFor(job.source),
         remainingMs,
         now,
@@ -146,7 +160,18 @@ export async function runWorker(opts: WorkerOptions): Promise<WorkerSummary> {
         log: jobLog,
         now,
       };
-      const deps = { db: opts.db, adapter, job, run, ctx, now, remainingMs, suppressNotifications: job.suppressNotifications };
+      const deps = {
+        db: opts.db,
+        adapter,
+        job,
+        run,
+        ctx,
+        now,
+        remainingMs,
+        suppressNotifications: job.suppressNotifications,
+        // several ad pages in flight only pay off in long CLI slices; a short function slice must not overrun its budget
+        enrichConcurrency: opts.budgetMs >= 30_000 ? (adapter.enrichConcurrency ?? 1) : 1,
+      };
       let result: HandlerResult;
       try {
         result = job.type === "enrich" ? await handleEnrichJob(deps) : await handleListJob(deps);
@@ -164,14 +189,35 @@ export async function runWorker(opts: WorkerOptions): Promise<WorkerSummary> {
         await pauseJob(opts.db, job.id, result.cursor ?? null, result.notBefore ?? tEnd, result.stats, result.error);
         summary.paused += 1;
       } else {
-        const outcome = await failJob(opts.db, job.id, result.error ?? "unknown error", result.stats, tEnd);
+        const outcome = await failJob(opts.db, job.id, result.error ?? "unknown error", result.stats, tEnd, result.cursor);
         if (outcome === "failed") summary.failed += 1;
         jobLog.warn("job failed", { error: result.error, outcome });
       }
-      await mergeRunStats(opts.db, job.runId, result.stats);
-      await heartbeatLease(opts.db, holder, Math.max(remainingMs(), 0) + 60_000, tEnd);
-      // A pause without a future notBefore means this invocation's budget is spent; stop re-claiming.
-      if (result.status === "paused" && (!result.notBefore || result.notBefore.getTime() <= tEnd.getTime())) break;
+      await serialized(() => mergeRunStats(opts.db, job.runId, result.stats));
+      return result;
+    };
+
+    while (remainingMs() > MIN_LOOP_MS) {
+      const t = now();
+      const states = await listSourceStates(opts.db);
+      const blocked = states.filter((s) => s.blockedUntil && s.blockedUntil > t).map((s) => s.source);
+      // One job per portal at a time, portals in parallel: rate limits are per portal, and a short function
+      // invocation would otherwise spend its whole budget waiting between two requests to a single site.
+      const batch: ScrapeJobRow[] = [];
+      const taken = new Set<Source>();
+      while (batch.length < MAX_PARALLEL_JOBS) {
+        const job = await claimNextJob(opts.db, { sources: allowed.filter((src) => !taken.has(src)), excludeSources: blocked, now: t });
+        if (!job) break;
+        batch.push(job);
+        taken.add(job.source);
+      }
+      if (batch.length === 0) break;
+      const results = await Promise.all(batch.map((job) => runJob(job)));
+      const tEnd = now();
+      await serialized(() => heartbeatLease(opts.db, holder, Math.max(remainingMs(), 0) + 60_000, tEnd));
+      // A pause without a future notBefore means the budget is spent; stop when every job in the batch says so.
+      const spent = results.filter((r): r is HandlerResult => r !== null);
+      if (spent.length && spent.every((r) => r.status === "paused" && (!r.notBefore || r.notBefore.getTime() <= tEnd.getTime()))) break;
     }
 
     const finalized = await finalizeFinishedRuns(opts.db, now());

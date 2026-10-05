@@ -73,12 +73,18 @@ describe("search area", () => {
     expect(derived.otodom.locationPath).toBe("malopolskie/wielicki/wieliczka");
     expect(derived.olx.cityName).toBe("Wieliczka");
     expect(derived.olx.distanceKm).toBe(22);
+    expect(derived.otodom.radiusKm).toBe(25); // Otodom only paginates reliably on its own radius values
     expect(derived.domiporta).toMatchObject({ location: "malopolskie/wieliczka", radiusKm: 22 });
     expect(derived.nieruchomosci_online).toMatchObject({ location: "Wieliczka", radiusKm: 22 });
     expect(derived.gratka.location).not.toContain("krakow"); // excluded by TERC
     expect(derived.gratka.location.split(", ")).toContain("gmina-swiatniki-gorne");
     expect(derived.morizon.location.split(", ")).toContain("krakowski/gmina-mogilany");
     expect(derived.adresowo.location.split(", ")).toContain("gmina-niepolomice");
+  });
+
+  it("snaps Otodom radii up to the next supported value", async () => {
+    const { snapOtodomRadius } = await import("./constants");
+    expect([0, 5, 15, 19, 22, 26, 80].map(snapOtodomRadius)).toEqual([0, 5, 15, 25, 25, 50, 75]);
   });
 
   it("finds the gminas around Wieliczka in the bundled dataset", () => {

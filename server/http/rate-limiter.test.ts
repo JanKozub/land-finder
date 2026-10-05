@@ -39,6 +39,33 @@ describe("source http politeness", () => {
     expect(blockDurationMs(10)).toBe(6 * 60 * 60 * 1000);
   });
 
+  it("keeps the minimum interval when requests are issued concurrently", async () => {
+    let t = Date.parse("2026-10-03T13:00:00Z");
+    const starts: number[] = [];
+    const client: FetchClient = {
+      get: async () => {
+        starts.push(t);
+        return { status: 200, headers: new Headers(), text: "{}" };
+      },
+    };
+    const http = createSourceHttp({
+      db: handle.db,
+      source: "domiporta",
+      rate: { minIntervalMs: 1000, maxPer10Min: 100, maxPerSlice: 10 },
+      client,
+      remainingMs: () => 60_000,
+      sleep: async (ms) => {
+        t += ms;
+      },
+      now: () => new Date(t),
+      log: silentLogger,
+    });
+    await Promise.all(["1", "2", "3"].map((n) => http.get(`https://www.domiporta.pl/${n}`)));
+    expect(starts).toHaveLength(3);
+    for (let i = 1; i < starts.length; i++) expect(starts[i]! - starts[i - 1]!).toBeGreaterThanOrEqual(800); // interval × jitter ≥ 0.8
+    expect(http.requestsThisSlice).toBe(3);
+  });
+
   it("records requests and enforces the per-slice cap", async () => {
     let t = Date.parse("2026-10-03T12:00:00Z");
     const client: FetchClient = { get: async () => ({ status: 200, headers: new Headers(), text: "{}" }) };

@@ -47,12 +47,20 @@ export function blockDurationMs(consecutiveBlocks: number): number {
 export function createSourceHttp(opts: SourceHttpOptions): SourceHttp {
   const now = opts.now ?? (() => new Date());
   const sleep = opts.sleep ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)));
+  // Concurrent callers (an enrich job fetching several ad pages at once) take turns through acquire(), so the
+  // minimum interval and the window are enforced across all of them; only the waiting is serialized, not the fetch.
+  let gate: Promise<unknown> = Promise.resolve();
+  const gated = <T>(fn: () => Promise<T>): Promise<T> => {
+    const next = gate.then(fn, fn);
+    gate = next.catch(() => undefined);
+    return next;
+  };
   const self: SourceHttp = {
     requestsThisSlice: 0,
     async get(url, headers) {
       let retried = false;
       for (;;) {
-        await acquire();
+        await gated(acquire);
         const res = await opts.client.get(url, headers);
         self.requestsThisSlice += 1;
         opts.onRequest?.();

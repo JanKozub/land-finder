@@ -20,6 +20,8 @@ export interface HandlerDeps {
   now: () => Date;
   remainingMs: () => number;
   suppressNotifications: boolean;
+  /** How many ad pages an enrich job may have in flight at once (default 1). */
+  enrichConcurrency?: number;
 }
 
 export function emptyStats(): RunStats {

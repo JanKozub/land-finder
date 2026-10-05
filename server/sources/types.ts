@@ -76,6 +76,8 @@ export interface SourceAdapter {
   rate: RateConfig;
   estimatedPageCostMs: number;
   estimatedEnrichCostMs?: number;
+  /** Ad pages fetched side by side by a long-running worker (CLI); short function slices always use 1. */
+  enrichConcurrency?: number;
   /** One cheap request (first list page) used by the "check connection" button, outside the rate limiter. */
   probe?(settings: Settings): { url: string; headers: Record<string, string> };
   initialCursor(kind: Kind, mode: ScrapeMode, settings: Settings): Cursor;

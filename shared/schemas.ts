@@ -43,7 +43,7 @@ export const SettingsSchema = z.object({
       .string()
       .min(1)
       .regex(/^[a-z0-9-]+(\/[a-z0-9-]+)*$/, "Ścieżka lokalizacji Otodom: małe litery, cyfry, myślniki, ukośniki"),
-    /** Any integer; Otodom honours most values but ignores some (see OTODOM_RADII), so the UI offers a check. */
+    /** Any integer; searches snap it up to the next radius Otodom supports (see OTODOM_RADII). */
     radiusKm: z.number().int().min(0).max(100),
   }),
   // Defaults keep settings saved before a portal existed loadable.

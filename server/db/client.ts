@@ -39,7 +39,7 @@ export async function createDb(url: string = env.databaseUrl): Promise<DbHandle>
     const db = drizzle(client, { schema }) as unknown as Db;
     return { db, kind: "pglite", close: () => client.close() };
   }
-  const sql = postgres(url, { prepare: false, max: 1, idle_timeout: 20, connect_timeout: 10 });
+  const sql = postgres(url, { prepare: false, max: env.dbPoolMax, idle_timeout: 20, connect_timeout: 10 });
   const db = drizzlePostgres(sql, { schema }) as unknown as Db;
   return { db, kind: "postgres", close: () => sql.end({ timeout: 5 }) };
 }

@@ -10,7 +10,35 @@ const CANDIDATE_BBOX_KM = 10;
 const INACTIVE_GRACE_DAYS = 180;
 const CANDIDATE_LIMIT = 300;
 
-export function toCandidate(row: ListingRow): DedupCandidate {
+/** What `decide` looks at; whole rows carry attributes and descriptions that only slow the candidate queries down. */
+const candidateColumns = {
+  id: listings.id,
+  propertyId: listings.propertyId,
+  kind: listings.kind,
+  lat: listings.lat,
+  lon: listings.lon,
+  locationPrecision: listings.locationPrecision,
+  locationRadiusKm: listings.locationRadiusKm,
+  areaM2: listings.areaM2,
+  plotAreaM2: listings.plotAreaM2,
+  price: listings.price,
+  titleNorm: listings.titleNorm,
+  advertiserName: listings.advertiserName,
+  advertiserId: listings.advertiserId,
+  city: listings.city,
+  // the fields identity keys are derived from (see dedupKeysFor)
+  internalId: sql<string | null>`${listings.attributes}->>'internalId'`,
+  externalId: sql<string | null>`${listings.attributes}->>'externalId'`,
+  offerNumber: sql<string | null>`${listings.attributes}->>'offerNumber'`,
+};
+
+type CandidateFields = Pick<
+  ListingRow,
+  "kind" | "lat" | "lon" | "locationPrecision" | "locationRadiusKm" | "areaM2" | "plotAreaM2" | "price" | "titleNorm" | "advertiserName" | "advertiserId" | "city"
+>;
+type CandidateRow = CandidateFields & { id: number; propertyId: number | null; internalId: string | null; externalId: string | null; offerNumber: string | null };
+
+export function toCandidate(row: CandidateFields & { attributes: Record<string, unknown> }): DedupCandidate {
   return {
     kind: row.kind,
     lat: row.lat,
@@ -51,7 +79,7 @@ export async function createPropertyFromListing(db: Db, row: ListingRow, opts: A
   return created!.id;
 }
 
-async function findCandidates(db: Db, L: ListingRow, now: Date): Promise<ListingRow[]> {
+async function findCandidates(db: Db, L: ListingRow, now: Date): Promise<CandidateRow[]> {
   const conds = [
     ne(listings.id, L.id),
     eq(listings.kind, L.kind),
@@ -77,13 +105,13 @@ async function findCandidates(db: Db, L: ListingRow, now: Date): Promise<Listing
     const spread = L.kind === "house" ? 0.25 : 0.06;
     conds.push(or(isNull(listings.areaM2), between(listings.areaM2, L.areaM2 * (1 - spread), L.areaM2 * (1 + spread)))!);
   }
-  const rows = await db.select().from(listings).where(and(...conds)).limit(CANDIDATE_LIMIT);
+  const rows: CandidateRow[] = await db.select(candidateColumns).from(listings).where(and(...conds)).limit(CANDIDATE_LIMIT);
 
   // Listings sharing an identity key (same platform id, same agency reference) regardless of location/area.
   const keys = dedupKeysFor(L.attributes);
   if (keys.length) {
     const byKey = await db
-      .select()
+      .select(candidateColumns)
       .from(listings)
       .where(and(ne(listings.id, L.id), isNotNull(listings.propertyId), sql`${listings.attributes}->'dedupKeys' ?| array[${sql.join(keys.map((k) => sql`${k}`), sql`, `)}]`))
       .limit(50);
@@ -110,7 +138,7 @@ export async function assignProperty(db: Db, listingId: number, opts: AssignOpti
   const candidates = await findCandidates(db, L, now);
   const perProperty = new Map<number, { count: number; score: number; listingId: number; reason: string }>();
   for (const c of candidates) {
-    const d = decide(me, toCandidate(c));
+    const d = decide(me, toCandidate({ ...c, attributes: { internalId: c.internalId, externalId: c.externalId, offerNumber: c.offerNumber } }));
     if (!d.match || c.propertyId === null) continue;
     const cur = perProperty.get(c.propertyId);
     if (!cur) perProperty.set(c.propertyId, { count: 1, score: d.score, listingId: c.id, reason: d.reason });
